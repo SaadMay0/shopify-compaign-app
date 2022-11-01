@@ -1,11 +1,14 @@
 import { useState, useCallback } from "react";
 import { Card, Page, Tabs, Layout } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
-
 import { BannerComponent, CampaignTable } from "../components";
-import { useAuthenticatedFetch } from "../hooks";
 
+import { useAuthenticatedFetch } from "../hooks";
+import {  useNavigate } from "@shopify/app-bridge-react";
 export default function Dashboard() {
+
+  	const navigate = useNavigate();
+
   const fetch = useAuthenticatedFetch();
   const [selected, setSelected] = useState(1);
 
@@ -70,7 +73,10 @@ export default function Dashboard() {
         title="Campaignes"
         primaryAction={{
           content: "New Campaign",
-          onAction: () => console.log("Campaign Button Click"),
+          onAction: () => {
+             navigate("/campaign");
+            console.log("Campaign Button Click")
+          },
         }}
       />
       <Page>

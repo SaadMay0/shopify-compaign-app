@@ -13,7 +13,11 @@ import redirectToAuth from "./helpers/redirect-to-auth.js";
 import { BillingInterval } from "./helpers/ensure-billing.js";
 import { AppInstallations } from "./app_installations.js";
 
+import config from "./server/db/config/index.js";
+import mountRoutes from "./server/routing/routes/index.js";
+
 const USE_ONLINE_TOKENS = false;
+const { DATABASE } = config;
  
 const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
@@ -33,8 +37,20 @@ Shopify.Context.initialize({
   IS_EMBEDDED_APP: true,
   // This should be replaced with your preferred storage strategy
   // See note below regarding using CustomSessionStorage with this template.
-  SESSION_STORAGE: new Shopify.Session.SQLiteSessionStorage(DB_PATH),
-  ...(process.env.SHOP_CUSTOM_DOMAIN && {CUSTOM_SHOP_DOMAINS: [process.env.SHOP_CUSTOM_DOMAIN]}),
+ 
+  // SESSION_STORAGE: new Shopify.Session.SQLiteSessionStorage(DB_PATH),
+  // ...(process.env.SHOP_CUSTOM_DOMAIN && {CUSTOM_SHOP_DOMAINS: [process.env.SHOP_CUSTOM_DOMAIN]}),
+  // });
+
+    SESSION_STORAGE: Shopify.Session.PostgreSQLSessionStorage.withCredentials(
+    DATABASE.HOST,
+    DATABASE.DATABASE,
+    DATABASE.USERNAME,
+    DATABASE.PASSWORD,
+    {
+      sessionTableName: "store",
+    }
+  ),
 });
 
 // NOTE: If you choose to implement your own storage strategy using
@@ -67,7 +83,7 @@ const BILLING_SETTINGS = {
 //
 // More details can be found on shopify.dev:
 // https://shopify.dev/apps/webhooks/configuration/mandatory-webhooks
-setupGDPRWebHooks("/api/webhooks");
+setupGDPRWebHooks("/api/webhooks"); 
 
 // export for test use only
 export async function createServer(
@@ -82,7 +98,7 @@ export async function createServer(
 
   applyAuthMiddleware(app, {
     billing: billingSettings,
-  });
+  }); 
 
   // Do not call app.use(express.json()) before processing webhooks with
   // Shopify.Webhooks.Registry.process().
@@ -99,6 +115,28 @@ export async function createServer(
       }
     }
   });
+
+
+console.log(process.env.HOST);
+  app.use("/api/v1.0/webhook", (req, res, next) => {
+    req.rawBody = "";
+    // req.setEncoding("utf8");
+    console.log("webhook middleware");
+    req
+      .on("data", (chunk) => {
+        console.log("receiving webhook data");
+        req.rawBody += chunk;
+      })
+      .on("end", () => {
+        console.log("webhook data received..");
+        // next();
+      });
+    next();
+  });
+  app.use(express.json({ limit: "50mb" }));
+  // app.use(express.urlencoded({ extended: false }));
+
+  mountRoutes(app);
 
   // All endpoints after this point will require an active session
   app.use(

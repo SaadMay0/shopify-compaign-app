@@ -110,8 +110,7 @@ export function CampaignTable({
         <IndexTable.Row
           id={ele.id}
           key={ele.id}
-          onClick={(e) => {
-          }}
+          onClick={(e) => {}}
           selected={selectedResources.includes(ele.id)}
           position={index}
         >
@@ -124,7 +123,6 @@ export function CampaignTable({
               </IndexTable.Cell>
             );
           })}
-       
         </IndexTable.Row>
       </>
     );
