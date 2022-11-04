@@ -23,7 +23,6 @@ const navigate = useNavigate();
             // accessibilityLabel: "Secondary action label",
             onAction: () => {
               navigate("/dashboard");
-              alert("Duplicate action")
             },
           },
         ]}

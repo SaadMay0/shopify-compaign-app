@@ -4,6 +4,7 @@ import {
   TextStyle,
   useIndexResourceState,
   Button,
+  Spinner,
 } from "@shopify/polaris";
 
 import { ToastComponent } from "./Tost";
@@ -17,30 +18,30 @@ export function CampaignTable({
   bannerToggleActive,
   setBannerDescription,
 }) {
-    const fetch = useAuthenticatedFetch();
-    
-    const [active, setActive] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showPopUp, setShowPopUp] = useState();
-  const [sortValue, setSortValue] = useState("shopifyOrderNbr");
-  const [orders, setOrders] = useState([]);
-  const [preferences, setpreferences] = useState();
+  const fetch = useAuthenticatedFetch();
+
+  // const [active, setActive] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  // const [showPopUp, setShowPopUp] = useState();
+  // const [sortValue, setSortValue] = useState("shopifyOrderNbr");
+  const [compaigns, setCompaigns] = useState([]);
+  // const [preferences, setpreferences] = useState();
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
-      useIndexResourceState(orders);
-    
-// Toast Component Start
-    
+    useIndexResourceState(compaigns);
+
+  // Toast Component Start
+
   const [toastActive, setToastActive] = useState(false);
   const [toastContent, setToastContent] = useState("");
   const [isToastError, setIsToastError] = useState(false);
-  
+
   //Callback
   const toggleToasrActive = useCallback(
     () => setToastActive((active) => !active),
     []
   );
-    
-    // Tost Component End
+
+  // Tost Component End
   // const [bannerActive, setBannerActive] = useState(true);
   // const [bannerTitle, setBannerTitle] = useState(false);
   // const [bannerStatus, setBannerStatus] = useState(false);
@@ -51,40 +52,31 @@ export function CampaignTable({
 
   // const [selectedResourcesState,setSelectedResourcesState] = useState("selectedResources");
 
-  
   const [tableHeaderTitles, setTableHeaderTitles] = useState([
     { key: "campaignName", title: "Campaignes" },
-    { key: "campaignOrders", title: "Orders" },
-    { key: "campaignSales", title: "Sales" },
+    // { key: "campaignOrders", title: "Orders" },
+    // { key: "campaignSales", title: "Sales" },
     { key: "campaignStatus", title: "Status" },
     { key: "campaignStart", title: "Start" },
     { key: "campaignEnd", title: "End" },
   ]);
-
-
- 
-
 
   const resourceName = {
     singular: "campaign",
     plural: "campaigns",
   };
 
-
-
- 
-
-//   const renderLightbox = (
-//     <Lightbox
-//       handleLightboxToggle={handle}
-//       active={active}
-//       orderId={showPopUp}
-//       preferences={preferences}
-//       orders={orders}
-//       getAllData={getAllData}
-//       setIsLoading={setIsLoading}
-//     />
-//   );
+  //   const renderLightbox = (
+  //     <Lightbox
+  //       handleLightboxToggle={handle}
+  //       active={active}
+  //       orderId={showPopUp}
+  //       preferences={preferences}
+  //       orders={compaigns}
+  //       getAllData={getAllData}
+  //       setIsLoading={setIsLoading}
+  //     />
+  //   );
 
   let renderToast = (
     <ToastComponent
@@ -104,7 +96,7 @@ export function CampaignTable({
   //   />
   // );
 
-  const rowMarkup = orders.map((ele, index) => {
+  const rowMarkup = compaigns.map((ele, index) => {
     return (
       <>
         <IndexTable.Row
@@ -114,37 +106,81 @@ export function CampaignTable({
           selected={selectedResources.includes(ele.id)}
           position={index}
         >
-          {tableHeaderTitles.map((col) => {
-            return (
-              <IndexTable.Cell>
-                <TextStyle variation="strong">
-                  {ele[col.key] ? `${ele[col.key]}` : "-"}
-                </TextStyle>
-              </IndexTable.Cell>
-            );
-          })}
+          <IndexTable.Cell>
+            <TextStyle variation="strong">{ele.campaignName}</TextStyle>
+          </IndexTable.Cell>
+          {/* <IndexTable.Cell>
+            <TextStyle>{ele.campaignOrders}</TextStyle>
+          </IndexTable.Cell>
+          <IndexTable.Cell>
+            <TextStyle>{ele.campaignSales}</TextStyle>
+          </IndexTable.Cell> */}
+          <IndexTable.Cell>
+            <TextStyle>{ele.campaignStatus}</TextStyle>
+          </IndexTable.Cell>
+          <IndexTable.Cell>
+            <TextStyle>
+              {`${ele.campaignStart}`}
+            
+            </TextStyle>
+          </IndexTable.Cell>
+          <IndexTable.Cell>
+            <TextStyle>
+              {`${ele.campaignEnd}`}
+            </TextStyle>
+          </IndexTable.Cell>
         </IndexTable.Row>
       </>
     );
   });
+
+  // server Request
+
+  useEffect(() => {
+    getAllCompaigns();
+  }, []);
+
+  async function getAllCompaigns() {
+    try {
+      await fetch("api/compaign/getCompaigns", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data.Response.Data, "all Compaigns");
+
+          if (data.Response.Data) {
+            setCompaigns(data.Response.Data);
+          } else {
+            console.log("else part run");
+          }
+          setIsLoading(false);
+          return data;
+        });
+    } catch (error) {
+      console.log(`${error}`);
+    }
+  }
+
   return (
-    <>        
-        <IndexTable
-          resourceName={resourceName}
-          itemCount={orders.length}
-          selectedItemsCount={
-            allResourcesSelected ? "All" : selectedResources.length
-          }
-          onSelectionChange={
-            handleSelectionChange
-          }
-          
-          loading={isLoading}
-          headings={tableHeaderTitles}
-          selectable={false}
-        >
-          {rowMarkup}
-        </IndexTable>
+    <>
+
+      <IndexTable
+        resourceName={resourceName}
+        itemCount={compaigns.length}
+        selectedItemsCount={
+          allResourcesSelected ? "All" : selectedResources.length
+        }
+        onSelectionChange={handleSelectionChange}
+        loading={isLoading}
+        headings={tableHeaderTitles}
+        selectable={false}
+      > 
+        { rowMarkup }
+      </IndexTable>
       {toastActive ? renderToast : null}
       {/* 
       <Pagination

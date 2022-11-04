@@ -7,15 +7,15 @@ export function TimeSection({
   paragraph,
   inputTitle,
   hourSortOptions,
-  mintSortOptions,
+  minuteSortOptions,
   timeSortOptions,
   hourValue,
-  mintValue,
+  minuteValue,
   timeValue,
   dateValue,
   Date,
   Hour,
-  Mint,
+  Minute,
   Time,
 }) {
   return (
@@ -40,9 +40,9 @@ export function TimeSection({
             />
             <Select
               // label="hh"
-              options={mintSortOptions}
-              value={mintValue}
-              onChange={Mint}
+              options={minuteSortOptions}
+              value={minuteValue}
+              onChange={Minute}
             />
             <Select
               // label="hh"

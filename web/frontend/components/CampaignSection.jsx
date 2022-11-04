@@ -28,31 +28,32 @@ export function CampaignSection() {
   const fetch = useAuthenticatedFetch();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [resourcePickerInitialSelection, setResourceInitialSelection] = useState(false);
+  const [resourcePickerInitialSelection, setResourceInitialSelection] =
+    useState(false);
   const [compaignInfo, setCompaignInfo] = useState([]);
   // Compaign title
   const [compaignTitle, setCompignTitle] = useState("");
   // Compaign Start State
   const [compaignStartDate, setCompaignStartDate] = useState("");
-  const [compaignStartHour, setCompaignStartHour] = useState(0);
-  const [compaignStartMint, setCompaignStartMint] = useState(0);
-  const [compaignStartTime, setCompaignStartTime] = useState(0);
+  const [compaignStartHour, setCompaignStartHour] = useState("0");
+  const [compaignStartMinute, setCompaignStartMinute] = useState("0");
+  const [compaignStartTime, setCompaignStartTime] = useState("AM");
   // Compaign End State
   const [compaignEndDate, setCompaignEndDate] = useState("");
-  const [compaignEndHour, setCompaignEndHour] = useState(0);
-  const [compaignEndMint, setCompaignEndMint] = useState(0);
-  const [compaignEndTime, setCompaignEndTime] = useState(0);
+  const [compaignEndHour, setCompaignEndHour] = useState("0");
+  const [compaignEndMinute, setCompaignEndMinute] = useState("0");
+  const [compaignEndTime, setCompaignEndTime] = useState("AM");
   // Toast Component State
-   const [toastActive, setToastActive] = useState(false);
-   const [toastContent, setToastContent] = useState("");
-   const [toastIsError, setToastIsError] = useState(false);
+  const [toastActive, setToastActive] = useState(false);
+  const [toastContent, setToastContent] = useState("");
+  const [toastIsError, setToastIsError] = useState(false);
 
   // UseEffect && Callback
-  
-    const handleCompaignTitleTextChange = useCallback(
-      (value) => setCompignTitle(value),
-      []
-    );
+
+  const handleCompaignTitleTextChange = useCallback(
+    (value) => setCompignTitle(value),
+    []
+  );
 
   // Compaign Start Callback
 
@@ -64,8 +65,8 @@ export function CampaignSection() {
     setCompaignStartHour(value);
     console.log(value, "???????????????");
   }, []);
-  const handleStartMintChange = useCallback(
-    (value) => setCompaignStartMint(value),
+  const handleStartMinuteChange = useCallback(
+    (value) => setCompaignStartMinute(value),
     []
   );
   const handleStartTimeChange = useCallback(
@@ -84,8 +85,8 @@ export function CampaignSection() {
 
     []
   );
-  const handleEndMintChange = useCallback(
-    (value) => setCompaignEndMint(value),
+  const handleEndMinuteChange = useCallback(
+    (value) => setCompaignEndMinute(value),
     []
   );
   const handleEndTimeChange = useCallback(
@@ -94,9 +95,12 @@ export function CampaignSection() {
   );
 
   // Toast Callback
-  const toastToggleActive = useCallback(() => setToastActive((active) => !active), []);
+  const toastToggleActive = useCallback(
+    () => setToastActive((active) => !active),
+    []
+  );
 
- // Functions 
+  // Functions
 
   const handleCampaignQuantityChange = (arrayIndex) => (ele) => {
     console.log(ele, "handleCampaignQuantityChange");
@@ -107,7 +111,7 @@ export function CampaignSection() {
 
   const handleCampaignPriceChange = (arrayIndex) => (ele) => {
     console.log(ele, "handleCampaignProductsPriceChange");
-    compaignInfo[arrayIndex].compaignPrice = ele;
+    compaignInfo[arrayIndex].compaignCostDiscount = ele;
 
     setCompaignInfo([...compaignInfo]);
   };
@@ -119,8 +123,7 @@ export function CampaignSection() {
     setCompaignInfo([...compaignInfo]);
   };
 
-
-  const handleCampaignVendorsChange = (arrayIndex) => (ele ,index) => {
+  const handleCampaignVendorsChange = (arrayIndex) => (ele, index) => {
     console.log(ele, "handleCampaignVendorsChange");
     compaignInfo[arrayIndex].vendorsSlect = ele;
 
@@ -136,19 +139,19 @@ export function CampaignSection() {
     compaignInfo[arrayIndex].popoverActive = !ele;
     setCompaignInfo([...compaignInfo]);
   };
-   
-  //   = useCallback(
-  //    () => setPopoverActive((popoverActive) => !popoverActive),
-  //    []
-  //  );
-   const activator = (
-     <Button onClick={(e) => {
-       e.stopPropagation(e);
-      //  handleTogglePopoverActive(index);
-     }} disclosure>
-       Vendors
-     </Button>
-   );
+
+
+  const activator = (
+    <Button
+      onClick={(e) => {
+        e.stopPropagation(e);
+        //  handleTogglePopoverActive(index);
+      }}
+      disclosure
+    >
+      Vendors
+    </Button>
+  );
 
   const rowMarkup = compaignInfo.map((ele, index) => {
     return (
@@ -163,7 +166,7 @@ export function CampaignSection() {
             <TextStyle>{ele.title}</TextStyle>
           </Stack>
         </IndexTable.Cell>
-        <IndexTable.Cell>
+        {/* <IndexTable.Cell>
           <Popover
             active={ele.popoverActive}
             activator={(index)=>{
@@ -179,7 +182,7 @@ export function CampaignSection() {
               allowMultiple
             />
           </Popover>
-        </IndexTable.Cell>
+        </IndexTable.Cell> */}
         <IndexTable.Cell>
           <TextField
             type="number"
@@ -190,7 +193,7 @@ export function CampaignSection() {
         <IndexTable.Cell>
           <TextField
             type="number"
-            value={ele.compaignPrice}
+            value={ele.compaignCostDiscount}
             onChange={handleCampaignPriceChange(index)}
             suffix="%"
           />
@@ -212,16 +215,16 @@ export function CampaignSection() {
     );
   });
 
-    let renderToastComponent = (
-      <ToastComponent
-        toggleActive={toastToggleActive}
-        active={toastActive}
-        content={toastContent}
-        error={toastIsError}
-      />
-    );
+  let renderToastComponent = (
+    <ToastComponent
+      toggleActive={toastToggleActive}
+      active={toastActive}
+      content={toastContent}
+      error={toastIsError}
+    />
+  );
 
-// Variables
+  // Variables
 
   const resourceName = {
     singular: "customer",
@@ -243,7 +246,7 @@ export function CampaignSection() {
     { value: "11", label: "11" },
     { value: "12", label: "12" },
   ];
-  const mintSortOptions = [
+  const minuteSortOptions = [
     { value: "0", label: "mm" },
     { value: "1", label: "1" },
     { value: "2", label: "2" },
@@ -307,12 +310,11 @@ export function CampaignSection() {
     { value: "60", label: "60" },
   ];
   const timeSortOptions = [
-    { value: "0", label: "AM" },
-    { value: "1", label: "PM" },
+    { value: "AM", label: "AM" },
+    { value: "PM", label: "PM" },
   ];
 
   // *******************************************************
- 
 
   // Server Requests
   async function getCompainInfo(ids) {
@@ -320,7 +322,131 @@ export function CampaignSection() {
       let obj = {
         collectionIds: ids,
       };
+      await fetch("/api/compaign/CompaignInfo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+        body: JSON.stringify(obj),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("getCompainInfo ======>", data.Response.Data);
+          if (data.Response.Data) {
+            setCompaignInfo(data.Response.Data);
+          } else {
+            setToastContent(data.Response.Message);
+            setToastIsError(true);
+            setToastActive(true);
+          }
+          setIsLoading(false);
+
+          // console.log("getCollectionProduct get Upsell *******************");
+          return data;
+        });
+    } catch (error) {
+      console.log(`${error}`);
+    }
+  }
+
+
+
+  async function updateVariantes(ids, compaignInfo) {
+    try {
+      let obj = {
+        collectionIds: ids,
+        compaignInfo,
+      };
       await fetch("/api/CompaignInfo", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+        body: JSON.stringify(obj),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("getCompainInfo ======>", data.Response.Data);
+          if (data.Response.Data) {
+            // setCompaignInfo(data.Response.Data);
+          } else {
+            setToastContent(data.Response.Message);
+            setToastIsError(true);
+            setToastActive(true);
+          }
+          setIsLoading(false);
+
+          // console.log("getCollectionProduct get Upsell *******************");
+          return data;
+        });
+    } catch (error) {
+      console.log(`${error}`);
+    }
+  }
+  async function getCompain() {
+    try {
+      await fetch("/api/compaign/getCompaignsById", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("getCompainInfo ======>", data.Response.Data);
+          if (data.Response.Data) {
+            setCompaignInfo(data.Response.Data);
+            // setCompaignTitle(),
+            // setCompaignInfo(),
+            // setCompaignStartDate(),
+            // setCompaignStartHour(),
+            // setCompaignStartMinute(),
+            // setCompaignStartTime(),
+            // setCompaignEndDate(),
+            // setCompaignEndHour(),
+            // setCompaignEndMinute(),
+            // setCompaignEndTime(),
+          } else {
+            setToastContent(data.Response.Message);
+            setToastIsError(true);
+            setToastActive(true);
+          }
+          setIsLoading(false);
+
+          // console.log("getCollectionProduct get Upsell *******************");
+          return data;
+        });
+    } catch (error) {
+      console.log(`${error}`);
+    }
+  }
+
+  async function createCompaign(
+    compaignTitle,
+    compaignInfo,
+    compaignStartDate,
+    compaignStartHour,
+    compaignStartMinute,
+    compaignStartTime,
+    compaignEndDate,
+    compaignEndHour,
+    compaignEndMinute,
+    compaignEndTime
+  ) {
+    try {
+      let obj = {
+        compaignTitle,
+        compaignInfo,
+        compaignStartDate,
+        compaignStartHour,
+        compaignStartMinute,
+        compaignStartTime,
+        compaignEndDate,
+        compaignEndHour,
+        compaignEndMinute,
+        compaignEndTime,
+      };
+      await fetch("/api/compaign/newCompaigns", {
         method: "POST",
         headers: {
           "Content-Type": "application/json;charset=UTF-8",
@@ -365,7 +491,7 @@ export function CampaignSection() {
           // allProducts.map((ele) => {
           //   Object.assign(ele, {
           //     compaignQuantity: 1,
-          //     compaignPrice: 0,
+          //     compaignCostDiscount: 0,
           //     compaignDiccount: 0,
           //   });
           // });
@@ -395,14 +521,14 @@ export function CampaignSection() {
           inputTitle="Start Date"
           dateValue={compaignStartDate}
           hourSortOptions={hourSortOptions}
-          mintSortOptions={mintSortOptions}
+          minuteSortOptions={minuteSortOptions}
           timeSortOptions={timeSortOptions}
           hourValue={compaignStartHour}
-          mintValue={compaignStartMint}
+          minuteValue={compaignStartMinute}
           timeValue={compaignStartTime}
           Date={handleStartDateChange}
           Hour={handleStartHourChange}
-          Mint={handleStartMintChange}
+          Minute={handleStartMinuteChange}
           Time={handleStartTimeChange}
         />
 
@@ -425,24 +551,22 @@ export function CampaignSection() {
               <div style={{ padding: "5% 50%" }}>
                 <Spinner accessibilityLabel="Spinner example" size="small" />
               </div>
-            ) :
-                compaignInfo.length == 0 ? null : (
-                  <IndexTable
-                    resourceName={resourceName}
-                    itemCount={resourcePickerInitialSelection.length}
-                    // loading={isLoading}
-                    headings={[
-                      { title: "" },
-                      { title: "Quantity" },
-                      { title: "Price" },
-                      { title: "Discount" },
-                    ]}
-                    selectable={false}
-                  >
-                    {rowMarkup}
-                  </IndexTable>
-                )
-              }
+            ) : compaignInfo.length == 0 ? null : (
+              <IndexTable
+                resourceName={resourceName}
+                itemCount={resourcePickerInitialSelection.length}
+                // loading={isLoading}
+                headings={[
+                  { title: "" },
+                  { title: "Quantity" },
+                  { title: "Cost" },
+                  { title: "Discount" },
+                ]}
+                selectable={false}
+              >
+                {rowMarkup}
+              </IndexTable>
+            )}
           </Card>
         </Layout.Section>
 
@@ -452,14 +576,14 @@ export function CampaignSection() {
           inputTitle="End Date"
           dateValue={compaignEndDate}
           hourSortOptions={hourSortOptions}
-          mintSortOptions={mintSortOptions}
+          minuteSortOptions={minuteSortOptions}
           timeSortOptions={timeSortOptions}
           hourValue={compaignEndHour}
-          mintValue={compaignEndMint}
+          minuteValue={compaignEndMinute}
           timeValue={compaignEndTime}
           Date={handleEndDateChange}
           Hour={handleEndHourChange}
-          Mint={handleEndMintChange}
+          Minute={handleEndMinuteChange}
           Time={handleEndTimeChange}
         />
       </Layout>
@@ -467,13 +591,28 @@ export function CampaignSection() {
       <PageActions
         primaryAction={{
           content: "Save",
+          onAction: () => {
+            createCompaign(
+              compaignTitle,
+              compaignInfo,
+              compaignStartDate,
+              compaignStartHour,
+              compaignStartMinute,
+              compaignStartTime,
+              compaignEndDate,
+              compaignEndHour,
+              compaignEndMinute,
+              compaignEndTime
+            );
+          },
         }}
         secondaryActions={[
           {
             content: "Cancel",
             // destructive: true,
             onAction: () => {
-              navigate("/dashboard");
+              // navigate("/dashboard");
+              updateVariantes(resourcePickerInitialSelection, compaignInfo);
             },
           },
         ]}

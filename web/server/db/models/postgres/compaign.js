@@ -36,32 +36,22 @@ export default (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      campaignOrders: {
-        type: DataTypes.INTEGER,
-      },
-      campaignSales: {
-        type: DataTypes.FLOAT,
-      },
+      // campaignOrders: {
+      //   type: DataTypes.INTEGER,
+      // },
+      // campaignSales: {
+      //   type: DataTypes.FLOAT,
+      // },
       campaignStatus: {
         type: DataTypes.STRING,
       },
       campaignStart: {
-           type: DataTypes.TEXT,
-        get: function () {
-          return JSON.parse(this.getDataValue("campaignStart"));
-        },
-        set: function (val) {
-          return this.setDataValue("campaignStart", JSON.stringify(val));
-        },
+        allowNull: false,
+        type: DataTypes.DATE,
       },
       campaignEnd: {
-           type: DataTypes.TEXT,
-        get: function () {
-          return JSON.parse(this.getDataValue("campaignEnd"));
-        },
-        set: function (val) {
-          return this.setDataValue("campaignEnd", JSON.stringify(val));
-        },
+        allowNull: false,
+        type: DataTypes.DATE,
       },
       compaignInfo: {
         type: DataTypes.TEXT,

@@ -20,23 +20,23 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      campaignOrders: {
-        type: Sequelize.INTEGER,
-      },
-      campaignSales: {
-        type: Sequelize.FLOAT,
-      },
+      // campaignOrders: {
+      //   type: Sequelize.INTEGER,
+      // },
+      // campaignSales: {
+      //   type: Sequelize.FLOAT,
+      // },
       campaignStatus: {
         type: Sequelize.STRING,
       },
       campaignStart: {
-        type: Sequelize.STRING,
+        type: Sequelize.DATE,
       },
       campaignEnd: {
-        type: Sequelize.STRING,
+        type: Sequelize.DATE,
       },
       compaignInfo: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
       },
       storeId: {
         type: Sequelize.STRING,
