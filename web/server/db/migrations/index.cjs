@@ -8,7 +8,7 @@ module.exports = {
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
 
-    await queryInterface.createTable("Compaign", {
+    await queryInterface.createTable("Campaign", {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
@@ -35,7 +35,7 @@ module.exports = {
       campaignEnd: {
         type: Sequelize.DATE,
       },
-      compaignInfo: {
+      campaignInfo: {
         type: Sequelize.TEXT,
       },
       storeId: {
@@ -67,7 +67,7 @@ module.exports = {
      */
 
     // await queryInterface.dropAllTables();
-    await queryInterface.dropTable("Compaign");
+    await queryInterface.dropTable("Campaign");
 
   },
 };

@@ -1,13 +1,13 @@
 import express from "express";
 import {
   dashboard,
-  getCompaignInfo,
+  getCampaignInfo,
 } from "../services/shopify/dashboard.js";
 import "colors";
 const router = express.Router();
 
 
 router.get("/dashboard", dashboard);
-router.post("/CompaignInfo", getCompaignInfo);
+router.post("/CampaignInfo", getCampaignInfo);
 
 export default router;

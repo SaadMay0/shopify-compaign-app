@@ -1,7 +1,7 @@
 "use strict";
 import { Model } from "sequelize";
 export default (sequelize, DataTypes) => {
-  class Compaign extends Model {
+  class Campaign extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,19 +11,19 @@ export default (sequelize, DataTypes) => {
       /**
        *  define association here Like This
        * 
-       * Compaign.belongsTo(models.Preferences, {
+       * Campaign.belongsTo(models.Preferences, {
        *   foreignKey: { name: "storeId", allowNull: true },
        *   onDelete: "CASCADE",
        * })
        */
-        Compaign.belongsTo(models.Preferences, {
+        Campaign.belongsTo(models.Preferences, {
           foreignKey: { name: "storeId", allowNull: true },
           onDelete: "CASCADE",
         })
 
     }
   }
-  Compaign.init(
+  Campaign.init(
     {
       id: {
         type: DataTypes.UUID,
@@ -53,13 +53,13 @@ export default (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.DATE,
       },
-      compaignInfo: {
+      campaignInfo: {
         type: DataTypes.TEXT,
         get: function () {
-          return JSON.parse(this.getDataValue("compaignInfo"));
+          return JSON.parse(this.getDataValue("campaignInfo"));
         },
         set: function (val) {
-          return this.setDataValue("compaignInfo", JSON.stringify(val));
+          return this.setDataValue("campaignInfo", JSON.stringify(val));
         },
       },
       storeId: {
@@ -81,9 +81,9 @@ export default (sequelize, DataTypes) => {
     },
     {
       sequelize,
-      modelName: "Compaign",
-      tableName: "Compaign",
+      modelName: "Campaign",
+      tableName: "Campaign",
     }
   );
-  return Compaign;
+  return Campaign;
 };

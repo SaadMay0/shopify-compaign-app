@@ -24,10 +24,10 @@ export function CampaignTable({
   const [isLoading, setIsLoading] = useState(true);
   // const [showPopUp, setShowPopUp] = useState();
   // const [sortValue, setSortValue] = useState("shopifyOrderNbr");
-  const [compaigns, setCompaigns] = useState([]);
+  const [campaigns, setCampaigns] = useState([]);
   // const [preferences, setpreferences] = useState();
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
-    useIndexResourceState(compaigns);
+    useIndexResourceState(campaigns);
 
   // Toast Component Start
 
@@ -72,7 +72,7 @@ export function CampaignTable({
   //       active={active}
   //       orderId={showPopUp}
   //       preferences={preferences}
-  //       orders={compaigns}
+  //       orders={campaigns}
   //       getAllData={getAllData}
   //       setIsLoading={setIsLoading}
   //     />
@@ -96,7 +96,7 @@ export function CampaignTable({
   //   />
   // );
 
-  const rowMarkup = compaigns.map((ele, index) => {
+  const rowMarkup = campaigns.map((ele, index) => {
     return (
       <>
         <IndexTable.Row
@@ -137,12 +137,12 @@ export function CampaignTable({
   // server Request
 
   useEffect(() => {
-    getAllCompaigns();
+    getAllCampaigns();
   }, []);
 
-  async function getAllCompaigns() {
+  async function getAllCampaigns() {
     try {
-      await fetch("api/compaign/getCompaigns", {
+      await fetch("api/campaign/getCampaigns", {
         method: "GET",
         headers: {
           "Content-Type": "application/json;charset=UTF-8",
@@ -150,10 +150,10 @@ export function CampaignTable({
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log(data.Response.Data, "all Compaigns");
+          console.log(data.Response.Data, "all Campaigns");
 
           if (data.Response.Data) {
-            setCompaigns(data.Response.Data);
+            setCampaigns(data.Response.Data);
           } else {
             console.log("else part run");
           }
@@ -170,7 +170,7 @@ export function CampaignTable({
 
       <IndexTable
         resourceName={resourceName}
-        itemCount={compaigns.length}
+        itemCount={campaigns.length}
         selectedItemsCount={
           allResourcesSelected ? "All" : selectedResources.length
         }

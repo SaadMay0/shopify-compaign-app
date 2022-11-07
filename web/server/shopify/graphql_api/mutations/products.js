@@ -1,6 +1,6 @@
 import { Shopify } from "@shopify/shopify-api";
 
-export const variantsUpdate = async (session, cost, price, compareAtPrice) => {
+export const variantsUpdate = async (session,id, cost, price, compareAtPrice) => {
   try {
     const client = new Shopify.Clients.Graphql(
       session.shop,
@@ -31,7 +31,7 @@ export const variantsUpdate = async (session, cost, price, compareAtPrice) => {
     }`,
         variables: {
           input: {
-            id: "gid://shopify/ProductVariant/43729076",
+            id: id,
             inventoryItem: {
               cost: cost,
               tracked: true,

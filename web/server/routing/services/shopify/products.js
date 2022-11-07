@@ -14,7 +14,7 @@ export const getCompaignInfo = async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
 
     Status = 200;
-    Message = "Get Compain Info Successfully";
+    Message = "Get Campain Info Successfully";
     Err = " Looking Good";
   } catch (err) {
     console.log("getCompaignInfo", err);
@@ -44,7 +44,7 @@ export const newCompaigns = async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
 
     Status = 200;
-    Message = "Get Compain Info Successfully";
+    Message = "Get Campain Info Successfully";
     Err = " Looking Good";
   } catch (err) {
     console.log("getCompaignInfo", err);
@@ -74,7 +74,7 @@ export const getCompaigns = async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
 
     Status = 200;
-    Message = "Get Compain Info Successfully";
+    Message = "Get Campain Info Successfully";
     Err = " Looking Good";
   } catch (err) {
     console.log("getCompaignInfo", err);
@@ -104,7 +104,7 @@ export const getCompaignsById = async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
 
     Status = 200;
-    Message = "Get Compain Info Successfully";
+    Message = "Get Campain Info Successfully";
     Err = " Looking Good";
   } catch (err) {
     console.log("getCompaignInfo", err);
@@ -134,7 +134,7 @@ export const updateCompaigns = async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
 
     Status = 200;
-    Message = "Get Compain Info Successfully";
+    Message = "Get Campain Info Successfully";
     Err = " Looking Good";
   } catch (err) {
     console.log("getCompaignInfo", err);
@@ -164,7 +164,7 @@ export const deleteCompaignsById = async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
 
     Status = 200;
-    Message = "Get Compain Info Successfully";
+    Message = "Get Campain Info Successfully";
     Err = " Looking Good";
   } catch (err) {
     console.log("getCompaignInfo", err);

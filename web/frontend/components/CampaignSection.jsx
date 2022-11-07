@@ -1,5 +1,5 @@
 import { ResourcePicker } from "@shopify/app-bridge-react";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect,setTimeout } from "react";
 
 import {
   Page,
@@ -30,19 +30,19 @@ export function CampaignSection() {
   const [isLoading, setIsLoading] = useState(false);
   const [resourcePickerInitialSelection, setResourceInitialSelection] =
     useState(false);
-  const [compaignInfo, setCompaignInfo] = useState([]);
-  // Compaign title
-  const [compaignTitle, setCompignTitle] = useState("");
-  // Compaign Start State
-  const [compaignStartDate, setCompaignStartDate] = useState("");
-  const [compaignStartHour, setCompaignStartHour] = useState("0");
-  const [compaignStartMinute, setCompaignStartMinute] = useState("0");
-  const [compaignStartTime, setCompaignStartTime] = useState("AM");
-  // Compaign End State
-  const [compaignEndDate, setCompaignEndDate] = useState("");
-  const [compaignEndHour, setCompaignEndHour] = useState("0");
-  const [compaignEndMinute, setCompaignEndMinute] = useState("0");
-  const [compaignEndTime, setCompaignEndTime] = useState("AM");
+  const [campaignInfo, setCampaignInfo] = useState([]);
+  // Campaign title
+  const [campaignTitle, setCompignTitle] = useState("");
+  // Campaign Start State
+  const [campaignStartDate, setCampaignStartDate] = useState("");
+  const [campaignStartHour, setCampaignStartHour] = useState("0");
+  const [campaignStartMinute, setCampaignStartMinute] = useState("0");
+  const [campaignStartTime, setCampaignStartTime] = useState("AM");
+  // Campaign End State
+  const [campaignEndDate, setCampaignEndDate] = useState("");
+  const [campaignEndHour, setCampaignEndHour] = useState("0");
+  const [campaignEndMinute, setCampaignEndMinute] = useState("0");
+  const [campaignEndTime, setCampaignEndTime] = useState("AM");
   // Toast Component State
   const [toastActive, setToastActive] = useState(false);
   const [toastContent, setToastContent] = useState("");
@@ -50,47 +50,45 @@ export function CampaignSection() {
 
   // UseEffect && Callback
 
-  const handleCompaignTitleTextChange = useCallback(
+  const handleCampaignTitleTextChange = useCallback(
     (value) => setCompignTitle(value),
     []
   );
 
-  // Compaign Start Callback
+  // Campaign Start Callback
 
   const handleStartDateChange = useCallback((value) => {
-    setCompaignStartDate(value);
-    console.log(value, "???????????????");
+    setCampaignStartDate(value);
   }, []);
   const handleStartHourChange = useCallback((value) => {
-    setCompaignStartHour(value);
-    console.log(value, "???????????????");
+    setCampaignStartHour(value);
   }, []);
   const handleStartMinuteChange = useCallback(
-    (value) => setCompaignStartMinute(value),
+    (value) => setCampaignStartMinute(value),
     []
   );
   const handleStartTimeChange = useCallback(
-    (value) => setCompaignStartTime(value),
+    (value) => setCampaignStartTime(value),
     []
   );
 
-  // Compaign End Callback
+  // Campaign End Callback
 
   const handleEndDateChange = useCallback(
-    (value) => setCompaignEndDate(value),
+    (value) => setCampaignEndDate(value),
     []
   );
   const handleEndHourChange = useCallback(
-    (value) => setCompaignEndHour(value),
+    (value) => setCampaignEndHour(value),
 
     []
   );
   const handleEndMinuteChange = useCallback(
-    (value) => setCompaignEndMinute(value),
+    (value) => setCampaignEndMinute(value),
     []
   );
   const handleEndTimeChange = useCallback(
-    (value) => setCompaignEndTime(value),
+    (value) => setCampaignEndTime(value),
     []
   );
 
@@ -104,40 +102,40 @@ export function CampaignSection() {
 
   const handleCampaignQuantityChange = (arrayIndex) => (ele) => {
     console.log(ele, "handleCampaignQuantityChange");
-    compaignInfo[arrayIndex].compaignQuantity = ele;
+    campaignInfo[arrayIndex].campaignQuantity = ele;
 
-    setCompaignInfo([...compaignInfo]);
+    setCampaignInfo([...campaignInfo]);
   };
 
   const handleCampaignPriceChange = (arrayIndex) => (ele) => {
     console.log(ele, "handleCampaignProductsPriceChange");
-    compaignInfo[arrayIndex].compaignCostDiscount = ele;
+    campaignInfo[arrayIndex].campaignCostDiscount = ele;
 
-    setCompaignInfo([...compaignInfo]);
+    setCampaignInfo([...campaignInfo]);
   };
 
   const handleCampaignDicountChange = (arrayIndex) => (ele) => {
     console.log(ele, "handleCampaignProductsDicountChange");
-    compaignInfo[arrayIndex].compaignDiccount = ele;
+    campaignInfo[arrayIndex].campaignDiccount = ele;
 
-    setCompaignInfo([...compaignInfo]);
+    setCampaignInfo([...campaignInfo]);
   };
 
   const handleCampaignVendorsChange = (arrayIndex) => (ele, index) => {
     console.log(ele, "handleCampaignVendorsChange");
-    compaignInfo[arrayIndex].vendorsSlect = ele;
+    campaignInfo[arrayIndex].vendorsSlect = ele;
 
-    setCompaignInfo([...compaignInfo]);
+    setCampaignInfo([...campaignInfo]);
   };
   const handleSlectionsDelete = (arrayIndex) => (ele) => {
-    compaignInfo.splice(arrayIndex, 1);
-    setCompaignInfo([...compaignInfo]);
+    campaignInfo.splice(arrayIndex, 1);
+    setCampaignInfo([...campaignInfo]);
   };
 
   const handleTogglePopoverActive = (arrayIndex) => (ele) => {
     console.log(ele, "handleTogglePopoverActive");
-    compaignInfo[arrayIndex].popoverActive = !ele;
-    setCompaignInfo([...compaignInfo]);
+    campaignInfo[arrayIndex].popoverActive = !ele;
+    setCampaignInfo([...campaignInfo]);
   };
 
 
@@ -153,7 +151,7 @@ export function CampaignSection() {
     </Button>
   );
 
-  const rowMarkup = compaignInfo.map((ele, index) => {
+  const rowMarkup = campaignInfo.map((ele, index) => {
     return (
       <IndexTable.Row id={ele.id} key={ele.id} position={index}>
         <IndexTable.Cell>
@@ -186,14 +184,14 @@ export function CampaignSection() {
         <IndexTable.Cell>
           <TextField
             type="number"
-            value={ele.compaignQuantity}
+            value={ele.campaignQuantity}
             onChange={handleCampaignQuantityChange(index)}
           />
         </IndexTable.Cell>
         <IndexTable.Cell>
           <TextField
             type="number"
-            value={ele.compaignCostDiscount}
+            value={ele.campaignCostDiscount}
             onChange={handleCampaignPriceChange(index)}
             suffix="%"
           />
@@ -201,7 +199,7 @@ export function CampaignSection() {
         <IndexTable.Cell>
           <TextField
             type="number"
-            value={ele.compaignDiccount}
+            value={ele.campaignDiccount}
             onChange={handleCampaignDicountChange(index)}
             suffix="%"
           />
@@ -317,12 +315,12 @@ export function CampaignSection() {
   // *******************************************************
 
   // Server Requests
-  async function getCompainInfo(ids) {
+  async function getCampainInfo(ids) {
     try {
       let obj = {
         collectionIds: ids,
       };
-      await fetch("/api/compaign/CompaignInfo", {
+      await fetch("/api/campaign/CampaignInfo", {
         method: "POST",
         headers: {
           "Content-Type": "application/json;charset=UTF-8",
@@ -331,9 +329,9 @@ export function CampaignSection() {
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log("getCompainInfo ======>", data.Response.Data);
-          if (data.Response.Data) {
-            setCompaignInfo(data.Response.Data);
+          console.log("getCampainInfo ======>", data.Response.Data);
+          if (data.Response.Status == 200) {
+            setCampaignInfo(data.Response.Data);
           } else {
             setToastContent(data.Response.Message);
             setToastIsError(true);
@@ -351,13 +349,14 @@ export function CampaignSection() {
 
 
 
-  async function updateVariantes(ids, compaignInfo) {
+  async function updateVariantes(ids, campaignInfo, campaignTitle) {
     try {
       let obj = {
         collectionIds: ids,
-        compaignInfo,
+        campaignInfo,
+        campaignTitle,
       };
-      await fetch("/api/CompaignInfo", {
+      await fetch("/api/CampaignInfo", {
         method: "POST",
         headers: {
           "Content-Type": "application/json;charset=UTF-8",
@@ -366,9 +365,9 @@ export function CampaignSection() {
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log("getCompainInfo ======>", data.Response.Data);
+          console.log("getCampainInfo ======>", data.Response.Data);
           if (data.Response.Data) {
-            // setCompaignInfo(data.Response.Data);
+            // setCampaignInfo(data.Response.Data);
           } else {
             setToastContent(data.Response.Message);
             setToastIsError(true);
@@ -383,9 +382,9 @@ export function CampaignSection() {
       console.log(`${error}`);
     }
   }
-  async function getCompain() {
+  async function getCampain() {
     try {
-      await fetch("/api/compaign/getCompaignsById", {
+      await fetch("/api/campaign/getCampaignsById", {
         method: "POST",
         headers: {
           "Content-Type": "application/json;charset=UTF-8",
@@ -393,19 +392,19 @@ export function CampaignSection() {
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log("getCompainInfo ======>", data.Response.Data);
+          console.log("getCampainInfo ======>", data.Response.Data);
           if (data.Response.Data) {
-            setCompaignInfo(data.Response.Data);
-            // setCompaignTitle(),
-            // setCompaignInfo(),
-            // setCompaignStartDate(),
-            // setCompaignStartHour(),
-            // setCompaignStartMinute(),
-            // setCompaignStartTime(),
-            // setCompaignEndDate(),
-            // setCompaignEndHour(),
-            // setCompaignEndMinute(),
-            // setCompaignEndTime(),
+            setCampaignInfo(data.Response.Data);
+            // setCampaignTitle(),
+            // setCampaignInfo(),
+            // setCampaignStartDate(),
+            // setCampaignStartHour(),
+            // setCampaignStartMinute(),
+            // setCampaignStartTime(),
+            // setCampaignEndDate(),
+            // setCampaignEndHour(),
+            // setCampaignEndMinute(),
+            // setCampaignEndTime(),
           } else {
             setToastContent(data.Response.Message);
             setToastIsError(true);
@@ -421,32 +420,32 @@ export function CampaignSection() {
     }
   }
 
-  async function createCompaign(
-    compaignTitle,
-    compaignInfo,
-    compaignStartDate,
-    compaignStartHour,
-    compaignStartMinute,
-    compaignStartTime,
-    compaignEndDate,
-    compaignEndHour,
-    compaignEndMinute,
-    compaignEndTime
+  async function createCampaign(
+    campaignTitle,
+    campaignInfo,
+    campaignStartDate,
+    campaignStartHour,
+    campaignStartMinute,
+    campaignStartTime,
+    campaignEndDate,
+    campaignEndHour,
+    campaignEndMinute,
+    campaignEndTime
   ) {
     try {
       let obj = {
-        compaignTitle,
-        compaignInfo,
-        compaignStartDate,
-        compaignStartHour,
-        compaignStartMinute,
-        compaignStartTime,
-        compaignEndDate,
-        compaignEndHour,
-        compaignEndMinute,
-        compaignEndTime,
+        campaignTitle,
+        campaignInfo,
+        campaignStartDate,
+        campaignStartHour,
+        campaignStartMinute,
+        campaignStartTime,
+        campaignEndDate,
+        campaignEndHour,
+        campaignEndMinute,
+        campaignEndTime,
       };
-      await fetch("/api/compaign/newCompaigns", {
+      await fetch("/api/campaign/newCampaigns", {
         method: "POST",
         headers: {
           "Content-Type": "application/json;charset=UTF-8",
@@ -455,9 +454,16 @@ export function CampaignSection() {
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log("getCompainInfo ======>", data.Response.Data);
-          if (data.Response.Data) {
-            setCompaignInfo(data.Response.Data);
+          console.log("getCampainInfo ======>", data.Response.Data);
+          if (data.Response.Status == 200) {
+            setCampaignInfo(data.Response.Data);
+              setToastContent(data.Response.Message);
+              setToastIsError(false);
+            setToastActive(true);
+            setTimeout(() => {
+              navigate("/dashboard");
+              
+            },2000)
           } else {
             setToastContent(data.Response.Message);
             setToastIsError(true);
@@ -490,14 +496,14 @@ export function CampaignSection() {
           // let allProducts = ele.selection;
           // allProducts.map((ele) => {
           //   Object.assign(ele, {
-          //     compaignQuantity: 1,
-          //     compaignCostDiscount: 0,
-          //     compaignDiccount: 0,
+          //     campaignQuantity: 1,
+          //     campaignCostDiscount: 0,
+          //     campaignDiccount: 0,
           //   });
           // });
-          // setCompaignInfo(allProducts);
+          // setCampaignInfo(allProducts);
           // console.log("allProducts ====>", allProducts);
-          getCompainInfo(ele.selection);
+          getCampainInfo(ele.selection);
           setResourceState(false);
         }}
       />
@@ -507,8 +513,8 @@ export function CampaignSection() {
             <TextField
               label="Title"
               type="text"
-              value={compaignTitle}
-              onChange={handleCompaignTitleTextChange}
+              value={campaignTitle}
+              onChange={handleCampaignTitleTextChange}
               helpText="Only You will See This Name or Title"
               autoComplete="text"
             />
@@ -519,13 +525,13 @@ export function CampaignSection() {
           heading="Start Date"
           paragraph="Secduled when your campaign Start"
           inputTitle="Start Date"
-          dateValue={compaignStartDate}
+          dateValue={campaignStartDate}
           hourSortOptions={hourSortOptions}
           minuteSortOptions={minuteSortOptions}
           timeSortOptions={timeSortOptions}
-          hourValue={compaignStartHour}
-          minuteValue={compaignStartMinute}
-          timeValue={compaignStartTime}
+          hourValue={campaignStartHour}
+          minuteValue={campaignStartMinute}
+          timeValue={campaignStartTime}
           Date={handleStartDateChange}
           Hour={handleStartHourChange}
           Minute={handleStartMinuteChange}
@@ -545,13 +551,13 @@ export function CampaignSection() {
                 // console.log(ele, "===resordes Pricker");
               }}
             >
-              Select Compaign Products
+              Select Campaign Products
             </Button>
             {isLoading ? (
               <div style={{ padding: "5% 50%" }}>
                 <Spinner accessibilityLabel="Spinner example" size="small" />
               </div>
-            ) : compaignInfo.length == 0 ? null : (
+            ) : campaignInfo.length == 0 ? null : (
               <IndexTable
                 resourceName={resourceName}
                 itemCount={resourcePickerInitialSelection.length}
@@ -574,13 +580,13 @@ export function CampaignSection() {
           heading="End Date"
           paragraph="Secduled when your campaign End"
           inputTitle="End Date"
-          dateValue={compaignEndDate}
+          dateValue={campaignEndDate}
           hourSortOptions={hourSortOptions}
           minuteSortOptions={minuteSortOptions}
           timeSortOptions={timeSortOptions}
-          hourValue={compaignEndHour}
-          minuteValue={compaignEndMinute}
-          timeValue={compaignEndTime}
+          hourValue={campaignEndHour}
+          minuteValue={campaignEndMinute}
+          timeValue={campaignEndTime}
           Date={handleEndDateChange}
           Hour={handleEndHourChange}
           Minute={handleEndMinuteChange}
@@ -592,17 +598,17 @@ export function CampaignSection() {
         primaryAction={{
           content: "Save",
           onAction: () => {
-            createCompaign(
-              compaignTitle,
-              compaignInfo,
-              compaignStartDate,
-              compaignStartHour,
-              compaignStartMinute,
-              compaignStartTime,
-              compaignEndDate,
-              compaignEndHour,
-              compaignEndMinute,
-              compaignEndTime
+            createCampaign(
+              campaignTitle,
+              campaignInfo,
+              campaignStartDate,
+              campaignStartHour,
+              campaignStartMinute,
+              campaignStartTime,
+              campaignEndDate,
+              campaignEndHour,
+              campaignEndMinute,
+              campaignEndTime
             );
           },
         }}
@@ -612,7 +618,7 @@ export function CampaignSection() {
             // destructive: true,
             onAction: () => {
               // navigate("/dashboard");
-              updateVariantes(resourcePickerInitialSelection, compaignInfo);
+              updateVariantes(resourcePickerInitialSelection, campaignInfo,campaignTitle);
             },
           },
         ]}
