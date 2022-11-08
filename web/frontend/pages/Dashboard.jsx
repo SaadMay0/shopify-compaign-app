@@ -35,11 +35,11 @@ export default function Dashboard() {
       // accessibilityLabel: "All Campaign",
       panelID: "all-campaign",
     },
-    {
-      id: "draft",
-      content: "Draft",
-      panelID: "draft-campaign",
-    },
+    // {
+    //   id: "draft",
+    //   content: "Draft",
+    //   panelID: "draft-campaign",
+    // },
     {
       id: "scheduled",
       content: "Scheduled",
@@ -88,7 +88,7 @@ export default function Dashboard() {
               <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
                 <Card.Section>
                   <CampaignTable
-                    filterOrders={tabs[selected]}
+                    tab={tabs[selected]}
                     setBannerTitle={setBannerTitle}
                     setBannerStatus={setBannerStatus}
                     bannerToggleActive={bannerToggleActive}

@@ -6,14 +6,14 @@ export function BannerComponent({
   toggleActive,
   Description,
 }) {
-  console.log(
-    active,
-    title,
-    status,
-    toggleActive,
-    Description,
-    "****Banner Component Value****"
-  );
+  // console.log(
+  //   active,
+  //   title,
+  //   status,
+  //   toggleActive,
+  //   Description,
+  //   "****Banner Component Value****"
+  // );
   return active ? (
     <Banner
       title={title}

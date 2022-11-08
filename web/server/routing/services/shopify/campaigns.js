@@ -2,6 +2,10 @@ import { Shopify } from "@shopify/shopify-api";
 import Sequelize from "sequelize";
 import db from "../../../db/models/postgres/index.js";
 import { getCollectionProducts } from "../../../shopify/rest_api/collection.js";
+import {
+  scheduleJob,
+  schedule2Job,
+} from "../helper_functions/shopify/scheduleJob.js";
 const Op = Sequelize.Op;
 import "colors";
 
@@ -127,8 +131,7 @@ export const newCampaigns = async (req, res) => {
       },
     });
 
-
-    console.log(cheeck,"Check That value");
+    console.log(cheeck, "Check That value");
 
     if (cheeck.length == 0) {
       const [row, created] = await db.Campaign.findOrCreate({
@@ -145,9 +148,25 @@ export const newCampaigns = async (req, res) => {
         },
       });
       Data = [row];
-      Status = 200; 
+      Status = 200;
       Message = " Campain Created Successfully";
       Err = " Looking Good";
+      await scheduleJob(
+        session,
+        campaignInfo,
+        campaignStartDate,
+        campaignStartHour,
+        campaignStartMinute,
+        campaignStartTime
+      );
+      await schedule2Job(
+        session,
+        campaignInfo,
+        campaignEndDate,
+        campaignEndHour,
+        campaignEndMinute,
+        campaignEndTime
+      );
     } else {
       Data = null;
       Status = 401;
@@ -193,7 +212,7 @@ export const getCampaigns = async (req, res) => {
     Err = err;
   }
 
-  res.status(200).send({ 
+  res.status(200).send({
     Response: {
       Data,
       Status,
@@ -217,12 +236,56 @@ export const getCampaignsById = async (req, res) => {
       where: { storeId: session.id, id: id },
     });
 
-    Data = [...campaign];
+    console.log(campaign, "campaign");
+    Data = campaign;
     Status = 200;
     Message = "Get Campain  Successfully";
     Err = " Looking Good";
   } catch (err) {
     console.log("getCampaignsById", err);
+    Status = 404;
+    Message = "Following Path Not Found";
+    Err = err;
+  }
+
+  res.status(200).send({ 
+    Response: {
+      Data,
+      Status,
+      Message,
+      Err,
+    },
+  });
+};
+
+export const getCampaignsByStatus = async (req, res) => {
+  console.log("===> getCampaignsByStatus its work");
+  let Data = [];
+  let Status;
+  let Message;
+  let Err;
+  try {
+    const { tab } = req.query;
+    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    console.log(tab, "tab isssssss");
+    let campaign;
+
+    if (tab == "All") {
+      campaign = await db.Campaign.findAll({
+        where: { storeId: session.id },
+      });
+    } else {
+      campaign = await db.Campaign.findAll({
+        where: { storeId: session.id, campaignStatus: tab },
+      });
+    }
+
+    Data = [...campaign];
+    Status = 200;
+    Message = "Get Campain  Successfully";
+    Err = " Looking Good";
+  } catch (err) {
+    console.log("getCampaignsByStatus", err);
     Status = 404;
     Message = "Following Path Not Found";
     Err = err;
@@ -260,39 +323,58 @@ export const updateCampaigns = async (req, res) => {
     } = req.body;
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
 
-    let startDate = campaignStartDate.split("-");
-    let endDate = campaignEndDate.split("-");
+    // let startDate = campaignStartDate.split("-");
+    // let endDate = campaignEndDate.split("-");
 
-    let compStart = {
-      year: startDate[0],
-      month: startDate[1],
-      day: startDate[2],
-      hour: campaignStartHour,
-      minute: campaignStartMinute,
-      time: campaignStartTime,
-    };
+    // let compStart = {
+    //   year: startDate[0],
+    //   month: startDate[1],
+    //   day: startDate[2],
+    //   hour: campaignStartHour,
+    //   minute: campaignStartMinute,
+    //   time: campaignStartTime,
+    // };
 
-    let compEnd = {
-      year: endDate[0],
-      month: endDate[1],
-      day: endDate[2],
-      hour: campaignEndHour,
-      minute: campaignEndMinute,
-      time: campaignEndTime,
-    };
-    const campaigns = await db.Campaign.update(
-      {
-        campaignName: campaignTitle,
-        campaignStart: compStart,
-        campaignEnd: compEnd,
-        campaignInfo: campaignInfo,
+    // let compEnd = {
+    //   year: endDate[0],
+    //   month: endDate[1],
+    //   day: endDate[2],
+    //   hour: campaignEndHour,
+    //   minute: campaignEndMinute,
+    //   time: campaignEndTime,
+    // };
+
+    const cheeck = await db.Campaign.findAll({
+      where: {
+        campaignEnd: {
+          [Op.between]: [
+            `${campaignStartDate} ${campaignStartHour}:${campaignStartMinute}: 00 ${campaignStartTime}`,
+            `${campaignEndDate} ${campaignEndHour}:${campaignEndMinute}: 00  ${campaignEndTime}`,
+          ],
+        },
       },
-      { where: { storeId: session.id, id: id } }
-    );
-    Data = [...campaigns];
-    Status = 200;
-    Message = " Campain update Successfully";
-    Err = " Looking Good";
+    });
+
+    if (cheeck.length == 0) {
+      const campaigns = await db.Campaign.update(
+        {
+          campaignName: campaignTitle,
+          campaignStart: `${campaignStartDate} ${campaignStartHour}:${campaignStartMinute}: 00 ${campaignStartTime}`,
+          campaignEnd: `${campaignEndDate} ${campaignEndHour}:${campaignEndMinute}: 00  ${campaignEndTime}`,
+          campaignInfo: campaignInfo,
+        },
+        { where: { storeId: session.id, id: id } }
+      );
+      Data = [...campaigns];
+      Status = 200;
+      Message = " Campain update Successfully";
+      Err = " Looking Good";
+    } else {
+      Data = null;
+      Status = 401;
+      Message = "Already have an Campaign between you selected Date";
+      Err = "Duplication not allow";
+    }
   } catch (err) {
     console.log("updateCampaigns", err);
     Status = 404;

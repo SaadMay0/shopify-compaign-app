@@ -13,10 +13,10 @@ export function TimeSection({
   minuteValue,
   timeValue,
   dateValue,
-  Date,
-  Hour,
-  Minute,
-  Time,
+  handleDate,
+  handleHour,
+  handleMinute,
+  handleTime,
 }) {
   return (
     <Layout.Section>
@@ -29,26 +29,26 @@ export function TimeSection({
             label={inputTitle}
             type="date"
             value={dateValue}
-            onChange={Date}
+            onChange={handleDate}
             autoComplete="date"
           />
           <Stack>
             <Select
               options={hourSortOptions}
               value={hourValue}
-              onChange={Hour}
+              onChange={handleHour}
             />
             <Select
               // label="hh"
               options={minuteSortOptions}
               value={minuteValue}
-              onChange={Minute}
+              onChange={handleMinute}
             />
             <Select
               // label="hh"
               options={timeSortOptions}
               value={timeValue}
-              onChange={Time}
+              onChange={handleTime}
             />
           </Stack>
         </Stack>

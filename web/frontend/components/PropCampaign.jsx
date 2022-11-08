@@ -1,5 +1,5 @@
 import { ResourcePicker } from "@shopify/app-bridge-react";
-import { useState, useCallback, useEffect, setTimeout } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 import {
   Page,
@@ -20,15 +20,14 @@ import {
 import { ImageMajor } from "@shopify/polaris-icons";
 import { TimeSection } from "./TimeSection";
 import { ToastComponent } from "./Tost";
-// import {useLocation, useNavigate } from "@shopify/app-bridge-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "@shopify/app-bridge-react";
+// import {  useLocation } from "react-router-dom";
 import { useAuthenticatedFetch } from "../hooks";
-
-export function CampaignSection({ campaignData }) {
-  // const { state } = useLocation();
-  // const { allData } = state;
+export function PropCampaign({ campaignId }) {
+  //   const location = useLocation();
+  // const { id } = state;
   const navigate = useNavigate();
-
+  console.log(campaignId, "********************PropCampaign");
   const [ResourcePickerState, setResourceState] = useState(false);
   const fetch = useAuthenticatedFetch();
 
@@ -53,23 +52,6 @@ export function CampaignSection({ campaignData }) {
   const [toastContent, setToastContent] = useState("");
   const [toastIsError, setToastIsError] = useState(false);
 
-  // console.log(
-  //   campaignStartDate,
-  //   campaignStartHour,
-  //   campaignStartMinute,
-  //   campaignStartTime,
-  //   "********************Campain Start"
-  // );
-
-  // console.log(
-  //   campaignEndDate,
-  //   campaignEndHour,
-  //   campaignEndMinute,
-  //   campaignEndTime,
-  //   "********************Campain End"
-  // );
-  console.log(campaignData, "************");
-
   // UseEffect && Callback
 
   const handleCampaignTitleTextChange = useCallback(
@@ -85,9 +67,10 @@ export function CampaignSection({ campaignData }) {
   const handleStartHourChange = useCallback((value) => {
     setCampaignStartHour(value);
   }, []);
-  const handleStartMinuteChange = useCallback((value) => {
-    setCampaignStartMinute(value);
-  }, []);
+  const handleStartMinuteChange = useCallback(
+    (value) => setCampaignStartMinute(value),
+    []
+  );
   const handleStartTimeChange = useCallback(
     (value) => setCampaignStartTime(value),
     []
@@ -334,39 +317,6 @@ export function CampaignSection({ campaignData }) {
 
   // *******************************************************
 
-  // if (campaignData) {
-  useEffect(() => {
-    if (campaignData) {
-      getCampain(campaignData.id);
-    }
-    // if (campaignData) {
-    //   // getCampain(id);
-
-    //   let startDate = campaignData.campaignStart.split("T");
-    //   let endDate = campaignData.campaignEnd.split("T");
-
-    //   let startHour = startDate[1].split(":")[0];
-    //   let startMinute = startDate[1].split(":")[1];
-    //   let startTime = Number(startDate[1].split(":")[0]) <= 12 ? "AM" : "PM";
-
-    //   let endHour = endDate[1].split(":")[0];
-    //   let endMinute = endDate[1].split(":")[1];
-    //   let endTime = Number(endDate[1].split(":")[0]) <= 12 ? "AM" : "PM";
-
-    //   setCompignTitle(campaignData.campaignName);
-    //   setCampaignInfo(campaignData.campaignInfo);
-    //   setCampaignStartDate(startDate[0]);
-    //   setCampaignStartHour(startHour);
-    //   setCampaignStartMinute(startMinute);
-    //   setCampaignStartTime(startTime);
-    //   setCampaignEndDate(endDate[0]);
-    //   setCampaignEndHour(endHour);
-    //   setCampaignEndMinute(endMinute);
-    //   setCampaignEndTime(endTime);
-    // }
-  }, []);
-  // }
-  // }
   // Server Requests
   async function getCampainInfo(ids) {
     try {
@@ -433,61 +383,29 @@ export function CampaignSection({ campaignData }) {
       console.log(`${error}`);
     }
   }
-  async function getCampain(id) {
+  async function getCampain() {
     try {
-      await fetch(`/api/campaign/getCampaignsById?id=${id}`, {
-        method: "GET",
+      await fetch("/api/campaign/getCampaignsById", {
+        method: "POST",
         headers: {
           "Content-Type": "application/json;charset=UTF-8",
         },
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log("getCampain ======>", data);
-          if (data.Response.Status == 200) {
-            console.log("campaign data from the api response", data);
-            const { campaignStart, campaignEnd, campaignInfo, campaignName } =
-              data.Response.Data;
-
-            let startDate = new Date(campaignStart);
-            let endDate = new Date(campaignEnd);
-
-            let startHour = startDate.getHours() + 1;
-            let startMinute = startDate.getMinutes() + 1;
-            let startTime = Number(startHour) <= 12 ? "AM" : "PM";
-
-            let endHour = endDate.getHours() + 1;
-            let endMinute = endDate.getMinutes() + 1;
-            let endTime = Number(endHour) <= 12 ? "AM" : "PM";
-
-              let sstartHour = startHour > 12 ? Number(startHour) - 12 : startHour;
-            let eendHour = endHour > 12 ? Number(endHour) - 12 : endHour;
-            
-
-
-
-            console.log(
-              typeof endHour,
-              campaignName,
-              campaignInfo,
-              sstartHour,
-              startMinute,
-              startTime,
-              eendHour,
-              endMinute,
-              endTime," Its the Data in -- fomate"
-            );
-
-            // setCampaignInfo(campaignInfo);
-            // setCompignTitle(campaignName);
-            // setCampaignStartDate(startDate);
-            // setCampaignStartHour(startHour);
-            // setCampaignStartMinute(startMinute);
-            // setCampaignStartTime(startTime);
-            // setCampaignEndDate(endDate);
-            // setCampaignEndHour(endHour);
-            // setCampaignEndMinute(endMinute);
-            // setCampaignEndTime(endTime);
+          console.log("getCampainInfo ======>", data.Response.Data);
+          if (data.Response.Data) {
+            setCampaignInfo(data.Response.Data);
+            // setCampaignTitle(),
+            // setCampaignInfo(),
+            // setCampaignStartDate(),
+            // setCampaignStartHour(),
+            // setCampaignStartMinute(),
+            // setCampaignStartTime(),
+            // setCampaignEndDate(),
+            // setCampaignEndHour(),
+            // setCampaignEndMinute(),
+            // setCampaignEndTime(),
           } else {
             setToastContent(data.Response.Message);
             setToastIsError(true);
@@ -545,7 +463,7 @@ export function CampaignSection({ campaignData }) {
             setToastActive(true);
 
             // setTimeout(() => {
-            // navigate("/dashboard");
+            navigate("/dashboard");
 
             // },4000)
           } else {
@@ -616,10 +534,10 @@ export function CampaignSection({ campaignData }) {
           hourValue={campaignStartHour}
           minuteValue={campaignStartMinute}
           timeValue={campaignStartTime}
-          handleDate={handleStartDateChange}
-          handleHour={handleStartHourChange}
-          handleMinute={handleStartMinuteChange}
-          handleTime={handleStartTimeChange}
+          Date={handleStartDateChange}
+          Hour={handleStartHourChange}
+          Minute={handleStartMinuteChange}
+          Time={handleStartTimeChange}
         />
 
         <Layout.Section>
@@ -671,10 +589,10 @@ export function CampaignSection({ campaignData }) {
           hourValue={campaignEndHour}
           minuteValue={campaignEndMinute}
           timeValue={campaignEndTime}
-          handleDate={handleEndDateChange}
-          handleHour={handleEndHourChange}
-          handleMinute={handleEndMinuteChange}
-          handleTime={handleEndTimeChange}
+          Date={handleEndDateChange}
+          Hour={handleEndHourChange}
+          Minute={handleEndMinuteChange}
+          Time={handleEndTimeChange}
         />
       </Layout>
 
