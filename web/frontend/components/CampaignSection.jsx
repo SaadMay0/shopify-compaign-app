@@ -1,5 +1,6 @@
 import { ResourcePicker } from "@shopify/app-bridge-react";
-import { useState, useCallback, useEffect, setTimeout } from "react";
+
+import { useState, useCallback, useEffect } from "react";
 
 import {
   Page,
@@ -20,13 +21,13 @@ import {
 import { ImageMajor } from "@shopify/polaris-icons";
 import { TimeSection } from "./TimeSection";
 import { ToastComponent } from "./Tost";
-// import {useLocation, useNavigate } from "@shopify/app-bridge-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "@shopify/app-bridge-react";
+import { useLocation } from "react-router-dom";
 import { useAuthenticatedFetch } from "../hooks";
 
-export function CampaignSection({ campaignData }) {
-  // const { state } = useLocation();
-  // const { allData } = state;
+export function CampaignSection() {
+  const state = useLocation();
+  // const { campaignData } = state;
   const navigate = useNavigate();
 
   const [ResourcePickerState, setResourceState] = useState(false);
@@ -34,7 +35,7 @@ export function CampaignSection({ campaignData }) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [resourcePickerInitialSelection, setResourceInitialSelection] =
-    useState(false);
+    useState([]);
   const [campaignInfo, setCampaignInfo] = useState([]);
   // Campaign title
   const [campaignTitle, setCompignTitle] = useState("");
@@ -54,21 +55,25 @@ export function CampaignSection({ campaignData }) {
   const [toastIsError, setToastIsError] = useState(false);
 
   // console.log(
-  //   campaignStartDate,
-  //   campaignStartHour,
-  //   campaignStartMinute,
-  //   campaignStartTime,
-  //   "********************Campain Start"
+    // campaignInfo,
+    // campaignStartDate,
+    // campaignStartHour,
+    // campaignStartMinute,
+    // campaignStartTime,
+    // "********************Campain Start"
   // );
 
   // console.log(
   //   campaignEndDate,
-  //   campaignEndHour,
+  //   campaignEndHour, 
   //   campaignEndMinute,
   //   campaignEndTime,
   //   "********************Campain End"
   // );
-  console.log(campaignData, "************");
+  // setTimeout(() => {
+  //   console.log(state, "************", window.location);
+    
+  // },4000)
 
   // UseEffect && Callback
 
@@ -137,18 +142,18 @@ export function CampaignSection({ campaignData }) {
 
   const handleCampaignDicountChange = (arrayIndex) => (ele) => {
     console.log(ele, "handleCampaignProductsDicountChange");
-    campaignInfo[arrayIndex].campaignDiccount = ele;
+    campaignInfo[arrayIndex].campaignDiscount = ele;
 
     setCampaignInfo([...campaignInfo]);
   };
 
   const handleCampaignVendorsChange = (arrayIndex) => (ele, index) => {
     console.log(ele, "handleCampaignVendorsChange");
-    campaignInfo[arrayIndex].vendorsSlect = ele;
+    campaignInfo[arrayIndex].vendorsSelect = ele;
 
     setCampaignInfo([...campaignInfo]);
   };
-  const handleSlectionsDelete = (arrayIndex) => (ele) => {
+  const handleSelectionsDelete = (arrayIndex) => (ele) => {
     campaignInfo.splice(arrayIndex, 1);
     setCampaignInfo([...campaignInfo]);
   };
@@ -172,6 +177,8 @@ export function CampaignSection({ campaignData }) {
   );
 
   const rowMarkup = campaignInfo.map((ele, index) => {
+    const key = `table-row-${index}`;
+    // console.log(ele)
     return (
       <IndexTable.Row id={ele.id} key={ele.id} position={index}>
         <IndexTable.Cell>
@@ -179,35 +186,32 @@ export function CampaignSection({ campaignData }) {
             <Thumbnail
               source={ele.image ? ele.image : ImageMajor}
               alt="Black orange scarf"
-              size="large"
+              size="large" 
             />
             <TextStyle>{ele.title}</TextStyle>
           </Stack>
         </IndexTable.Cell>
-        {/* <IndexTable.Cell>
-          <Popover
+        <IndexTable.Cell>
+          {/* <Popover
             active={ele.popoverActive}
-            activator={(index)=>{
-               handleTogglePopoverActive(index)
-              return activator
-            }}
+            activator={(index)=>activator}
             onClose={handleTogglePopoverActive(index)}
-          >
+          > */}
             <OptionList
               options={ele.vendorsOptions}
-              selected={ele.vendorsSlect}
+              selected={ele.vendorsSelect}
               onChange={handleCampaignVendorsChange(index)}
               allowMultiple
             />
-          </Popover>
-        </IndexTable.Cell> */}
-        <IndexTable.Cell>
+          {/* </Popover> */}
+        </IndexTable.Cell>
+        {/* <IndexTable.Cell>
           <TextField
             type="number"
             value={ele.campaignQuantity}
             onChange={handleCampaignQuantityChange(index)}
           />
-        </IndexTable.Cell>
+        </IndexTable.Cell> */}
         <IndexTable.Cell>
           <TextField
             type="number"
@@ -219,16 +223,16 @@ export function CampaignSection({ campaignData }) {
         <IndexTable.Cell>
           <TextField
             type="number"
-            value={ele.campaignDiccount}
+            value={ele.campaignDiscount}
             onChange={handleCampaignDicountChange(index)}
             suffix="%"
           />
         </IndexTable.Cell>
-        {/* <IndexTable.Cell>
-          <Button primary onClick={handleSlectionsDelete(index)}>
+        <IndexTable.Cell>
+          <Button primary onClick={handleSelectionsDelete(index)}>
             Deleted
           </Button>
-        </IndexTable.Cell> */}
+        </IndexTable.Cell>
       </IndexTable.Row>
     );
   });
@@ -245,8 +249,8 @@ export function CampaignSection({ campaignData }) {
   // Variables
 
   const resourceName = {
-    singular: "customer",
-    plural: "customers",
+    singular: "Campaign",
+    plural: "Campaignes",
   };
 
   const hourSortOptions = [
@@ -336,34 +340,7 @@ export function CampaignSection({ campaignData }) {
 
   // if (campaignData) {
   useEffect(() => {
-    if (campaignData) {
-      getCampain(campaignData.id);
-    }
-    // if (campaignData) {
-    //   // getCampain(id);
-
-    //   let startDate = campaignData.campaignStart.split("T");
-    //   let endDate = campaignData.campaignEnd.split("T");
-
-    //   let startHour = startDate[1].split(":")[0];
-    //   let startMinute = startDate[1].split(":")[1];
-    //   let startTime = Number(startDate[1].split(":")[0]) <= 12 ? "AM" : "PM";
-
-    //   let endHour = endDate[1].split(":")[0];
-    //   let endMinute = endDate[1].split(":")[1];
-    //   let endTime = Number(endDate[1].split(":")[0]) <= 12 ? "AM" : "PM";
-
-    //   setCompignTitle(campaignData.campaignName);
-    //   setCampaignInfo(campaignData.campaignInfo);
-    //   setCampaignStartDate(startDate[0]);
-    //   setCampaignStartHour(startHour);
-    //   setCampaignStartMinute(startMinute);
-    //   setCampaignStartTime(startTime);
-    //   setCampaignEndDate(endDate[0]);
-    //   setCampaignEndHour(endHour);
-    //   setCampaignEndMinute(endMinute);
-    //   setCampaignEndTime(endTime);
-    // }
+      getCampain(); 
   }, []);
   // }
   // }
@@ -433,7 +410,8 @@ export function CampaignSection({ campaignData }) {
       console.log(`${error}`);
     }
   }
-  async function getCampain(id) {
+  async function getCampain() {
+    let id = window.location.search.split("=").pop()
     try {
       await fetch(`/api/campaign/getCampaignsById?id=${id}`, {
         method: "GET",
@@ -445,6 +423,7 @@ export function CampaignSection({ campaignData }) {
         .then((data) => {
           console.log("getCampain ======>", data);
           if (data.Response.Status == 200) {
+            
             console.log("campaign data from the api response", data);
             const { campaignStart, campaignEnd, campaignInfo, campaignName } =
               data.Response.Data;
@@ -460,34 +439,23 @@ export function CampaignSection({ campaignData }) {
             let endMinute = endDate.getMinutes() + 1;
             let endTime = Number(endHour) <= 12 ? "AM" : "PM";
 
-              let sstartHour = startHour > 12 ? Number(startHour) - 12 : startHour;
-            let eendHour = endHour > 12 ? Number(endHour) - 12 : endHour;
-            
-
-
-
-            console.log(
-              typeof endHour,
-              campaignName,
-              campaignInfo,
-              sstartHour,
-              startMinute,
-              startTime,
-              eendHour,
-              endMinute,
-              endTime," Its the Data in -- fomate"
-            );
-
-            // setCampaignInfo(campaignInfo);
-            // setCompignTitle(campaignName);
-            // setCampaignStartDate(startDate);
-            // setCampaignStartHour(startHour);
-            // setCampaignStartMinute(startMinute);
-            // setCampaignStartTime(startTime);
-            // setCampaignEndDate(endDate);
-            // setCampaignEndHour(endHour);
-            // setCampaignEndMinute(endMinute);
-            // setCampaignEndTime(endTime);
+             startHour =
+              startHour > 12 ? Number(startHour) - 12 : startHour;
+             endHour = endHour > 12 ? Number(endHour) - 12 : endHour;
+            let end = endDate.toLocaleDateString().split("/");
+            let start = startDate.toLocaleDateString().split("/");
+            setIsLoading(true);
+            setResourceInitialSelection(campaignInfo);
+            setCampaignInfo(campaignInfo);
+            setCompignTitle(campaignName);
+            setCampaignStartDate(`${start[2]}-${start[0]}-${start[1]}`);
+            setCampaignStartHour(startHour.toString());
+            setCampaignStartMinute(startMinute.toString());
+            setCampaignStartTime(startTime);
+            setCampaignEndDate(`${end[2]}-${end[0]}-${end[1]}`);
+            setCampaignEndHour(endHour.toString());
+            setCampaignEndMinute(endMinute.toString());
+            setCampaignEndTime(endTime);
           } else {
             setToastContent(data.Response.Message);
             setToastIsError(true);
@@ -582,7 +550,7 @@ export function CampaignSection({ campaignData }) {
           //   Object.assign(ele, {
           //     campaignQuantity: 1,
           //     campaignCostDiscount: 0,
-          //     campaignDiccount: 0,
+          //     campaignDiscount: 0,
           //   });
           // });
           // setCampaignInfo(allProducts);
@@ -645,12 +613,13 @@ export function CampaignSection({ campaignData }) {
               <IndexTable
                 resourceName={resourceName}
                 itemCount={resourcePickerInitialSelection.length}
-                // loading={isLoading}
+                loading={isLoading}
                 headings={[
                   { title: "" },
-                  { title: "Quantity" },
+                  { title: "Vendors" },
                   { title: "Cost" },
                   { title: "Discount" },
+                  { title: "Actions" },
                 ]}
                 selectable={false}
               >
@@ -701,12 +670,13 @@ export function CampaignSection({ campaignData }) {
             content: "Cancel",
             // destructive: true,
             onAction: () => {
-              navigate("/dashboard");
-              updateVariantes(
-                resourcePickerInitialSelection,
-                campaignInfo,
-                campaignTitle
-              );
+              console.log(state, "************", window.location.search);
+              // navigate("/dashboard");
+              // updateVariantes(
+              //   resourcePickerInitialSelection,
+              //   campaignInfo,
+              //   campaignTitle
+              // );
             },
           },
         ]}

@@ -22,7 +22,7 @@ export const getCampaignInfo = async (req, res) => {
     await Promise.all(
       collectionIds.map(async (ele) => {
         let vendor = [];
-        let vendorSlect = [];
+        let vendorSelect = [];
         let collectionProducts = await getCollectionProducts(
           session,
           ele.id.split("/").pop()
@@ -31,22 +31,22 @@ export const getCampaignInfo = async (req, res) => {
           collectionProducts.products.map(async (ele) => {
             console.log(ele, "====");
             vendor.push({ value: `${ele.vendor}`, label: `${ele.vendor}` });
-            vendorSlect.push(ele.vendor);
+            vendorSelect.push(ele.vendor);
           })
         );
         let uniqueVendorsOption = [...new Set(vendor)];
-        let uniqueVendorSlect = [...new Set(vendorSlect)];
+        let uniqueVendorSelect = [...new Set(vendorSelect)];
 
         let obj = {
           id: ele.id,
           image: ele.image ? ele.image.originalSrc : null,
           title: ele.title,
-          campaignQuantity: 1,
+          // campaignQuantity: 1,
           campaignCostDiscount: 0,
           // campaignCostDiscount,
-          campaignDiccount: 0,
+          campaignDiscount: 0,
           vendorsOptions: uniqueVendorsOption,
-          vendorsSlect: uniqueVendorSlect,
+          vendorsSelect: uniqueVendorSelect,
           popoverActive: false,
         };
         Data.push(obj);

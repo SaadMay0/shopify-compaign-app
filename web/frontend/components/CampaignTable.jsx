@@ -7,12 +7,17 @@ import {
   Spinner,
   ButtonGroup,
 } from "@shopify/polaris";
+import {
+  // ResourcePicker,
+  useNavigationHistory,
+} from "@shopify/app-bridge-react";
 
 import { ToastComponent } from "./Tost";
 import { CampaignSection } from "./CampaignSection";
 // import {PropCampaign} from "./PropCampaign"
 import { useAuthenticatedFetch } from "../hooks";
-import { useNavigate } from "react-router-dom";
+import {useLocation, useNavigate } from "@shopify/app-bridge-react";
+// import { useNavigate } from "react-router-dom";
 export function CampaignTable({
   tab,
   setBannerTitle,
@@ -20,6 +25,7 @@ export function CampaignTable({
   bannerToggleActive,
   setBannerDescription,
 }) {
+  const { push, replace } = useNavigationHistory();
   const navigate = useNavigate();
   const fetch = useAuthenticatedFetch();
 
@@ -27,7 +33,7 @@ export function CampaignTable({
   const [renderCampaignData, setRenderCampaignData] = useState([]);
 
   const [isLoading, setIsLoading] = useState(true);
-  
+
   const [campaigns, setCampaigns] = useState([]);
   // const [preferences, setpreferences] = useState();
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
@@ -102,7 +108,8 @@ export function CampaignTable({
   // );
 
   let renderCampaignSection = (
-    <CampaignSection campaignData={renderCampaignData} />);
+    <CampaignSection campaignData={renderCampaignData} />
+  );
 
   const rowMarkup = campaigns.map((ele, index) => {
     const tableRowKey = `tbl-row-${index}`;
@@ -140,14 +147,13 @@ export function CampaignTable({
                 primary
                 onClick={(e) => {
                   e.stopPropagation(e);
-                  setRenderCampaign(true);
-                  setRenderCampaignData(ele);
+                  // setRenderCampaign(true);
+                  // setRenderCampaignData(ele);
                   // setIsLoading(true);
-                  // navigate("/campaign", {
-                  //   state: { allData: ele },
-                  // });
+               
+                  navigate(`/campaign?id=${ele.id}`);
 
-                  console.log("its work", ele);
+                  // console.log("its work", ele.id);
                   // updateCampaign(`${ele.id}`);
                 }}
               >
@@ -202,100 +208,101 @@ export function CampaignTable({
     }
   }
 
-     async function searchCampainByStatus() {
-       try {
-         await fetch(`api/campaign/getCampaignsByStatus?tab=${tab.content}`, {
-           method: "GET",
-           headers: {
-             "Content-Type": "application/json;charset=UTF-8",
-           },
-         })
-           .then((response) => response.json())
-           .then((data) => {
-             console.log(data, "all search");
-                if (data.Response.Status == 200) {
-                  setCampaigns(data.Response.Data);
-                } else {
-                  console.log("else part run");
-                }
-                setIsLoading(false);
-           });
-       } catch (error) {
-         console.log(`${error}`);
-       }
-     }
-  
-   async function updateCampaign(id) {
-     try {
-       await fetch(`api/campaign/updateCampaigns?id=${id}`, {
-         method: "PUT",
-         headers: {
-           "Content-Type": "application/json;charset=UTF-8",
-         },
-       })
-         .then((response) => response.json())
-         .then((data) => {
-           console.log(data, "all search");
-           if (data.Response.Status == 200) {
+  async function searchCampainByStatus() {
+    try {
+      await fetch(`api/campaign/getCampaignsByStatus?tab=${tab.content}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data, "all search");
+          if (data.Response.Status == 200) {
+            setCampaigns(data.Response.Data);
+          } else {
+            console.log("else part run");
+          }
+          setIsLoading(false);
+        });
+    } catch (error) {
+      console.log(`${error}`);
+    }
+  }
+
+  async function updateCampaign(id) {
+    try {
+      await fetch(`api/campaign/updateCampaigns?id=${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data, "all search");
+          if (data.Response.Status == 200) {
             //  setCampaigns(data.Response.Data);
-             searchCampainByStatus();
-           } else {
-             console.log("else part run");
-           }
-           setIsLoading(false);
-         });
-     } catch (error) {
-       console.log(`${error}`);
-     }
-   }
-  
-   async function deleteCampaign(id) {
-     try {
-       await fetch(`api/campaign/deleteCampaignsById?id=${id}`, {
-         method: "DELETE",
-         headers: {
-           "Content-Type": "application/json;charset=UTF-8",
-         },
-       })
-         .then((response) => response.json())
-         .then((data) => {
-           console.log(data, "all search");
-           if (data.Response.Status == 200) {
+            searchCampainByStatus();
+          } else {
+            console.log("else part run");
+          }
+          setIsLoading(false);
+        });
+    } catch (error) {
+      console.log(`${error}`);
+    }
+  }
+
+  async function deleteCampaign(id) {
+    try {
+      await fetch(`api/campaign/deleteCampaignsById?id=${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data, "all search");
+          if (data.Response.Status == 200) {
             //  setCampaigns(data.Response.Data);
-             searchCampainByStatus()
-           } else {
-             console.log("else part run");
-           }
-           setIsLoading(false);
-         });
-     } catch (error) {
-       console.log(`${error}`);
-     }
-   }
+            searchCampainByStatus();
+          } else {
+            console.log("else part run");
+          }
+          setIsLoading(false);
+        });
+    } catch (error) {
+      console.log(`${error}`);
+    }
+  }
+
+  
   return (
     <>
-      {renderCampaign ?
-      renderCampaignSection
-      :
-        (
-          <>
+      {renderCampaign ? (
+        renderCampaignSection
+      ) : (
+        <>
           <IndexTable
-        resourceName={resourceName}
-        itemCount={campaigns.length}
-        selectedItemsCount={
-          allResourcesSelected ? "All" : selectedResources.length
-        }
-        lastColumnSticky
-        onSelectionChange={handleSelectionChange}
-        loading={isLoading}
-        headings={tableHeaderTitles}
-        selectable={false}
-      >
-        {rowMarkup}
-      </IndexTable>
+            resourceName={resourceName}
+            itemCount={campaigns.length}
+            selectedItemsCount={
+              allResourcesSelected ? "All" : selectedResources.length
+            }
+            lastColumnSticky
+            onSelectionChange={handleSelectionChange}
+            loading={isLoading}
+            headings={tableHeaderTitles}
+            selectable={false}
+          >
+            {rowMarkup}
+          </IndexTable>
           {toastActive ? renderToast : null}
-          </>
-)}
+        </>
+      )}
       {/* 
       <Pagination
         hasPrevious
