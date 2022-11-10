@@ -7,17 +7,11 @@ import {
   Spinner,
   ButtonGroup,
 } from "@shopify/polaris";
-import {
-  // ResourcePicker,
-  useNavigationHistory,
-} from "@shopify/app-bridge-react";
 
 import { ToastComponent } from "./Tost";
-import { CampaignSection } from "./CampaignSection";
 // import {PropCampaign} from "./PropCampaign"
 import { useAuthenticatedFetch } from "../hooks";
-import {useLocation, useNavigate } from "@shopify/app-bridge-react";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@shopify/app-bridge-react";
 export function CampaignTable({
   tab,
   setBannerTitle,
@@ -25,12 +19,8 @@ export function CampaignTable({
   bannerToggleActive,
   setBannerDescription,
 }) {
-  const { push, replace } = useNavigationHistory();
   const navigate = useNavigate();
   const fetch = useAuthenticatedFetch();
-
-  const [renderCampaign, setRenderCampaign] = useState(false);
-  const [renderCampaignData, setRenderCampaignData] = useState([]);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -107,10 +97,6 @@ export function CampaignTable({
   //   />
   // );
 
-  let renderCampaignSection = (
-    <CampaignSection campaignData={renderCampaignData} />
-  );
-
   const rowMarkup = campaigns.map((ele, index) => {
     const tableRowKey = `tbl-row-${index}`;
     return (
@@ -125,12 +111,6 @@ export function CampaignTable({
           <IndexTable.Cell>
             <TextStyle variation="strong">{ele.campaignName}</TextStyle>
           </IndexTable.Cell>
-          {/* <IndexTable.Cell>
-            <TextStyle>{ele.campaignOrders}</TextStyle>
-          </IndexTable.Cell>
-          <IndexTable.Cell>
-            <TextStyle>{ele.campaignSales}</TextStyle>
-          </IndexTable.Cell> */}
           <IndexTable.Cell>
             <TextStyle>{ele.campaignStatus}</TextStyle>
           </IndexTable.Cell>
@@ -147,14 +127,8 @@ export function CampaignTable({
                 primary
                 onClick={(e) => {
                   e.stopPropagation(e);
-                  // setRenderCampaign(true);
-                  // setRenderCampaignData(ele);
-                  // setIsLoading(true);
-               
+                  setIsLoading(true);
                   navigate(`/campaign?id=${ele.id}`);
-
-                  // console.log("its work", ele.id);
-                  // updateCampaign(`${ele.id}`);
                 }}
               >
                 Update
@@ -179,34 +153,8 @@ export function CampaignTable({
   // server Request
 
   useEffect(() => {
-    // getAllCampaigns();
     searchCampainByStatus();
   }, [isLoading]);
-
-  async function getAllCampaigns() {
-    try {
-      await fetch("api/campaign/getCampaigns", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json;charset=UTF-8",
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data.Response.Data, "all Campaigns");
-
-          if (data.Response.Data) {
-            setCampaigns(data.Response.Data);
-          } else {
-            console.log("else part run");
-          }
-          setIsLoading(false);
-          return data;
-        });
-    } catch (error) {
-      console.log(`${error}`);
-    }
-  }
 
   async function searchCampainByStatus() {
     try {
@@ -221,30 +169,6 @@ export function CampaignTable({
           console.log(data, "all search");
           if (data.Response.Status == 200) {
             setCampaigns(data.Response.Data);
-          } else {
-            console.log("else part run");
-          }
-          setIsLoading(false);
-        });
-    } catch (error) {
-      console.log(`${error}`);
-    }
-  }
-
-  async function updateCampaign(id) {
-    try {
-      await fetch(`api/campaign/updateCampaigns?id=${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json;charset=UTF-8",
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data, "all search");
-          if (data.Response.Status == 200) {
-            //  setCampaigns(data.Response.Data);
-            searchCampainByStatus();
           } else {
             console.log("else part run");
           }
@@ -279,41 +203,23 @@ export function CampaignTable({
     }
   }
 
-  
   return (
     <>
-      {renderCampaign ? (
-        renderCampaignSection
-      ) : (
-        <>
-          <IndexTable
-            resourceName={resourceName}
-            itemCount={campaigns.length}
-            selectedItemsCount={
-              allResourcesSelected ? "All" : selectedResources.length
-            }
-            lastColumnSticky
-            onSelectionChange={handleSelectionChange}
-            loading={isLoading}
-            headings={tableHeaderTitles}
-            selectable={false}
-          >
-            {rowMarkup}
-          </IndexTable>
-          {toastActive ? renderToast : null}
-        </>
-      )}
-      {/* 
-      <Pagination
-        hasPrevious
-        onPrevious={() => {
-          console.log("Previous");
-        }}
-        hasNext
-        onNext={() => {
-          console.log("Next");
-        }}
-      /> */}
+      <IndexTable
+        resourceName={resourceName}
+        itemCount={campaigns.length}
+        selectedItemsCount={
+          allResourcesSelected ? "All" : selectedResources.length
+        }
+        lastColumnSticky
+        onSelectionChange={handleSelectionChange}
+        loading={isLoading}
+        headings={tableHeaderTitles}
+        selectable={false}
+      >
+        {rowMarkup}
+      </IndexTable>
+      {toastActive ? renderToast : null}
     </>
   );
 }

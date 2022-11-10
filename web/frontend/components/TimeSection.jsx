@@ -1,4 +1,3 @@
-import { useState, useCallback, useEffect } from "react";
 
 import { Layout, Card, TextField, Select, Stack } from "@shopify/polaris";
 
@@ -39,13 +38,11 @@ export function TimeSection({
               onChange={handleHour}
             />
             <Select
-              // label="hh"
               options={minuteSortOptions}
               value={minuteValue}
               onChange={handleMinute}
             />
             <Select
-              // label="hh"
               options={timeSortOptions}
               value={timeValue}
               onChange={handleTime}

@@ -1,29 +1,4 @@
 
-//   let productInfo = `query {
-//     product(id: ${id}) {
-//       availablePublicationCount
-//       title
-//       variants(first: 5) {
-//         edges {
-//           node {
-//             displayName
-//             id
-//             price
-//             compareAtPrice
-//             inventoryItem {
-//             unitCost {
-//              amount
-//              currencyCode
-//             }
-//             tracked
-//            }
-//           }
-//         }
-//       }
-//     }
-//   }`;
-
-//   gid://shopify/Product/7968030392598
 import { Shopify } from "@shopify/shopify-api";
 
 export const getProductByGraphql = async (session, id) => {
