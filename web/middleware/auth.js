@@ -3,6 +3,7 @@ import { gdprTopics } from "@shopify/shopify-api/dist/webhooks/registry.js";
 
 import ensureBilling from "../helpers/ensure-billing.js";
 import redirectToAuth from "../helpers/redirect-to-auth.js";
+import installWebhooks from "../server/shopify/install/webhook.install.js";
 
 export default function applyAuthMiddleware(
   app,
@@ -19,6 +20,14 @@ export default function applyAuthMiddleware(
         res,
         req.query
       );
+          if (session.accessToken) {
+            try {
+              installWebhooks(session);
+            } catch (e) {
+              console.log("ignore when created");
+              // ignore when created
+            }
+          }
 
       const responses = await Shopify.Webhooks.Registry.registerAll({
         shop: session.shop,

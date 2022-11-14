@@ -106,21 +106,23 @@ export const newCampaigns = async (req, res) => {
       campaignEndTime,
     } = req.body;
 
-      console.log(
-        campaignStartDate,
-        campaignStartHour,
-        campaignStartMinute,
-        campaignStartTime,
-        "Start Campaign*******"
-      );
+    console.log(
+      campaignStartDate,
+      campaignStartHour,
+      campaignStartMinute,
+      campaignStartTime,
+      "Start Campaign*******"
+    );
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
 
     const cheeck = await db.Campaign.findAll({
       where: {
         campaignEnd: {
           [Op.between]: [
-            `${campaignStartDate} ${campaignStartHour}:${campaignStartMinute}: 00 ${campaignStartTime}`,
-            `${campaignEndDate} ${campaignEndHour}:${campaignEndMinute}: 00  ${campaignEndTime}`,
+            new Date(
+              `${campaignStartDate} ${campaignStartHour}:${campaignStartMinute}: 00 ${campaignStartTime}`),
+            new Date(
+              `${campaignEndDate} ${campaignEndHour}:${campaignEndMinute}: 00  ${campaignEndTime}` ),
           ],
         },
       },
@@ -134,8 +136,12 @@ export const newCampaigns = async (req, res) => {
         defaults: {
           campaignName: campaignTitle,
           campaignStatus: "Scheduled",
-          campaignStart: `${campaignStartDate} ${campaignStartHour}:${campaignStartMinute}: 00 ${campaignStartTime}`,
-          campaignEnd: `${campaignEndDate} ${campaignEndHour}:${campaignEndMinute}: 00  ${campaignEndTime}`,
+          campaignStart: new Date(
+            `${campaignStartDate} ${campaignStartHour}:${campaignStartMinute}: 00 ${campaignStartTime}`
+          ),
+          campaignEnd: new Date(
+            `${campaignEndDate} ${campaignEndHour}:${campaignEndMinute}: 00  ${campaignEndTime}`
+          ),
           campaignInfo: campaignInfo,
           storeId: session.id,
         },
@@ -152,14 +158,14 @@ export const newCampaigns = async (req, res) => {
         campaignStartMinute,
         campaignStartTime
       );
-      await schedule2Job(
-        session,
-        campaignInfo,
-        campaignEndDate,
-        campaignEndHour,
-        campaignEndMinute,
-        campaignEndTime
-      );
+      // await schedule2Job(
+      //   session,
+      //   campaignInfo,
+      //   campaignEndDate,
+      //   campaignEndHour,
+      //   campaignEndMinute,
+      //   campaignEndTime
+      // );
     } else {
       Data = null;
       Status = 401;
@@ -229,7 +235,7 @@ export const getCampaignsById = async (req, res) => {
       where: { storeId: session.id, id: id },
     });
 
-    console.log( "campaign Get");
+    console.log("campaign Get");
     Data = campaign;
     Status = 200;
     Message = "Get Campain  Successfully";
@@ -337,7 +343,7 @@ export const updateCampaigns = async (req, res) => {
     //   time: campaignEndTime,
     // };
 
-    console.log(campaignStartDate, campaignEndDate,"its Update Route");
+    console.log(campaignStartDate, campaignEndDate, "its Update Route");
     const cheeck = await db.Campaign.findAll({
       where: {
         campaignEnd: {
@@ -350,19 +356,19 @@ export const updateCampaigns = async (req, res) => {
     });
 
     // if (cheeck.length == 0) {
-      const campaigns = await db.Campaign.update(
-        {
-          campaignName: campaignTitle,
-          campaignStart: `${campaignStartDate} ${campaignStartHour}:${campaignStartMinute}: 00 ${campaignStartTime}`,
-          campaignEnd: `${campaignEndDate} ${campaignEndHour}:${campaignEndMinute}: 00  ${campaignEndTime}`,
-          campaignInfo: campaignInfo,
-        },
-        { where: { storeId: session.id, id: id } }
-      );
-      Data = [...campaigns];
-      Status = 200;
-      Message = " Campain update Successfully";
-      Err = " Looking Good";
+    const campaigns = await db.Campaign.update(
+      {
+        campaignName: campaignTitle,
+        campaignStart: `${campaignStartDate} ${campaignStartHour}:${campaignStartMinute}: 00 ${campaignStartTime}`,
+        campaignEnd: `${campaignEndDate} ${campaignEndHour}:${campaignEndMinute}: 00  ${campaignEndTime}`,
+        campaignInfo: campaignInfo,
+      },
+      { where: { storeId: session.id, id: id } }
+    );
+    Data = [...campaigns];
+    Status = 200;
+    Message = " Campain update Successfully";
+    Err = " Looking Good";
     // } else {
     //   Data = null;
     //   Status = 401;

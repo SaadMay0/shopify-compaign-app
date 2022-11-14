@@ -2,8 +2,8 @@ import express from "express";
 import {
   ordersCreateWebhookHandler,
   appUninstalledWebhookHandler,
-} from "../services/webhook/webhook.js";
-import "colors";
+} from "../../services/webhook/webhook.js";
+
 const router = express.Router();
 
 const webhookTypesFuncMap = {
@@ -13,12 +13,11 @@ const webhookTypesFuncMap = {
 
 router.post("/:type", async (req, res) => {
   try {
-    console.log("ordersCreateWebhookHandler is working ".red);
     const { body, params, headers } = req;
     const { type } = params;
     const shop = headers["x-shopify-shop-domain"];
     console.log("==========================");
-    console.log("webhook received", shop, type);
+    console.log(`${type} webhook is received from ${shop} `);
     console.log("==========================");
 
     if (!shop || !type) {

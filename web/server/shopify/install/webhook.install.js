@@ -2,8 +2,8 @@ import { createWebhook } from "../handlers/install/webhook.service.js";
 import { EWebhookTopics } from "./helper/webhooks.type.js";
 
 const TOPICS = [
-  // EWebhookTopics.APP_UNINSTALLED,
-  EWebhookTopics.ORDERS_UPDATED,
+  EWebhookTopics.APP_UNINSTALLED,
+  // EWebhookTopics.ORDERS_UPDATED,
 ];
 
 
