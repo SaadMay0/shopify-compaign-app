@@ -190,104 +190,104 @@ export const schedule2Job = async (
   }
 };
 
-const jobProcessor = (id, session, campaignInfo) => {
-  return async () => {
-    const campaignProducsArr = await getCollectionProductsArr(
-      session,
-      campaignInfo
-    );
+// const jobProcessor = (id, session, campaignInfo) => {
+//   return async () => {
+//     const campaignProducsArr = await getCollectionProductsArr(
+//       session,
+//       campaignInfo
+//     );
 
-    console.log(campaignProducsArr, "=====1");
-    for (let i = 0; i < campaignProducsArr.length; i++) {
-      const { discount, costDiscount, products } = campaignProducsArr[i];
-      console.log("=====2");
-      for (let j = 0; j < products.length; j++) {
-        // const { id } = products[i];
-        const {
-          inventoryItem,
-          price: retailPrice,
-          compareAtPrice,
-        } = await getProductByGraphql(session, products[i].id);
-        const cost = Number(inventoryItem.unitCost.amount);
-        const price = Number(retailPrice);
-        const compareAt = Number(compareAtPrice);
+//     console.log(campaignProducsArr, "=====1");
+//     for (let i = 0; i < campaignProducsArr.length; i++) {
+//       const { discount, costDiscount, products } = campaignProducsArr[i];
+//       console.log("=====2");
+//       for (let j = 0; j < products.length; j++) {
+//         // const { id } = products[i];
+//         const {
+//           inventoryItem,
+//           price: retailPrice,
+//           compareAtPrice,
+//         } = await getProductByGraphql(session, products[i].id);
+//         const cost = Number(inventoryItem.unitCost.amount);
+//         const price = Number(retailPrice);
+//         const compareAt = Number(compareAtPrice);
 
-        let disCost = cost - cost * (costDiscount / 100);
-        let disPrice = price - price * (discount / 100);
-        let disCompareAt = compareAt - compareAt * (discount / 100);
-        await productsUpdate(
-          session,
-          products[i].id,
-          disCost,
-          disPrice,
-          disCompareAt
-        );
-        console.log("upDate Db is worke");
-        const [row, created] = await db.Campaign.findOrCreate({
-          where: {
-            storeId: session.id,
-            // campaignName: campaignInfo.title,
-            id: id,
-          },
-          defaults: {},
-        });
-        if (!created) {
-          row.campaignStatus = "Active";
-          row.save();
-        }
-        console.log("upDate Db is Done!");
-      }
-    }
-  };
+//         let disCost = cost - cost * (costDiscount / 100);
+//         let disPrice = price - price * (discount / 100);
+//         let disCompareAt = compareAt - compareAt * (discount / 100);
+//         await productsUpdate(
+//           session,
+//           products[i].id,
+//           disCost,
+//           disPrice,
+//           disCompareAt
+//         );
+//         console.log("upDate Db is worke");
+//         const [row, created] = await db.Campaign.findOrCreate({
+//           where: {
+//             storeId: session.id,
+//             // campaignName: campaignInfo.title,
+//             id: id,
+//           },
+//           defaults: {},
+//         });
+//         if (!created) {
+//           row.campaignStatus = "Active";
+//           row.save();
+//         }
+//         console.log("upDate Db is Done!");
+//       }
+//     }
+//   };
 
-  // console.log("campaignProducsArr is === ", campaignProducsArr.length);
-  // await Promise.all(
-  //   campaignProducsArr.map(async (ele) => {
-  //     discount = ele.discount;
-  //     costDiscount = ele.costDiscount;
+//   // console.log("campaignProducsArr is === ", campaignProducsArr.length);
+//   // await Promise.all(
+//   //   campaignProducsArr.map(async (ele) => {
+//   //     discount = ele.discount;
+//   //     costDiscount = ele.costDiscount;
 
-  //     await Promise.all(
-  //       ele.products.map(async (productId) => {
-  //         let singleProduct = await getProductByGraphql(session, productId.id);
-  //         let cost = Number(singleProduct.inventoryItem.unitCost.amount);
-  //         let price = Number(singleProduct.price);
-  //         let compareAt = Number(singleProduct.compareAtPrice);
+//   //     await Promise.all(
+//   //       ele.products.map(async (productId) => {
+//   //         let singleProduct = await getProductByGraphql(session, productId.id);
+//   //         let cost = Number(singleProduct.inventoryItem.unitCost.amount);
+//   //         let price = Number(singleProduct.price);
+//   //         let compareAt = Number(singleProduct.compareAtPrice);
 
-  //         let disCost = cost - cost * (costDiscount / 100);
-  //         let disPrice = price - price * (discount / 100);
-  //         let disCompareAt = compareAt - compareAt * (discount / 100);
-  //         await productsUpdate(
-  //           session,
-  //           productId.id,
-  //           disCost,
-  //           disPrice,
-  //           disCompareAt
-  //         );
+//   //         let disCost = cost - cost * (costDiscount / 100);
+//   //         let disPrice = price - price * (discount / 100);
+//   //         let disCompareAt = compareAt - compareAt * (discount / 100);
+//   //         await productsUpdate(
+//   //           session,
+//   //           productId.id,
+//   //           disCost,
+//   //           disPrice,
+//   //           disCompareAt
+//   //         );
 
-  //         console.log("Campaign Update ======");
-  //         // await db.Campaign.update(
-  //         //   { campaignStatus: "Active" },
-  //         //   {
-  //         //     where: {
-  //         //       storeId: session.id,
-  //         //       campaignName: campaignInfo.title,
-  //         //     },
-  //         //   }
-  //         // );
-  //         const [row, created] = await db.Campaign.findOrCreate({
-  //           where: {
-  //             storeId: session.id,
-  //             campaignName: campaignInfo.title,
-  //           },
-  //           defaults: {},
-  //         });
-  //         if (!created) {
-  //           row.campaignStatus = "Expired";
-  //           row.save();
-  //         }
-  //         console.log("Campaign Update Complete======");
-  //       })
-  //     );
-  //   })
-  // );
-};
+//   //         console.log("Campaign Update ======");
+//   //         // await db.Campaign.update(
+//   //         //   { campaignStatus: "Active" },
+//   //         //   {
+//   //         //     where: {
+//   //         //       storeId: session.id,
+//   //         //       campaignName: campaignInfo.title,
+//   //         //     },
+//   //         //   }
+//   //         // );
+//   //         const [row, created] = await db.Campaign.findOrCreate({
+//   //           where: {
+//   //             storeId: session.id,
+//   //             campaignName: campaignInfo.title,
+//   //           },
+//   //           defaults: {},
+//   //         });
+//   //         if (!created) {
+//   //           row.campaignStatus = "Expired";
+//   //           row.save();
+//   //         }
+//   //         console.log("Campaign Update Complete======");
+//   //       })
+//   //     );
+//   //   })
+//   // );
+// };
