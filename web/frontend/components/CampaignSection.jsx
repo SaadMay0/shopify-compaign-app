@@ -141,21 +141,13 @@ export function CampaignSection() {
     setCampaignInfo([...campaignInfo]);
   };
 
-  const handleTogglePopoverActive = (arrayIndex) => (ele) => {
-    console.log(ele, "handleTogglePopoverActive");
-    campaignInfo[arrayIndex].popoverActive = !ele;
-    setCampaignInfo([...campaignInfo]);
-  };
-
-  const activator = (index) => {
-    console.log("activator is working ", index);
-    handleTogglePopoverActive(index);
+  const activator = (index,ele) => {
     return (
       <Button
         onClick={(e) => {
-          console.log("buttom");
-          handleTogglePopoverActive(index);
-          // e.stopPropagation(e);
+          console.log("buttom", ele.popoverActive);
+           campaignInfo[index].popoverActive = !ele.popoverActive;
+           setCampaignInfo([...campaignInfo]);
         }}
         disclosure
       >
@@ -182,8 +174,8 @@ export function CampaignSection() {
         <IndexTable.Cell>
           <Popover
             active={ele.popoverActive}
-            activator={activator(index)}
-            onClose={handleTogglePopoverActive(index)}
+            activator={activator(index,ele)}
+            // onClose={handleTogglePopoverActive(index)}
           >
             <OptionList
               options={ele.vendorsOptions}
@@ -377,6 +369,8 @@ export function CampaignSection() {
 
             let startDate = new Date(campaignStart);
             let endDate = new Date(campaignEnd);
+
+            console.log(startDate, "************startDate***********");
 
             let startHour = startDate.getHours() ;
             let startMinute = startDate.getMinutes() ;

@@ -7,10 +7,11 @@ import {
   schedule2Job,
 } from "../helper_functions/shopify/scheduleJob.js";
 import "colors";
+import moment from "moment";
 const Op = Sequelize.Op;
 
 export const getCampaignInfo = async (req, res) => {
-  console.log("===> campaign/getCollectionProducts its work");
+  console.log("===> getCampaignInfo its work");
   let Data = [];
   let Status;
   let Message;
@@ -27,7 +28,6 @@ export const getCampaignInfo = async (req, res) => {
           });
 
           if (result.length == 1) {
-            console.log("==========Result Is Pushed");
             Data.push(...result);
           } else {
             let vendor = [];
@@ -38,27 +38,24 @@ export const getCampaignInfo = async (req, res) => {
             );
             await Promise.all(
               collectionProducts.products.map(async (ele) => {
-                console.log(ele.vendor, "====");
-                vendor.push({
-                  value: `${ele.vendor}`,
-                  label: `${ele.vendor}`,
-                });
-                vendorSelect.push(ele.vendor);
+                if (!vendorSelect.includes(`${ele.vendor}`)) {
+                  vendor.push({
+                    value: `${ele.vendor}`,
+                    label: `${ele.vendor}`,
+                  });
+                  vendorSelect.push(`${ele.vendor}`);
+                }
               })
             );
-            let uniqueVendorsOption = [...new Set(vendor)];
-            let uniqueVendorSelect = [...new Set(vendorSelect)];
 
             let obj = {
               id: ele.id,
               image: ele.image ? ele.image.originalSrc : null,
               title: ele.title,
-              // campaignQuantity: 1,
               campaignCostDiscount: 0,
-              // campaignCostDiscount,
               campaignDiscount: 0,
-              vendorsOptions: uniqueVendorsOption,
-              vendorsSelect: uniqueVendorSelect,
+              vendorsOptions: vendor,
+              vendorsSelect: vendorSelect,
               popoverActive: false,
             };
             Data.push(obj);
@@ -106,71 +103,79 @@ export const newCampaigns = async (req, res) => {
       campaignEndTime,
     } = req.body;
 
-    console.log(
-      campaignStartDate,
-      campaignStartHour,
-      campaignStartMinute,
-      campaignStartTime,
-      "Start Campaign*******"
-    );
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
 
+    let toDate = moment(new Date(), "YYYY-MM-DD hh:mm:ss a").format();
+
+    let startDate = moment(
+      `${campaignStartDate} ${campaignStartHour}:${campaignStartMinute}: 00 ${campaignStartTime}`,
+      "YYYY-MM-DD hh:mm:ss a"
+    ).format();
+
+    let endDate = moment(
+      `${campaignEndDate} ${campaignEndHour}:${campaignEndMinute}: 00  ${campaignEndTime}`,
+      "YYYY-MM-DD hh:mm:ss a"
+    ).format();
     const cheeck = await db.Campaign.findAll({
       where: {
         campaignEnd: {
-          [Op.between]: [
-            new Date(
-              `${campaignStartDate} ${campaignStartHour}:${campaignStartMinute}: 00 ${campaignStartTime}`),
-            new Date(
-              `${campaignEndDate} ${campaignEndHour}:${campaignEndMinute}: 00  ${campaignEndTime}` ),
-          ],
+          [Op.between]: [startDate, endDate],
         },
       },
     });
 
-    console.log(cheeck, "Check That value");
+    console.log(campaignStartHour,"888888888", campaignStartMinute);
 
-    if (cheeck.length == 0) {
-      const [row, created] = await db.Campaign.findOrCreate({
-        where: { storeId: session.id, campaignName: campaignTitle },
-        defaults: {
-          campaignName: campaignTitle,
-          campaignStatus: "Scheduled",
-          campaignStart: new Date(
-            `${campaignStartDate} ${campaignStartHour}:${campaignStartMinute}: 00 ${campaignStartTime}`
-          ),
-          campaignEnd: new Date(
-            `${campaignEndDate} ${campaignEndHour}:${campaignEndMinute}: 00  ${campaignEndTime}`
-          ),
-          campaignInfo: campaignInfo,
-          storeId: session.id,
-        },
-      });
-      Data = [row];
-      Status = 200;
-      Message = " Campain Created Successfully";
-      Err = " Looking Good";
-      await scheduleJob(
-        session,
-        campaignInfo,
-        campaignStartDate,
-        campaignStartHour,
-        campaignStartMinute,
-        campaignStartTime
-      );
-      // await schedule2Job(
-      //   session,
-      //   campaignInfo,
-      //   campaignEndDate,
-      //   campaignEndHour,
-      //   campaignEndMinute,
-      //   campaignEndTime
-      // );
+    if (toDate <= startDate) {
+      if (cheeck.length == 0) {
+        const [row, created] = await db.Campaign.findOrCreate({
+          where: { storeId: session.id, campaignName: campaignTitle },
+          defaults: {
+            campaignName: campaignTitle,
+            campaignStatus: "Scheduled",
+            campaignStart: startDate,
+            campaignEnd: endDate,
+            campaignInfo: campaignInfo,
+            storeId: session.id,
+          },
+        });
+        console.log(row.id, "Row Id ");
+        Data = [row];
+        Status = 200;
+        Message = " Campain Created Successfully";
+        Err = " Looking Good";
+        await scheduleJob(
+          row.id,
+          session,
+          // campaignInfo,
+          campaignStartDate,
+          campaignStartHour,
+          campaignStartMinute,
+          campaignStartTime
+        );
+        await schedule2Job(
+          row.id,
+          session,
+          // campaignInfo,
+          campaignEndDate,
+          campaignEndHour,
+          campaignEndMinute,
+          campaignEndTime
+        );
+      } else {
+        Data = null;
+        Status = 401;
+        Message = "Already have an Campaign between you selected Date";
+        Err = "Duplication not allow";
+      }
+      // console.log(endDate, "Start Campaign*******", startDate, toDate);
     } else {
+      console.log("else Part Is working");
+
       Data = null;
       Status = 401;
-      Message = "Already have an Campaign between you selected Date";
-      Err = "Duplication not allow";
+      Message = "Start Campaign Date or Time must be greater ";
+      Err = "Invalid Date or Time";
     }
   } catch (err) {
     console.log("newCampaigns", err);
@@ -266,7 +271,6 @@ export const getCampaignsByStatus = async (req, res) => {
   try {
     const { tab } = req.query;
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
-    console.log(tab, "tab isssssss");
     let campaign;
 
     if (tab == "All") {
@@ -343,38 +347,56 @@ export const updateCampaigns = async (req, res) => {
     //   time: campaignEndTime,
     // };
 
-    console.log(campaignStartDate, campaignEndDate, "its Update Route");
+    let toDate = moment(new Date(), "YYYY-MM-DD hh:mm:ss a").format();
+
+    let startDate = moment(
+      `${campaignStartDate} ${campaignStartHour}:${campaignStartMinute}: 00 ${campaignStartTime}`,
+      "YYYY-MM-DD hh:mm:ss a"
+    ).format();
+
+    let endDate = moment(
+      `${campaignEndDate} ${campaignEndHour}:${campaignEndMinute}: 00  ${campaignEndTime}`,
+      "YYYY-MM-DD hh:mm:ss a"
+    ).format();
+
+    console.log(startDate, endDate, "its Update Route");
+
     const cheeck = await db.Campaign.findAll({
       where: {
         campaignEnd: {
-          [Op.between]: [
-            `${campaignStartDate} ${campaignStartHour}:${campaignStartMinute}: 00 ${campaignStartTime}`,
-            `${campaignEndDate} ${campaignEndHour}:${campaignEndMinute}: 00  ${campaignEndTime}`,
-          ],
+          [Op.between]: [startDate, endDate],
         },
       },
     });
+    if (toDate <= startDate) {
+      if (cheeck.length == 0) {
+        const campaigns = await db.Campaign.update(
+          {
+            campaignName: campaignTitle,
+            campaignStart: startDate,
+            campaignEnd: endDate,
+            campaignInfo: campaignInfo,
+          },
+          { where: { storeId: session.id, id: id } }
+        );
+        Data = [...campaigns];
+        Status = 200;
+        Message = " Campain update Successfully";
+        Err = " Looking Good";
+      } else {
+        Data = null;
+        Status = 401;
+        Message = "Already have an Campaign between you selected Date";
+        Err = "Duplication not allow";
+      }
+    } else {
+      console.log("else Part Is working");
 
-    // if (cheeck.length == 0) {
-    const campaigns = await db.Campaign.update(
-      {
-        campaignName: campaignTitle,
-        campaignStart: `${campaignStartDate} ${campaignStartHour}:${campaignStartMinute}: 00 ${campaignStartTime}`,
-        campaignEnd: `${campaignEndDate} ${campaignEndHour}:${campaignEndMinute}: 00  ${campaignEndTime}`,
-        campaignInfo: campaignInfo,
-      },
-      { where: { storeId: session.id, id: id } }
-    );
-    Data = [...campaigns];
-    Status = 200;
-    Message = " Campain update Successfully";
-    Err = " Looking Good";
-    // } else {
-    //   Data = null;
-    //   Status = 401;
-    //   Message = "Already have an Campaign between you selected Date";
-    //   Err = "Duplication not allow";
-    // }
+      Data = null;
+      Status = 401;
+      Message = "Start Campaign Date or Time must be greater ";
+      Err = "Invalid Date or Time";
+    }
   } catch (err) {
     console.log("updateCampaigns", err);
     Status = 404;

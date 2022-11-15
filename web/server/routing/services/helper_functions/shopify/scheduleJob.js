@@ -5,8 +5,9 @@ import { getCollectionProductsArr } from "./campaigns.js";
 import cron from "node-cron";
 
 export const scheduleJob = async (
+  id,
   session,
-  campaignInfo,
+  // campaignInfo,
   campaignStartDate,
   campaignStartHour,
   campaignStartMinute,
@@ -16,7 +17,9 @@ export const scheduleJob = async (
   let time = campaignStartDate.split("-");
   let hour =
     campaignStartTime == "PM"
-      ? 12 + Number(campaignStartHour)
+      ? Number(campaignStartHour) == 12
+        ? campaignStartHour
+        : 12 + Number(campaignStartHour)
       : campaignStartHour;
 
   console.log(
@@ -26,43 +29,22 @@ export const scheduleJob = async (
   try {
     let task = cron.schedule(
       ` 3 ${campaignStartMinute} ${hour} ${time[2]} ${time[1]} *`,
-      jobProcessor(session, campaignInfo)
-    );
-    // task.stop();
-  } catch (err) {
-    console.log("scheduleJob Error", err);
-  }
-};
-
-export const schedule2Job = async (
-  session,
-  campaignInfo,
-  campaignEndDate,
-  campaignEndHour,
-  campaignEndMinute,
-  campaignEndTime
-) => {
-  let hour;
-  let time = campaignEndDate.split("-");
-  hour = campaignEndHour;
-
-  if (campaignEndTime == "PM") {
-    hour = 12 + Number(campaignEndHour);
-    // console.log(hour, campaignEndHour,"PM Conndition is work");
-  }
-  console.log(time, `=== 3 ${campaignEndMinute} ${hour} ${time[2]} ${time[1]}`);
-  try {
-    let task = cron.schedule(
-      ` 3 ${campaignEndMinute} ${hour} ${time[2]} ${time[1]} *`,
+      // jobProcessor(id, session, campaignInfo)
       async () => {
-        console.log("running a task every schedule2Job");
+        let campaign = await db.Campaign.findOne({
+          where: {
+            storeId: session.id,
+            id: id,
+          },
+        });
+        console.log("running a task every scheduleJob", campaign);
 
         let discount;
         let costDiscount;
 
         let campaignProducsArr = await getCollectionProductsArr(
           session,
-          campaignInfo
+          campaign.campaignInfo
         );
 
         console.log("AllData is === ", campaignProducsArr);
@@ -83,13 +65,12 @@ export const schedule2Job = async (
                 let price = Number(singleProduct.price);
                 let compareAt = Number(singleProduct.compareAtPrice);
 
-                //  let disCost = cost - cost * (costDiscount / 100);
-                //  let disPrice = price - price * (discount / 100);
-                //  let disCompareAt = compareAt - compareAt * (discount / 100);
-
-                let disCost = cost / (1 - costDiscount / 100);
-                let disPrice = price / (1 - discount / 100);
-                let disCompareAt = compareAt / (1 - discount / 100);
+                // let disCost = cost / (1 - costDiscount / 100);
+                // let disPrice = price / (1 - discount / 100);
+                // let disCompareAt = compareAt / (1 - discount / 100);
+                        let disCost = cost - cost * (costDiscount / 100);
+                        let disPrice = price - price * (discount / 100);
+                        let disCompareAt = compareAt - compareAt * (discount / 100);
 
                 let updatePrductsDiscount = await productsUpdate(
                   session,
@@ -98,15 +79,104 @@ export const schedule2Job = async (
                   disPrice,
                   disCompareAt
                 );
-                const result = await db.Campaign.update(
-                  { campaignStatus: "Expired" },
-                  {
-                    where: {
-                      storeId: session.id,
-                      campaignName: campaignInfo.title,
-                    },
-                  }
+
+                console.log("Update DB worke=======");
+
+                console.log("Campaign ****************");
+
+                campaign.campaignStatus = "Active";
+                campaign.save();
+                console.log("Update DB worke Done !!=======");
+              })
+            );
+          })
+        );
+
+        task.stop();
+      }
+    );
+    // tak.stop();
+  } catch (err) {
+    console.log("scheduleJob Error", err);
+  }
+};
+
+export const schedule2Job = async (
+  id,
+  session,
+  // campaignInfo,
+  campaignEndDate,
+  campaignEndHour,
+  campaignEndMinute,
+  campaignEndTime
+) => {
+  let time = campaignEndDate.split("-");
+  let hour =
+    campaignEndTime == "PM"
+      ? Number(campaignEndHour) == 12
+        ? campaignEndHour
+        : 12 + Number(campaignEndHour)
+      : campaignEndHour;
+  console.log(time, `=== 3 ${campaignEndMinute} ${hour} ${time[2]} ${time[1]}`);
+  try {
+    let task = cron.schedule(
+      ` 3 ${campaignEndMinute} ${hour} ${time[2]} ${time[1]} *`,
+      async () => {
+        
+        let campaign = await db.Campaign.findOne({
+          where: {
+            storeId: session.id,
+            id: id,
+          },
+        });
+        console.log("running a task every schedule2Job",campaign);
+
+        
+        let discount;
+        let costDiscount;
+        
+        let campaignProducsArr = await getCollectionProductsArr(
+          session,
+          campaign.campaignInfo
+        );
+          
+          console.log("AllData is === ", campaignProducsArr);
+          await Promise.all(
+            campaignProducsArr.map(async (ele) => {
+              discount = ele.discount;
+              costDiscount = ele.costDiscount;
+              
+            await Promise.all(
+              ele.products.map(async (productId) => {
+                console.log(productId, "productId======");
+
+                let singleProduct = await getProductByGraphql(
+                  session,
+                  productId.id
                 );
+                let cost = Number(singleProduct.inventoryItem.unitCost.amount);
+                let price = Number(singleProduct.price);
+                let compareAt = Number(singleProduct.compareAtPrice);
+                
+                let disCost = cost / (1 - costDiscount / 100);
+                let disPrice = price / (1 - discount / 100);
+                let disCompareAt = compareAt / (1 - discount / 100);
+                
+                let updatePrductsDiscount = await productsUpdate(
+                  session,
+                  productId.id,
+                  disCost,
+                  disPrice,
+                  disCompareAt
+                  );
+                  
+                  console.log("Update DB worke=======");
+                 
+                  console.log( "Campaign ****************");
+                  
+                  campaign.campaignStatus = "Expired";
+                  campaign.save();
+                console.log("Update DB worke Done !!=======");
               })
             );
           })
@@ -120,7 +190,7 @@ export const schedule2Job = async (
   }
 };
 
-const jobProcessor = (session, campaignInfo) => {
+const jobProcessor = (id, session, campaignInfo) => {
   return async () => {
     const campaignProducsArr = await getCollectionProductsArr(
       session,
@@ -132,12 +202,12 @@ const jobProcessor = (session, campaignInfo) => {
       const { discount, costDiscount, products } = campaignProducsArr[i];
       console.log("=====2");
       for (let j = 0; j < products.length; j++) {
-        const { id } = products[i];
+        // const { id } = products[i];
         const {
           inventoryItem,
           price: retailPrice,
           compareAtPrice,
-        } = await getProductByGraphql(session, id);
+        } = await getProductByGraphql(session, products[i].id);
         const cost = Number(inventoryItem.unitCost.amount);
         const price = Number(retailPrice);
         const compareAt = Number(compareAtPrice);
@@ -145,12 +215,19 @@ const jobProcessor = (session, campaignInfo) => {
         let disCost = cost - cost * (costDiscount / 100);
         let disPrice = price - price * (discount / 100);
         let disCompareAt = compareAt - compareAt * (discount / 100);
-        await productsUpdate(session, id, disCost, disPrice, disCompareAt);
-
+        await productsUpdate(
+          session,
+          products[i].id,
+          disCost,
+          disPrice,
+          disCompareAt
+        );
+        console.log("upDate Db is worke");
         const [row, created] = await db.Campaign.findOrCreate({
           where: {
             storeId: session.id,
-            campaignName: campaignInfo.title,
+            // campaignName: campaignInfo.title,
+            id: id,
           },
           defaults: {},
         });
@@ -158,6 +235,7 @@ const jobProcessor = (session, campaignInfo) => {
           row.campaignStatus = "Active";
           row.save();
         }
+        console.log("upDate Db is Done!");
       }
     }
   };

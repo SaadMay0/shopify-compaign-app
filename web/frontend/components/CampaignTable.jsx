@@ -115,10 +115,12 @@ export function CampaignTable({
             <TextStyle>{ele.campaignStatus}</TextStyle>
           </IndexTable.Cell>
           <IndexTable.Cell>
-            <TextStyle>{`${ele.campaignStart}`}</TextStyle>
+            <TextStyle>{`${
+              new Date(ele.campaignStart).toLocaleString()
+            }`}</TextStyle>
           </IndexTable.Cell>
           <IndexTable.Cell>
-            <TextStyle>{`${ele.campaignEnd}`}</TextStyle>
+            <TextStyle>{`${new Date(ele.campaignEnd).toLocaleString()}`}</TextStyle>
           </IndexTable.Cell>
 
           <IndexTable.Cell>
@@ -166,7 +168,7 @@ export function CampaignTable({
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log(data, "all search");
+          
           if (data.Response.Status == 200) {
             setCampaigns(data.Response.Data);
           } else {
