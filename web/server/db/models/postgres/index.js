@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 import fs from "fs";
 import path from "path";
 import Sequelize from "sequelize";
@@ -32,21 +32,23 @@ const sequelize = new Sequelize(
   }
 );
 
-fs.readdirSync(__dirname)
-  .filter((file) => {
-    return (
-      file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js"
-    );
-  })
-  .forEach(async (file) => {
-    const modelPath = `./${file}`;
-
-    const modelFunc = await import(modelPath);
-    const model = modelFunc.default(sequelize, Sequelize);
+const availableFiles = fs.readdirSync(__dirname);
+const jsFiles = availableFiles.filter((file) => {
+  return (
+    file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js"
+  );
+});
 
 
-    db[model.name] = model;
-  });
+
+jsFiles.forEach(async (file) => {
+  const modelPath = `./${file}`;
+
+  const modelFunc = await import(modelPath);
+  const model = modelFunc.default(sequelize, Sequelize);
+
+  db[model.name] = model;
+});
 
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {

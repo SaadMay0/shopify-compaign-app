@@ -5,6 +5,9 @@ import { getCollectionProducts } from "../../../shopify/rest_api/collection.js";
 import {
   scheduleJob,
   schedule2Job,
+  testjobs,
+  startJob,
+  endJob,
 } from "../helper_functions/shopify/scheduleJob.js";
 import "colors";
 import moment from "moment";
@@ -18,49 +21,50 @@ export const getCampaignInfo = async (req, res) => {
   let Err;
   try {
     const { collectionIds, campaignInfo } = req.body;
-    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    // const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
 
     await Promise.all(
       collectionIds.map(async (ele) => {
-        if (campaignInfo.length >= 0) {
-          const result = campaignInfo.filter((items) => {
-            return items.id == ele.id;
-          });
+        // if (!campaignInfo.length > 0) {
+        const result = campaignInfo.filter((items) => {
+          return items.id == ele.id;
+        });
 
-          if (result.length == 1) {
-            Data.push(...result);
-          } else {
-            let vendor = [];
-            let vendorSelect = [];
-            let collectionProducts = await getCollectionProducts(
-              session,
-              ele.id.split("/").pop()
-            );
-            await Promise.all(
-              collectionProducts.products.map(async (ele) => {
-                if (!vendorSelect.includes(`${ele.vendor}`)) {
-                  vendor.push({
-                    value: `${ele.vendor}`,
-                    label: `${ele.vendor}`,
-                  });
-                  vendorSelect.push(`${ele.vendor}`);
-                }
-              })
-            );
+        if (result.length == 1) {
+          Data.push(...result);
+        } else {
+          let vendor = [];
+          let vendorSelect = [];
+          let collectionProducts = await getCollectionProducts(
+            session,
+            ele.id.split("/").pop()
+          );
+          await Promise.all(
+            collectionProducts.products.map(async (ele) => {
+              if (!vendorSelect.includes(`${ele.vendor}`)) {
+                vendor.push({
+                  value: `${ele.vendor}`,
+                  label: `${ele.vendor}`,
+                });
+                vendorSelect.push(`${ele.vendor}`);
+              }
+            })
+          );
 
-            let obj = {
-              id: ele.id,
-              image: ele.image ? ele.image.originalSrc : null,
-              title: ele.title,
-              campaignCostDiscount: 0,
-              campaignDiscount: 0,
-              vendorsOptions: vendor,
-              vendorsSelect: vendorSelect,
-              popoverActive: false,
-            };
-            Data.push(obj);
-          }
+          let obj = {
+            id: ele.id,
+            image: ele.image ? ele.image.originalSrc : null,
+            title: ele.title,
+            campaignCostDiscount: 0,
+            campaignDiscount: 0,
+            vendorsOptions: vendor,
+            vendorsSelect: vendorSelect,
+            popoverActive: false,
+          };
+          Data.push(obj);
         }
+        // }
       })
     );
     Status = 200;
@@ -103,7 +107,8 @@ export const newCampaigns = async (req, res) => {
       campaignEndTime,
     } = req.body;
 
-    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
+    // const session = await Shopify.Utils.loadCurrentSession(req, res, false);
 
     let toDate = moment(new Date(), "YYYY-MM-DD hh:mm:ss a").format();
 
@@ -124,7 +129,7 @@ export const newCampaigns = async (req, res) => {
       },
     });
 
-    console.log(campaignStartHour,"888888888", campaignStartMinute);
+    console.log(campaignStartHour, "888888888", campaignStartMinute);
 
     if (toDate <= startDate) {
       if (cheeck.length == 0) {
@@ -144,24 +149,26 @@ export const newCampaigns = async (req, res) => {
         Status = 200;
         Message = " Campain Created Successfully";
         Err = " Looking Good";
-        await scheduleJob(
-          row.id,
-          session,
-          // campaignInfo,
-          campaignStartDate,
-          campaignStartHour,
-          campaignStartMinute,
-          campaignStartTime
-        );
-        await schedule2Job(
-          row.id,
-          session,
-          // campaignInfo,
-          campaignEndDate,
-          campaignEndHour,
-          campaignEndMinute,
-          campaignEndTime
-        );
+        // await scheduleJob(
+        //   row.id,
+        //   session,
+        //   // campaignInfo,
+        //   campaignStartDate,
+        //   campaignStartHour,
+        //   campaignStartMinute,
+        //   campaignStartTime
+        // );
+        // await schedule2Job(
+        //   row.id,
+        //   session,
+        //   // campaignInfo,
+        //   campaignEndDate,
+        //   campaignEndHour,
+        //   campaignEndMinute,
+        //   campaignEndTime
+        // );
+        await startJob(row.id, session, row.campaignStart);
+        await endJob(row.id, session, row.campaignEnd);
       } else {
         Data = null;
         Status = 401;
@@ -201,7 +208,8 @@ export const getCampaigns = async (req, res) => {
   let Message;
   let Err;
   try {
-    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
+    // const session = await Shopify.Utils.loadCurrentSession(req, res, false);
     const campaigns = await db.Campaign.findAll({
       where: { storeId: session.id },
     });
@@ -234,7 +242,8 @@ export const getCampaignsById = async (req, res) => {
   let Err;
   try {
     const { id } = req.query;
-    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
+    // const session = await Shopify.Utils.loadCurrentSession(req, res, false);
 
     const campaign = await db.Campaign.findOne({
       where: { storeId: session.id, id: id },
@@ -270,7 +279,8 @@ export const getCampaignsByStatus = async (req, res) => {
   let Err;
   try {
     const { tab } = req.query;
-    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
+    // const session = await Shopify.Utils.loadCurrentSession(req, res, false);
     let campaign;
 
     if (tab == "All") {
@@ -324,7 +334,8 @@ export const updateCampaigns = async (req, res) => {
       campaignEndMinute,
       campaignEndTime,
     } = req.body;
-    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    // const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
 
     // let startDate = campaignStartDate.split("-");
     // let endDate = campaignEndDate.split("-");
@@ -376,9 +387,12 @@ export const updateCampaigns = async (req, res) => {
             campaignStart: startDate,
             campaignEnd: endDate,
             campaignInfo: campaignInfo,
+            campaignStatus: "Scheduled",
           },
           { where: { storeId: session.id, id: id } }
         );
+        await startJob(id, session, startDate);
+        await endJob(id, session, endDate);
         Data = [...campaigns];
         Status = 200;
         Message = " Campain update Successfully";
@@ -422,7 +436,8 @@ export const deleteCampaignsById = async (req, res) => {
   let Err;
   try {
     const { id } = req.query;
-    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    // const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
 
     const campaigns = await db.Campaign.destroy({
       where: { storeId: session.id, id: id },
@@ -446,4 +461,97 @@ export const deleteCampaignsById = async (req, res) => {
       Err,
     },
   });
+};
+
+export const testCroneJob = async (req, res) => {
+  console.log("===> testCroneJob its work");
+  let Data = [];
+  let Status;
+  let Message;
+  let Err;
+  try {
+    const { id } = req.body;
+
+    const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
+    // const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+
+    let campaign = await db.Campaign.findOne({
+      where: {
+        storeId: session.id,
+        id: id,
+      },
+    });
+    //  startJob(campaign.id, session, campaign.campaignStart);
+    endJob(campaign.id, session, campaign.campaignEnd);
+
+    Status = 200;
+    Message = " Crone Job Test Successfully";
+    Err = " Looking Good";
+  } catch (err) {
+    console.log("Test Crone job", err);
+    Status = 404;
+    Message = "Following Path Not Found";
+    Err = err;
+  }
+
+  res.status(200).send({
+    Response: {
+      Data,
+      Status,
+      Message,
+      Err,
+    },
+  });
+};
+
+export const reSchedulAllJobs = async (req, res) => {
+  console.log("===> reSchedulAllJobs its work");
+  let Data = [];
+  let Status;
+  let Message;
+  let Err;
+  try {
+    let campaign = await db.Campaign.findAll({});
+
+    await Promise.all(
+      campaign.map(async (ele) => {
+        console.log(ele.storeId);
+        const session = await Shopify.Utils.loadOfflineSession(
+          ele.storeId.split("_").pop()
+        );
+
+        console.log(session, ele.storeId);
+ 
+        let toDate = new Date();
+        let startDate = new Date(ele.campaignStart);
+
+        if (toDate <= startDate && ele.campaignStatus == "Scheduled") {
+          console.log("if conndition is passs");
+         await startJob(ele.id, session, ele.campaignStart);
+         await endJob(ele.id, session, ele.campaignEnd);
+        }
+        console.log("else");
+      })
+    );
+
+    console.log("all ways run");
+    Data = campaign;
+    Status = 200;
+    Message = " reSchedulAllJobs Successfully";
+    Err = " Looking Good";
+  } catch (err) {
+    console.log("reSchedulAllJobs Err", err);
+    Status = 404;
+    Message = "Following Path Not Found";
+    Err = err;
+  }
+
+  // res.status(200).send({
+  //   Response: {
+  //     Data,
+  //     Status,
+  //     Message,
+  //     Err,
+  //   },
+  // });
 };

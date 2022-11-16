@@ -14,7 +14,9 @@ import { BillingInterval } from "./helpers/ensure-billing.js";
 import { AppInstallations } from "./server/routing/services/helper_functions/webhook/index.js";
 import config from "./server/db/config/index.js";
 import mountRoutes from "./server/routing/routes/index.js";
-import gdprWebhooks from "./server/routing/routes/gdpr_webhooks/index.js";
+import webhooks from "./server/routing/routes/gdpr_webhooks/index.js";
+import { reSchedulAllJobs } from "./server/routing/services/shopify/campaigns.js";
+
 
 const USE_ONLINE_TOKENS = false;
 const { DATABASE } = config;
@@ -24,7 +26,6 @@ const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 // TODO: There should be provided by env vars
 const DEV_INDEX_PATH = `${process.cwd()}/frontend/`;
 const PROD_INDEX_PATH = `${process.cwd()}/frontend/dist/`;
-
 
 Shopify.Context.initialize({
   API_KEY: process.env.SHOPIFY_API_KEY,
@@ -53,6 +54,8 @@ const BILLING_SETTINGS = {
   // currencyCode: "USD",
   // interval: BillingInterval.OneTime,
 };
+ 
+
 
 // export for test use only
 export async function createServer(
@@ -62,19 +65,36 @@ export async function createServer(
 ) {
   const app = express();
 
-  gdprWebhooks(app);
+ 
 
+  console.log("===============================================");
+  // console.log(app.on);
+ 
+  console.log("==============================================");
+
+  // setTimeout(async () => {
+  //   console.log("setTimeOut==============================");
+  //   await reSchedulAllJobs();
+  // },1000)
+ 
+  // app.use(reSchedulAllJobs);  
+  webhooks(app);
   app.set("use-online-tokens", USE_ONLINE_TOKENS);
   app.use(cookieParser(Shopify.Context.API_SECRET_KEY));
-
-  applyAuthMiddleware(app, {
-    billing: billingSettings,
-  });
   
+
+  applyAuthMiddleware(app, {  
+    billing: billingSettings, 
+  });
+
   // https://ee8e-110-39-147-226.ngrok.io?shop=saad-checkout-ui-ext.myshopify.com&host=c2FhZC1jaGVja291dC11aS1leHQubXlzaG9waWZ5LmNvbS9hZG1pbg
+
   console.log(process.env.HOST);
 
   // All endpoints after this point will require an active session
+  app.use(express.json({ limit: "50mb" }));
+  app.use(express.urlencoded({ extended: false }));
+  mountRoutes(app);
 
   app.use(
     "/api/*",
@@ -83,8 +103,9 @@ export async function createServer(
     })
   );
 
-  app.use(express.json({ limit: "50mb" }));
-  app.use(express.urlencoded({ extended: false }));
+  // app.use("/api/*", reSchedulAllJobs);
+  // app.use(express.json({ limit: "50mb" }));
+  // app.use(express.urlencoded({ extended: false }));
 
   app.use((req, res, next) => {
     const shop = Shopify.Utils.sanitizeShop(req.query.shop);
@@ -101,7 +122,7 @@ export async function createServer(
     next();
   });
 
-  mountRoutes(app);
+  // mountRoutes(app);
 
   if (isProd) {
     const compression = await import("compression").then(
@@ -147,4 +168,6 @@ export async function createServer(
   return { app };
 }
 
-createServer().then(({ app }) => app.listen(PORT));
+createServer().then(({ app }) => {
+  app.listen(PORT)
+});
