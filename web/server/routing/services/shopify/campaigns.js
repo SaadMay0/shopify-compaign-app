@@ -3,9 +3,6 @@ import Sequelize from "sequelize";
 import db from "../../../db/models/postgres/index.js";
 import { getCollectionProducts } from "../../../shopify/rest_api/collection.js";
 import {
-  scheduleJob,
-  schedule2Job,
-  testjobs,
   startJob,
   endJob,
 } from "../helper_functions/shopify/scheduleJob.js";
