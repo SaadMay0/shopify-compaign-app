@@ -6,7 +6,6 @@ export const getCollectionProductsArr = async (session, campaignInfo) => {
 
     await Promise.all(
       campaignInfo.map(async (ele) => {
-        console.log("campaignInfo === ", ele.id);
         let discount = ele.campaignDiscount;
         let costDiscount = ele.campaignCostDiscount;
         let vendors = ele.vendorsSelect;
@@ -20,7 +19,6 @@ export const getCollectionProductsArr = async (session, campaignInfo) => {
         await Promise.all(
           collectionProducts.products.map(async (product) => {
             vendors.filter((vender) => {
-              console.log(vender, product.vendor);
               if (vender == product.vendor) {
                 allProducts.push({
                   id: product.admin_graphql_api_id,
@@ -37,6 +35,8 @@ export const getCollectionProductsArr = async (session, campaignInfo) => {
           vendors,
           products: uniqueProductsArr,
         };
+
+        console.log("Arr of Product Created");
 
         allData.push(obj1);
       })

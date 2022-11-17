@@ -21,12 +21,11 @@ export const getCampaignInfo = async (req, res) => {
   let Err;
   try {
     const { collectionIds, campaignInfo } = req.body;
-    // const session = await Shopify.Utils.loadCurrentSession(req, res, false);
-    const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
+    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
 
     await Promise.all(
       collectionIds.map(async (ele) => {
-        // if (!campaignInfo.length > 0) {
         const result = campaignInfo.filter((items) => {
           return items.id == ele.id;
         });
@@ -64,7 +63,6 @@ export const getCampaignInfo = async (req, res) => {
           };
           Data.push(obj);
         }
-        // }
       })
     );
     Status = 200;
@@ -107,8 +105,8 @@ export const newCampaigns = async (req, res) => {
       campaignEndTime,
     } = req.body;
 
-    const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
-    // const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
+    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
 
     let toDate = moment(new Date(), "YYYY-MM-DD hh:mm:ss a").format();
 
@@ -121,67 +119,57 @@ export const newCampaigns = async (req, res) => {
       `${campaignEndDate} ${campaignEndHour}:${campaignEndMinute}: 00  ${campaignEndTime}`,
       "YYYY-MM-DD hh:mm:ss a"
     ).format();
-    const cheeck = await db.Campaign.findAll({
-      where: {
-        campaignEnd: {
-          [Op.between]: [startDate, endDate],
-        },
-      },
-    });
 
-    console.log(campaignStartHour, "888888888", campaignStartMinute);
-
-    if (toDate <= startDate) {
-      if (cheeck.length == 0) {
-        const [row, created] = await db.Campaign.findOrCreate({
-          where: { storeId: session.id, campaignName: campaignTitle },
-          defaults: {
-            campaignName: campaignTitle,
-            campaignStatus: "Scheduled",
-            campaignStart: startDate,
-            campaignEnd: endDate,
-            campaignInfo: campaignInfo,
-            storeId: session.id,
+    if (startDate < endDate) {
+      const cheeck = await db.Campaign.findAll({
+        where: {
+          campaignEnd: {
+            [Op.between]: [startDate, endDate],
           },
-        });
-        console.log(row.id, "Row Id ");
-        Data = [row];
-        Status = 200;
-        Message = " Campain Created Successfully";
-        Err = " Looking Good";
-        // await scheduleJob(
-        //   row.id,
-        //   session,
-        //   // campaignInfo,
-        //   campaignStartDate,
-        //   campaignStartHour,
-        //   campaignStartMinute,
-        //   campaignStartTime
-        // );
-        // await schedule2Job(
-        //   row.id,
-        //   session,
-        //   // campaignInfo,
-        //   campaignEndDate,
-        //   campaignEndHour,
-        //   campaignEndMinute,
-        //   campaignEndTime
-        // );
-        await startJob(row.id, session, row.campaignStart);
-        await endJob(row.id, session, row.campaignEnd);
+        },
+      });
+
+      if (toDate <= startDate) {
+        if (cheeck.length == 0) {
+          const [row, created] = await db.Campaign.findOrCreate({
+            where: { storeId: session.id, campaignName: campaignTitle },
+            defaults: {
+              campaignName: campaignTitle,
+              campaignStatus: "Scheduled",
+              campaignStart: startDate,
+              campaignEnd: endDate,
+              campaignInfo: campaignInfo,
+              storeId: session.id,
+            },
+          });
+          console.log(row.id, "Row Id ");
+          Data = [row];
+          Status = 200;
+          Message = " Campain Created Successfully";
+          Err = " Looking Good";
+          await startJob(row.id, session, row.campaignStart);
+          await endJob(row.id, session, row.campaignEnd);
+        } else {
+          Data = null;
+          Status = 401;
+          Message = "Already have an Campaign between you selected Date";
+          Err = "Duplication not allow";
+        }
+        // console.log(endDate, "Start Campaign*******", startDate, toDate);
       } else {
+        console.log("else Part Is working");
+
         Data = null;
         Status = 401;
-        Message = "Already have an Campaign between you selected Date";
-        Err = "Duplication not allow";
+        Message =
+          "Start Campaign Date or Time must be greater then now Date or time ";
+        Err = "Invalid Date or Time";
       }
-      // console.log(endDate, "Start Campaign*******", startDate, toDate);
     } else {
-      console.log("else Part Is working");
-
       Data = null;
       Status = 401;
-      Message = "Start Campaign Date or Time must be greater ";
+      Message =
+        "End Campaign Date or Time must be less then Start Date or time";
       Err = "Invalid Date or Time";
     }
   } catch (err) {
@@ -208,8 +196,8 @@ export const getCampaigns = async (req, res) => {
   let Message;
   let Err;
   try {
-    const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
-    // const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
+    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
     const campaigns = await db.Campaign.findAll({
       where: { storeId: session.id },
     });
@@ -242,8 +230,8 @@ export const getCampaignsById = async (req, res) => {
   let Err;
   try {
     const { id } = req.query;
-    const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
-    // const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
+    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
 
     const campaign = await db.Campaign.findOne({
       where: { storeId: session.id, id: id },
@@ -279,8 +267,8 @@ export const getCampaignsByStatus = async (req, res) => {
   let Err;
   try {
     const { tab } = req.query;
-    const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
-    // const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
+    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
     let campaign;
 
     if (tab == "All") {
@@ -334,29 +322,8 @@ export const updateCampaigns = async (req, res) => {
       campaignEndMinute,
       campaignEndTime,
     } = req.body;
-    // const session = await Shopify.Utils.loadCurrentSession(req, res, false);
-    const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
-
-    // let startDate = campaignStartDate.split("-");
-    // let endDate = campaignEndDate.split("-");
-
-    // let compStart = {
-    //   year: startDate[0],
-    //   month: startDate[1],
-    //   day: startDate[2],
-    //   hour: campaignStartHour,
-    //   minute: campaignStartMinute,
-    //   time: campaignStartTime,
-    // };
-
-    // let compEnd = {
-    //   year: endDate[0],
-    //   month: endDate[1],
-    //   day: endDate[2],
-    //   hour: campaignEndHour,
-    //   minute: campaignEndMinute,
-    //   time: campaignEndTime,
-    // };
+    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
 
     let toDate = moment(new Date(), "YYYY-MM-DD hh:mm:ss a").format();
 
@@ -372,43 +339,51 @@ export const updateCampaigns = async (req, res) => {
 
     console.log(startDate, endDate, "its Update Route");
 
-    const cheeck = await db.Campaign.findAll({
-      where: {
-        campaignEnd: {
-          [Op.between]: [startDate, endDate],
-        },
-      },
-    });
-    if (toDate <= startDate) {
-      if (cheeck.length == 0) {
-        const campaigns = await db.Campaign.update(
-          {
-            campaignName: campaignTitle,
-            campaignStart: startDate,
-            campaignEnd: endDate,
-            campaignInfo: campaignInfo,
-            campaignStatus: "Scheduled",
+    if (startDate < endDate) {
+      const cheeck = await db.Campaign.findAll({
+        where: {
+          campaignEnd: {
+            [Op.between]: [startDate, endDate],
           },
-          { where: { storeId: session.id, id: id } }
-        );
-        await startJob(id, session, startDate);
-        await endJob(id, session, endDate);
-        Data = [...campaigns];
-        Status = 200;
-        Message = " Campain update Successfully";
-        Err = " Looking Good";
+        },
+      });
+      if (toDate <= startDate) {
+        if (cheeck.length == 0) {
+          const campaigns = await db.Campaign.update(
+            {
+              campaignName: campaignTitle,
+              campaignStart: startDate,
+              campaignEnd: endDate,
+              campaignInfo: campaignInfo,
+              campaignStatus: "Scheduled",
+            },
+            { where: { storeId: session.id, id: id } }
+          );
+          await startJob(id, session, startDate);
+          await endJob(id, session, endDate);
+          Data = [...campaigns];
+          Status = 200;
+          Message = " Campain update Successfully";
+          Err = " Looking Good";
+        } else {
+          Data = null;
+          Status = 401;
+          Message = "Already have an Campaign between you selected Date";
+          Err = "Duplication not allow";
+        }
       } else {
+        console.log("else Part Is working");
+
         Data = null;
         Status = 401;
-        Message = "Already have an Campaign between you selected Date";
-        Err = "Duplication not allow";
+        Message = "Start Campaign Date or Time must be greater ";
+        Err = "Invalid Date or Time";
       }
     } else {
-      console.log("else Part Is working");
-
       Data = null;
       Status = 401;
-      Message = "Start Campaign Date or Time must be greater ";
+      Message =
+        "End Campaign Date or Time must be less then Start Date or time";
       Err = "Invalid Date or Time";
     }
   } catch (err) {
@@ -436,8 +411,8 @@ export const deleteCampaignsById = async (req, res) => {
   let Err;
   try {
     const { id } = req.query;
-    // const session = await Shopify.Utils.loadCurrentSession(req, res, false);
-    const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
+    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
 
     const campaigns = await db.Campaign.destroy({
       where: { storeId: session.id, id: id },
@@ -461,6 +436,60 @@ export const deleteCampaignsById = async (req, res) => {
       Err,
     },
   });
+};
+
+export const reSchedulAllJobs = async (req, res) => {
+  console.log("===> reSchedulAllJobs its work");
+  let Data = [];
+  let Status;
+  let Message;
+  let Err;
+  try {
+    let campaign = await db.Campaign.findAll({});
+
+    await Promise.all(
+      campaign.map(async (ele) => {
+        const session = await Shopify.Utils.loadOfflineSession(
+          ele.storeId.split("_").pop()
+        );
+
+        let toDate = new Date();
+        let startDate = new Date(ele.campaignStart);
+
+        if (toDate <= startDate && ele.campaignStatus == "Scheduled") {
+          console.log("*******reSchedulAllJobs********");
+          await startJob(ele.id, session, ele.campaignStart);
+          await endJob(ele.id, session, ele.campaignEnd);
+        }
+
+        if (toDate >= startDate && ele.campaignStatus == "Active") {
+          console.log("*******reSchedulAllJobs that Not Expire********");
+          // await startJob(ele.id, session, ele.campaignStart);
+          await endJob(ele.id, session, ele.campaignEnd);
+        }
+      })
+    );
+    console.log("else");
+
+    Data = campaign;
+    Status = 200;
+    Message = " reSchedulAllJobs Successfully";
+    Err = " Looking Good";
+  } catch (err) {
+    console.log("reSchedulAllJobs Err", err);
+    Status = 404;
+    Message = "Following Path Not Found";
+    Err = err;
+  }
+
+  // res.status(200).send({
+  //   Response: {
+  //     Data,
+  //     Status,
+  //     Message,
+  //     Err,
+  //   },
+  // });
 };
 
 export const testCroneJob = async (req, res) => {
@@ -502,56 +531,4 @@ export const testCroneJob = async (req, res) => {
       Err,
     },
   });
-};
-
-export const reSchedulAllJobs = async (req, res) => {
-  console.log("===> reSchedulAllJobs its work");
-  let Data = [];
-  let Status;
-  let Message;
-  let Err;
-  try {
-    let campaign = await db.Campaign.findAll({});
-
-    await Promise.all(
-      campaign.map(async (ele) => {
-        console.log(ele.storeId);
-        const session = await Shopify.Utils.loadOfflineSession(
-          ele.storeId.split("_").pop()
-        );
-
-        console.log(session, ele.storeId);
- 
-        let toDate = new Date();
-        let startDate = new Date(ele.campaignStart);
-
-        if (toDate <= startDate && ele.campaignStatus == "Scheduled") {
-          console.log("if conndition is passs");
-         await startJob(ele.id, session, ele.campaignStart);
-         await endJob(ele.id, session, ele.campaignEnd);
-        }
-        console.log("else");
-      })
-    );
-
-    console.log("all ways run");
-    Data = campaign;
-    Status = 200;
-    Message = " reSchedulAllJobs Successfully";
-    Err = " Looking Good";
-  } catch (err) {
-    console.log("reSchedulAllJobs Err", err);
-    Status = 404;
-    Message = "Following Path Not Found";
-    Err = err;
-  }
-
-  // res.status(200).send({
-  //   Response: {
-  //     Data,
-  //     Status,
-  //     Message,
-  //     Err,
-  //   },
-  // });
-};
+}
