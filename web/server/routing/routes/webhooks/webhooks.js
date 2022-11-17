@@ -2,7 +2,7 @@ import express from "express";
 import {
   ordersCreateWebhookHandler,
   appUninstalledWebhookHandler,
-} from "../../services/webhook/webhook.js";
+} from "../../services/webhooks/webhooks.js";
 
 const router = express.Router();
 

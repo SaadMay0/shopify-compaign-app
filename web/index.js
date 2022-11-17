@@ -14,7 +14,7 @@ import { BillingInterval } from "./helpers/ensure-billing.js";
 import { AppInstallations } from "./server/routing/services/helper_functions/webhook/index.js";
 import config from "./server/db/config/index.js";
 import mountRoutes from "./server/routing/routes/index.js";
-import webhooks from "./server/routing/routes/gdpr_webhooks/index.js";
+import webhooks from "./server/routing/routes/webhooks/index.js";
 import { reSchedulAllJobs } from "./server/routing/services/shopify/campaigns.js";
 
  

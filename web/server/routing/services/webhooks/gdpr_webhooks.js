@@ -6,8 +6,7 @@ export const customersDataReqest = async (req, res) => {
     console.log("customersDataReqest is working");
     const { body, headers, rawBody } = req;
     const headerHMAC = headers["x-shopify-hmac-sha256"];
-    const shopifyWehookSecretKey =
-      "1aecd79f800ef739290b0e6144ac4460f31a34d30f9ade876231783ee3f3f808"; //process.env.SHOPIFY_API_SECRET;
+    const shopifyWehookSecretKey = process.env.SHOPIFY_API_SECRET;
 
     const generatedHash = crypto
       .createHmac("sha256", shopifyWehookSecretKey)
@@ -17,10 +16,10 @@ export const customersDataReqest = async (req, res) => {
     let hashEquals = Shopify.Utils.safeCompare(generatedHash, headerHMAC);
 
     if (hashEquals) {
-      res.status(200).send("");
+      res.status(200).send({});
       console.log("hashEquals True");
     } else {
-      res.status(401).send("");
+      res.status(401).send({});
       console.log("hashEquals false");
     }
   } catch (err) {
@@ -42,10 +41,10 @@ export const customersRedact = async (req, res) => {
     let hashEquals = Shopify.Utils.safeCompare(generatedHash, headerHMAC);
 
     if (hashEquals) {
-      res.status(200).send("");
+      res.status(200).send({});
       console.log("hashEquals True");
     } else {
-      res.status(401).send("");
+      res.status(401).send({});
       console.log("hashEquals false");
     }
   } catch (err) {
@@ -67,10 +66,10 @@ export const shopRedact = async (req, res) => {
     let hashEquals = Shopify.Utils.safeCompare(generatedHash, headerHMAC);
 
     if (hashEquals) {
-      res.status(200).send("");
+      res.status(200).send({});
       console.log("hashEquals True");
     } else {
-      res.status(401).send("");
+      res.status(401).send({});
       console.log("hashEquals false");
     }
   } catch (err) {
