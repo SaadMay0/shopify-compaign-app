@@ -1,3 +1,5 @@
+import { Shopify } from "@shopify/shopify-api";
+import crypto from "crypto";
 export const rawBodyHandler = (req, res, next) => {
   try {
     req.rawBody = "";
@@ -9,12 +11,38 @@ export const rawBodyHandler = (req, res, next) => {
         req.rawBody += chunk;
       })
       .on("end", () => {
-        console.log("webhook data received..",);
+        console.log("webhook data received..");
         next();
       });
     // next();
     console.log("rawBodyHandler is working");
   } catch (err) {
     console.log("rawBodyHandler Error", err);
+  }
+};
+
+export const verifyHMC = (req, res, next) => {
+  try {
+    console.log("verifyHMC is working");
+    const { body, headers, rawBody } = req;
+    const headerHMAC = headers["x-shopify-hmac-sha256"];
+    const shopifyWehookSecretKey =  process.env.SHOPIFY_API_SECRET;
+
+    const generatedHash = crypto
+      .createHmac("sha256", shopifyWehookSecretKey)
+      .update(rawBody, "utf-8")
+      .digest("base64");
+
+    let hashEquals = Shopify.Utils.safeCompare(generatedHash, headerHMAC);
+
+    if (hashEquals) {
+      console.log("verifyHMC True");
+      next();
+    } else {
+      res.status(401).send({});
+      console.log("verifyHMC false");
+    }
+  } catch (err) { 
+    console.log("verifyHMC middleware Error", err);
   }
 };
