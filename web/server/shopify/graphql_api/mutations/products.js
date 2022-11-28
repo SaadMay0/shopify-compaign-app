@@ -1,6 +1,12 @@
 import { Shopify } from "@shopify/shopify-api";
 
-export const variantsUpdate = async (session,id, cost, price, compareAtPrice) => {
+export const variantsUpdate = async (
+  session,
+  id,
+  cost,
+  price,
+  compareAtPrice
+) => {
   try {
     const client = new Shopify.Clients.Graphql(
       session.shop,
@@ -16,10 +22,11 @@ export const variantsUpdate = async (session,id, cost, price, compareAtPrice) =>
           title
           inventoryPolicy
           inventoryQuantity
-          inventoryItem: {
-            cost
-            tracked
-          },
+          inventoryItem {
+            unitCost {
+          amount,
+        },
+        },
           price
           compareAtPrice
         }
@@ -33,6 +40,9 @@ export const variantsUpdate = async (session,id, cost, price, compareAtPrice) =>
           input: {
             id: id,
             inventoryItem: {
+              // unitCost: {
+              //   amount: cost,
+              // },
               cost: cost,
               tracked: true,
             },
@@ -42,10 +52,10 @@ export const variantsUpdate = async (session,id, cost, price, compareAtPrice) =>
         },
       },
     });
-
+    // console.log(data.response);
     return data;
   } catch (err) {
-    console.log(` Catch Error ofvariantsUpdate = ${err.name}`, err);
+    console.log(` Catch Error ofvariantsUpdate = ${err.name}`, err.response);
   }
 };
 

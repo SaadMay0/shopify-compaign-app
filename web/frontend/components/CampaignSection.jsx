@@ -17,7 +17,9 @@ import {
   Spinner,
   OptionList,
   Popover,
+  // TitleBar,
 } from "@shopify/polaris";
+import { TitleBar } from "@shopify/app-bridge-react";
 import { ImageMajor } from "@shopify/polaris-icons";
 import { TimeSection } from "./TimeSection";
 import { ToastComponent } from "./Tost";
@@ -43,19 +45,18 @@ export function CampaignSection() {
   const [campaignTitle, setCompignTitle] = useState("");
   // Campaign Start State
   const [campaignStartDate, setCampaignStartDate] = useState("");
-  const [campaignStartHour, setCampaignStartHour] = useState("0");
-  const [campaignStartMinute, setCampaignStartMinute] = useState("0");
+  const [campaignStartHour, setCampaignStartHour] = useState("88");
+  const [campaignStartMinute, setCampaignStartMinute] = useState("99");
   const [campaignStartTime, setCampaignStartTime] = useState("AM");
   // Campaign End State
   const [campaignEndDate, setCampaignEndDate] = useState("");
-  const [campaignEndHour, setCampaignEndHour] = useState("0");
-  const [campaignEndMinute, setCampaignEndMinute] = useState("0");
+  const [campaignEndHour, setCampaignEndHour] = useState("88");
+  const [campaignEndMinute, setCampaignEndMinute] = useState("99");
   const [campaignEndTime, setCampaignEndTime] = useState("AM");
   // Toast Component State
   const [toastActive, setToastActive] = useState(false);
   const [toastContent, setToastContent] = useState("");
   const [toastIsError, setToastIsError] = useState(false);
-
 
   console.log(
     campaignStartDate,
@@ -141,13 +142,13 @@ export function CampaignSection() {
     setCampaignInfo([...campaignInfo]);
   };
 
-  const activator = (index,ele) => {
+  const activator = (index, ele) => {
     return (
       <Button
         onClick={(e) => {
           console.log("buttom", ele.popoverActive);
-           campaignInfo[index].popoverActive = !ele.popoverActive;
-           setCampaignInfo([...campaignInfo]);
+          campaignInfo[index].popoverActive = !ele.popoverActive;
+          setCampaignInfo([...campaignInfo]);
         }}
         disclosure
       >
@@ -174,7 +175,7 @@ export function CampaignSection() {
         <IndexTable.Cell>
           <Popover
             active={ele.popoverActive}
-            activator={activator(index,ele)}
+            activator={activator(index, ele)}
             // onClose={handleTogglePopoverActive(index)}
           >
             <OptionList
@@ -227,31 +228,33 @@ export function CampaignSection() {
   };
 
   const hourSortOptions = [
-    { value: "0", label: "hh" },
-    { value: "1", label: "1" },
-    { value: "2", label: "2" },
-    { value: "3", label: "3" },
-    { value: "4", label: "4" },
-    { value: "5", label: "5" },
-    { value: "6", label: "6" },
-    { value: "7", label: "7" },
-    { value: "8", label: "8" },
-    { value: "9", label: "9" },
+    { value: "88", label: "hh" },
+    { value: "0", label: "00" },
+    { value: "1", label: "01" },
+    { value: "2", label: "02" },
+    { value: "3", label: "03" },
+    { value: "4", label: "04" },
+    { value: "5", label: "05" },
+    { value: "6", label: "06" },
+    { value: "7", label: "07" },
+    { value: "8", label: "08" },
+    { value: "9", label: "09" },
     { value: "10", label: "10" },
     { value: "11", label: "11" },
     { value: "12", label: "12" },
   ];
   const minuteSortOptions = [
-    { value: "0", label: "mm" },
-    { value: "1", label: "1" },
-    { value: "2", label: "2" },
-    { value: "3", label: "3" },
-    { value: "4", label: "4" },
-    { value: "5", label: "5" },
-    { value: "6", label: "6" },
-    { value: "7", label: "7" },
-    { value: "8", label: "8" },
-    { value: "9", label: "9" },
+    { value: "99", label: "mm" },
+    { value: "0", label: "00" },
+    { value: "1", label: "01" },
+    { value: "2", label: "02" },
+    { value: "3", label: "03" },
+    { value: "4", label: "04" },
+    { value: "5", label: "05" },
+    { value: "6", label: "06" },
+    { value: "7", label: "07" },
+    { value: "8", label: "08" },
+    { value: "9", label: "09" },
     { value: "10", label: "10" },
     { value: "11", label: "11" },
     { value: "12", label: "12" },
@@ -302,7 +305,7 @@ export function CampaignSection() {
     { value: "57", label: "57" },
     { value: "58", label: "58" },
     { value: "59", label: "59" },
-    { value: "60", label: "60" },
+    // { value: "60", label: "60" },
   ];
   const timeSortOptions = [
     { value: "AM", label: "AM" },
@@ -312,7 +315,7 @@ export function CampaignSection() {
   // *******************************************************
 
   useEffect(() => {
-    if (window.location.search) {
+    if (window.location.search.length>13) {
       setUpdateCampaign(true);
       getCampain();
     }
@@ -370,29 +373,35 @@ export function CampaignSection() {
             let startDate = new Date(campaignStart);
             let endDate = new Date(campaignEnd);
 
-            console.log(startDate, "************startDate***********");
 
-            let startHour = startDate.getHours() ;
-            let startMinute = startDate.getMinutes() ;
+             let startedDate = startDate.toISOString().split("T").shift();
+            console.log(
+              startDate,
+              "************startDate***********",
+              startedDate
+            );
+
+            let startHour = startDate.getHours();
+            let startMinute = startDate.getMinutes();
             let startTime = Number(startHour) <= 12 ? "AM" : "PM";
 
-            let endHour = endDate.getHours() ;
-            let endMinute = endDate.getMinutes() ;
+            let endHour = endDate.getHours();
+            let endMinute = endDate.getMinutes();
             let endTime = Number(endHour) <= 12 ? "AM" : "PM";
 
             startHour = startHour > 12 ? Number(startHour) - 12 : startHour;
             endHour = endHour > 12 ? Number(endHour) - 12 : endHour;
-            let end = endDate.toLocaleDateString().split("/");
-            let start = startDate.toLocaleDateString().split("/");
+            let start = startDate.toISOString().split("T").shift();
+            let end = endDate.toISOString().split("T").shift();
             setIsLoading(true);
             setResourceInitialSelection(campaignInfo);
             setCampaignInfo(campaignInfo);
             setCompignTitle(campaignName);
-            setCampaignStartDate(`${start[2]}-${start[0]}-${start[1]}`);
+            setCampaignStartDate(start);
             setCampaignStartHour(startHour.toString());
             setCampaignStartMinute(startMinute.toString());
             setCampaignStartTime(startTime);
-            setCampaignEndDate(`${end[2]}-${end[0]}-${end[1]}`);
+            setCampaignEndDate(end);
             setCampaignEndHour(endHour.toString());
             setCampaignEndMinute(endMinute.toString());
             setCampaignEndTime(endTime);
@@ -529,152 +538,214 @@ export function CampaignSection() {
   }
 
   return (
-    <Page>
-      <ResourcePicker
-        resourceType="Collection"
-        showVariants={true}
-        open={ResourcePickerState}
-        // initialSelectionIds={{id:"gid://shopify/Collection/425608020246"}}
-        onCancel={() => {
-          setResourceState(false);
-        }}
-        onSelection={(ele) => {
-          setIsLoading(true);
-          setResourceInitialSelection(ele.selection);
-          getCampainInfo(ele.selection, campaignInfo);
-          setResourceState(false);
-        }}
-      />
-      <Layout>
-        <Layout.Section>
-          <Card sectioned>
-            <TextField
-              label="Title"
-              type="text"
-              value={campaignTitle}
-              onChange={handleCampaignTitleTextChange}
-              helpText="Only You will See This Name or Title"
-              autoComplete="text"
-            />
-          </Card>
-        </Layout.Section>
-
-        <TimeSection
-          heading="Start Date"
-          paragraph="Secduled when your campaign Start"
-          inputTitle="Start Date"
-          dateValue={campaignStartDate}
-          hourSortOptions={hourSortOptions}
-          minuteSortOptions={minuteSortOptions}
-          timeSortOptions={timeSortOptions}
-          hourValue={campaignStartHour}
-          minuteValue={campaignStartMinute}
-          timeValue={campaignStartTime}
-          handleDate={handleStartDateChange}
-          handleHour={handleStartHourChange}
-          handleMinute={handleStartMinuteChange}
-          handleTime={handleStartTimeChange}
-        />
-
-        <Layout.Section>
-          <Card title="Discount" sectioned>
-            <p>
-              only Collection with a maximum of 1000 Products can be Discounted
-            </p>
-            <br />
-            <Button
-              primary
-              onClick={() => {
-                setResourceState(true);
-                // console.log(ele, "===resordes Pricker");
-              }}
-            >
-              Select Campaign Products
-            </Button>
-            {isLoading ? (
-              <div style={{ padding: "5% 50%" }}>
-                <Spinner accessibilityLabel="Spinner example" size="small" />
-              </div>
-            ) : campaignInfo.length == 0 ? null : (
-              <IndexTable
-                resourceName={resourceName}
-                itemCount={resourcePickerInitialSelection.length}
-                loading={isLoading}
-                headings={[
-                  { title: "" },
-                  { title: "Vendors" },
-                  { title: "Cost" },
-                  { title: "Discount" },
-                  { title: "Actions" },
-                ]}
-                selectable={false}
-              >
-                {rowMarkup}
-              </IndexTable>
-            )}
-          </Card>
-        </Layout.Section>
-
-        <TimeSection
-          heading="End Date"
-          paragraph="Secduled when your campaign End"
-          inputTitle="End Date"
-          dateValue={campaignEndDate}
-          hourSortOptions={hourSortOptions}
-          minuteSortOptions={minuteSortOptions}
-          timeSortOptions={timeSortOptions}
-          hourValue={campaignEndHour}
-          minuteValue={campaignEndMinute}
-          timeValue={campaignEndTime}
-          handleDate={handleEndDateChange}
-          handleHour={handleEndHourChange}
-          handleMinute={handleEndMinuteChange}
-          handleTime={handleEndTimeChange}
-        />
-      </Layout>
-
-      <PageActions
+    <>
+      <TitleBar
+        title="Campaign"
         primaryAction={{
           content: "Save",
           onAction: () => {
-            updateCampaign
-              ? updateCampaigns(
-                  campaignTitle,
-                  campaignInfo,
-                  campaignStartDate,
-                  campaignStartHour,
-                  campaignStartMinute,
-                  campaignStartTime,
-                  campaignEndDate,
-                  campaignEndHour,
-                  campaignEndMinute,
-                  campaignEndTime
-                )
-              : createCampaign(
-                  campaignTitle,
-                  campaignInfo,
-                  campaignStartDate,
-                  campaignStartHour,
-                  campaignStartMinute,
-                  campaignStartTime,
-                  campaignEndDate,
-                  campaignEndHour,
-                  campaignEndMinute,
-                  campaignEndTime
-                );
+            // navigate("/campaign");
+            if (
+              campaignTitle &&
+              campaignInfo &&
+              campaignStartDate &&
+              campaignEndDate
+            ) {
+              console.log("Passss");
+              updateCampaign
+                ? updateCampaigns(
+                    campaignTitle,
+                    campaignInfo,
+                    campaignStartDate,
+                    campaignStartHour,
+                    campaignStartMinute,
+                    campaignStartTime,
+                    campaignEndDate,
+                    campaignEndHour,
+                    campaignEndMinute,
+                    campaignEndTime
+                  )
+                : createCampaign(
+                    campaignTitle,
+                    campaignInfo,
+                    campaignStartDate,
+                    campaignStartHour,
+                    campaignStartMinute,
+                    campaignStartTime,
+                    campaignEndDate,
+                    campaignEndHour,
+                    campaignEndMinute,
+                    campaignEndTime
+                  );
+            }
           },
         }}
         secondaryActions={[
           {
             content: "Cancel",
-            // destructive: true,
+            // accessibilityLabel: "Secondary action label",
             onAction: () => {
               navigate("/dashboard");
             },
           },
         ]}
       />
-      {toastActive ? renderToastComponent : null}
-    </Page>
+      <Page>
+        <ResourcePicker
+          resourceType="Collection"
+          showVariants={true}
+          open={ResourcePickerState}
+          // initialSelectionIds={{id:"gid://shopify/Collection/425608020246"}}
+          onCancel={() => {
+            setResourceState(false);
+          }}
+          onSelection={(ele) => {
+            setIsLoading(true);
+            setResourceInitialSelection(ele.selection);
+            getCampainInfo(ele.selection, campaignInfo);
+            setResourceState(false);
+          }}
+        />
+        <Layout>
+          <Layout.Section>
+            <Card sectioned>
+              <TextField
+                label="Title"
+                type="text"
+                value={campaignTitle}
+                onChange={handleCampaignTitleTextChange}
+                helpText="Only you will See this Name or Title"
+                autoComplete="text"
+              />
+            </Card>
+          </Layout.Section>
+
+          <TimeSection
+            heading="Start Date"
+            paragraph="When does the campaign start"
+            inputTitle="Start Date"
+            dateValue={campaignStartDate}
+            hourSortOptions={hourSortOptions}
+            minuteSortOptions={minuteSortOptions}
+            timeSortOptions={timeSortOptions}
+            hourValue={campaignStartHour}
+            minuteValue={campaignStartMinute}
+            timeValue={campaignStartTime}
+            handleDate={handleStartDateChange}
+            handleHour={handleStartHourChange}
+            handleMinute={handleStartMinuteChange}
+            handleTime={handleStartTimeChange}
+          />
+
+          <Layout.Section>
+            <Card title="Discount" sectioned>
+              <p>
+                Only collection with a maximum of 1000 products can be
+                discounted
+              </p>
+              <br />
+              <Button
+                primary
+                onClick={() => {
+                  setResourceState(true);
+                  // console.log(ele, "===resordes Pricker");
+                }}
+              >
+                Select Campaign Products
+              </Button>
+              {isLoading ? (
+                <div style={{ padding: "5% 50%" }}>
+                  <Spinner accessibilityLabel="Spinner example" size="small" />
+                </div>
+              ) : campaignInfo.length == 0 ? null : (
+                <IndexTable
+                  resourceName={resourceName}
+                  itemCount={resourcePickerInitialSelection.length}
+                  loading={isLoading}
+                  headings={[
+                    { title: "" },
+                    { title: "Vendors" },
+                    { title: "Cost Discount" },
+                    { title: "Price Discount" },
+                    { title: "Actions" },
+                  ]}
+                  selectable={false}
+                >
+                  {rowMarkup}
+                </IndexTable>
+              )}
+            </Card>
+          </Layout.Section>
+
+          <TimeSection
+            heading="End Date"
+            paragraph="When does the campaign end"
+            inputTitle="End Date"
+            dateValue={campaignEndDate}
+            hourSortOptions={hourSortOptions}
+            minuteSortOptions={minuteSortOptions}
+            timeSortOptions={timeSortOptions}
+            hourValue={campaignEndHour}
+            minuteValue={campaignEndMinute}
+            timeValue={campaignEndTime}
+            handleDate={handleEndDateChange}
+            handleHour={handleEndHourChange}
+            handleMinute={handleEndMinuteChange}
+            handleTime={handleEndTimeChange}
+          />
+        </Layout>
+
+        <PageActions
+          primaryAction={{
+            content: "Save",
+            onAction: () => {
+              if (
+                campaignTitle &&
+                campaignInfo &&
+                campaignStartDate &&
+                campaignEndDate
+              ) {
+                console.log("Passss");
+                updateCampaign
+                  ? updateCampaigns(
+                      campaignTitle,
+                      campaignInfo,
+                      campaignStartDate,
+                      campaignStartHour,
+                      campaignStartMinute,
+                      campaignStartTime,
+                      campaignEndDate,
+                      campaignEndHour,
+                      campaignEndMinute,
+                      campaignEndTime
+                    )
+                  : createCampaign(
+                      campaignTitle,
+                      campaignInfo,
+                      campaignStartDate,
+                      campaignStartHour,
+                      campaignStartMinute,
+                      campaignStartTime,
+                      campaignEndDate,
+                      campaignEndHour,
+                      campaignEndMinute,
+                      campaignEndTime
+                    );
+              }
+            },
+          }}
+          secondaryActions={[
+            {
+              content: "Cancel",
+              // destructive: true,
+              onAction: () => {
+                navigate("/dashboard");
+              },
+            },
+          ]}
+        />
+        {toastActive ? renderToastComponent : null}
+      </Page>
+    </>
   );
 }

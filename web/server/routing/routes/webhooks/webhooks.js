@@ -7,7 +7,7 @@ import {
 const router = express.Router();
 
 const webhookTypesFuncMap = {
-  orders_updated: ordersCreateWebhookHandler,
+  // orders_updated: ordersCreateWebhookHandler,
   app_uninstalled: appUninstalledWebhookHandler,
 };
 

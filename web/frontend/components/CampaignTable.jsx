@@ -31,15 +31,15 @@ export function CampaignTable({
 
   // Toast Component Start
 
-  const [toastActive, setToastActive] = useState(false);
-  const [toastContent, setToastContent] = useState("");
-  const [isToastError, setIsToastError] = useState(false);
+   const [toastActive, setToastActive] = useState(false);
+   const [toastContent, setToastContent] = useState("");
+   const [toastIsError, setToastIsError] = useState(false);
 
   //Callback
-  const toggleToasrActive = useCallback(
-    () => setToastActive((active) => !active),
-    []
-  );
+ const toastToggleActive = useCallback(
+   () => setToastActive((active) => !active),
+   []
+ );
 
   // Tost Component End
   // const [bannerActive, setBannerActive] = useState(true);
@@ -81,10 +81,10 @@ export function CampaignTable({
 
   let renderToast = (
     <ToastComponent
-      toggleActive={toggleToasrActive}
+      toggleActive={toastToggleActive}
       active={toastActive}
       content={toastContent}
-      error={isToastError}
+      error={toastIsError}
     />
   );
 
@@ -115,17 +115,31 @@ export function CampaignTable({
             <TextStyle>{ele.campaignStatus}</TextStyle>
           </IndexTable.Cell>
           <IndexTable.Cell>
-            <TextStyle>{`${
-              new Date(ele.campaignStart).toLocaleString()
-            }`}</TextStyle>
+            <TextStyle>{`${new Date(
+              ele.campaignStart
+            ).toLocaleString()}`}</TextStyle>
           </IndexTable.Cell>
           <IndexTable.Cell>
-            <TextStyle>{`${new Date(ele.campaignEnd).toLocaleString()}`}</TextStyle>
+            <TextStyle>{`${new Date(
+              ele.campaignEnd
+            ).toLocaleString()}`}</TextStyle>
           </IndexTable.Cell>
 
           <IndexTable.Cell>
             <ButtonGroup>
-              <Button
+              {ele.campaignStatus == "Active" ? null : (
+                <Button
+                  primary
+                  onClick={(e) => {
+                    e.stopPropagation(e);
+                    setIsLoading(true);
+                    navigate(`/campaign?id=${ele.id}`);
+                  }}
+                >
+                  Update
+                </Button>
+              )}
+              {/* <Button
                 primary
                 onClick={(e) => {
                   e.stopPropagation(e);
@@ -134,7 +148,7 @@ export function CampaignTable({
                 }}
               >
                 Update
-              </Button>
+              </Button> */}
               <Button
                 primary
                 onClick={(e) => {
@@ -194,9 +208,17 @@ export function CampaignTable({
           console.log(data, "all search");
           if (data.Response.Status == 200) {
             //  setCampaigns(data.Response.Data);
+             setToastContent(data.Response.Message);
+             setToastIsError(false);
+             setToastActive(true);
+             setIsLoading(true);
             searchCampainByStatus();
           } else {
             console.log("else part run");
+             setToastContent(data.Response.Message);
+             setToastIsError(false);
+             setToastActive(true);
+             setIsLoading(true);
           }
           setIsLoading(false);
         });

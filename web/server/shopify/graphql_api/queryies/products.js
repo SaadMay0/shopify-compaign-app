@@ -49,3 +49,46 @@ export const getProductByGraphql = async (session, id) => {
     );
   }
 };
+
+
+export const getProductVariantByGraphql = async (session, id) => {
+  console.log("getProductVariantByGraphql is working GraphQl");
+  try {
+    const client = new Shopify.Clients.Graphql(
+      `${session.shop}`,
+      session.accessToken
+    );
+
+    const data = await client.query({
+      data: `query {
+    productVariant(id: "${id}") {
+      id
+      title
+      displayName
+      price
+      compareAtPrice
+      inventoryItem {
+          unitCost {
+            amount
+            currencyCode
+          }
+          tracked
+        }
+    }
+  }`,
+    });
+
+      // console.log(data.body.data.productVariant, "Data is here");
+    if (data.body.data) {
+      return data.body.data.productVariant;
+    } else {
+      return data;
+    }
+  } catch (err) {
+    console.log(
+      ` Catch Error of get products Graphql  = ${err.name}`,
+      //   err
+      err.response.errors
+    );
+  }
+};

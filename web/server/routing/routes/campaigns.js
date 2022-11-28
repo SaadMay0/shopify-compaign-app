@@ -21,14 +21,15 @@ router.get("/reSchedulAllJobs", reSchedulAllJobs);
 
 router.post("/CampaignInfo", getCampaignInfo);
 router.post("/newCampaigns", newCampaigns); 
-router.post("/testCroneJob" , testCroneJob);
 
 // PUT
 
 router.put("/updateCampaigns", updateCampaigns);
- 
+
 // DELETE
 router.delete("/deleteCampaignsById", deleteCampaignsById);
 
+////  
+router.put("/testCroneJob" , testCroneJob);
  
 export default router;

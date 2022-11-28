@@ -25,7 +25,7 @@ export default function App() {
                   destination: "/dashboard",
                 },
                 {
-                  label: "CampaignSection",
+                  label: "Campaign Section",
                   destination: "/campaign",
                 },
               ]}

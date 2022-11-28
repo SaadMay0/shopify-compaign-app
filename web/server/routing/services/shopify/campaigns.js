@@ -2,9 +2,14 @@ import { Shopify } from "@shopify/shopify-api";
 import Sequelize from "sequelize";
 import db from "../../../db/models/postgres/index.js";
 import { getCollectionProducts } from "../../../shopify/rest_api/collection.js";
+import { getProduct } from "../../../shopify/rest_api/product.js";
 import {
   startJob,
   endJob,
+  start,
+  end,
+  starJob,
+  enJob,
 } from "../helper_functions/shopify/scheduleJob.js";
 import "colors";
 import moment from "moment";
@@ -32,12 +37,24 @@ export const getCampaignInfo = async (req, res) => {
         } else {
           let vendor = [];
           let vendorSelect = [];
+          let allVariants = [];
           let collectionProducts = await getCollectionProducts(
             session,
             ele.id.split("/").pop()
           );
           await Promise.all(
             collectionProducts.products.map(async (ele) => {
+              console.log(ele.id, "ele is here========>");
+              let productVariants = await getProduct(session, ele.id);
+
+              // console.log(productVariants,"pppppppppppppppp");
+              productVariants.variants.map(async (variants) => {
+                allVariants.push({
+                  id: variants.admin_graphql_api_id,
+                  vendor: productVariants.vendor,
+                });
+              });
+
               if (!vendorSelect.includes(`${ele.vendor}`)) {
                 vendor.push({
                   value: `${ele.vendor}`,
@@ -57,8 +74,10 @@ export const getCampaignInfo = async (req, res) => {
             vendorsOptions: vendor,
             vendorsSelect: vendorSelect,
             popoverActive: false,
+            allVariants,
           };
           Data.push(obj);
+          console.log(obj, "&&&&&&&&&&&&&&&&");
         }
       })
     );
@@ -102,8 +121,8 @@ export const newCampaigns = async (req, res) => {
       campaignEndTime,
     } = req.body;
 
-    // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
 
     let toDate = moment(new Date(), "YYYY-MM-DD hh:mm:ss a").format();
 
@@ -123,6 +142,7 @@ export const newCampaigns = async (req, res) => {
           campaignEnd: {
             [Op.between]: [startDate, endDate],
           },
+          storeId: session.id,
         },
       });
 
@@ -193,8 +213,8 @@ export const getCampaigns = async (req, res) => {
   let Message;
   let Err;
   try {
-    // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
     const campaigns = await db.Campaign.findAll({
       where: { storeId: session.id },
     });
@@ -227,8 +247,8 @@ export const getCampaignsById = async (req, res) => {
   let Err;
   try {
     const { id } = req.query;
-    // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
 
     const campaign = await db.Campaign.findOne({
       where: { storeId: session.id, id: id },
@@ -264,8 +284,8 @@ export const getCampaignsByStatus = async (req, res) => {
   let Err;
   try {
     const { tab } = req.query;
-    // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
     let campaign;
 
     if (tab == "All") {
@@ -334,7 +354,7 @@ export const updateCampaigns = async (req, res) => {
       "YYYY-MM-DD hh:mm:ss a"
     ).format();
 
-    console.log(startDate, endDate, "its Update Route");
+    console.log(startDate<endDate, "its Update Route!!!!!!!!!!!!");
 
     if (startDate < endDate) {
       const cheeck = await db.Campaign.findAll({
@@ -342,8 +362,10 @@ export const updateCampaigns = async (req, res) => {
           campaignEnd: {
             [Op.between]: [startDate, endDate],
           },
+          storeId: session.id,
         },
       });
+      console.log(toDate <= startDate,"1!!!!!!!!!!");
       if (toDate <= startDate) {
         if (cheeck.length == 0) {
           const campaigns = await db.Campaign.update(
@@ -411,13 +433,29 @@ export const deleteCampaignsById = async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
     // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
 
-    const campaigns = await db.Campaign.destroy({
+    const findCampaign = await db.Campaign.findOne({
       where: { storeId: session.id, id: id },
     });
 
-    Status = 200;
-    Message = "delete Campaigns By Id Successfully";
-    Err = " Looking Good";
+    if (findCampaign.campaignStatus == "Active") {
+      await end(id, session);
+
+      const campaigns = await db.Campaign.destroy({
+        where: { storeId: session.id, id: id },
+      });
+
+      Status = 200;
+      Message = "Your Request is under process it Takes a couple of minutes";
+      Err = " Looking Good";
+    } else {
+      const campaigns = await db.Campaign.destroy({
+        where: { storeId: session.id, id: id },
+      });
+      console.log(campaigns, "its Destroy data");
+      Status = 200;
+      Message = "Delete Campaign Successfully";
+      Err = " Looking Good";
+    }
   } catch (err) {
     console.log("deleteCampaignsById", err);
     Status = 404;
@@ -496,25 +534,54 @@ export const testCroneJob = async (req, res) => {
   let Message;
   let Err;
   try {
-    const { id } = req.body;
+    const {
+      id,
+      campaignTitle,
+      campaignInfo,
+      campaignStartDate,
+      campaignStartHour,
+      campaignStartMinute,
+      campaignStartTime,
+      campaignEndDate,
+      campaignEndHour,
+      campaignEndMinute,
+      campaignEndTime,
+    } = req.body;
+    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
 
-    const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
-    // const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    let toDate = moment(new Date(), "YYYY-MM-DD hh:mm:ss a").format();
 
-    let campaign = await db.Campaign.findOne({
-      where: {
-        storeId: session.id,
-        id: id,
+    let startDate = moment(
+      `${campaignStartDate} ${campaignStartHour}:${campaignStartMinute}: 00 ${campaignStartTime}`,
+      "YYYY-MM-DD hh:mm:ss a"
+    ).format();
+
+    let endDate = moment(
+      `${campaignEndDate} ${campaignEndHour}:${campaignEndMinute}: 00  ${campaignEndTime}`,
+      "YYYY-MM-DD hh:mm:ss a"
+    ).format();
+
+    console.log(startDate, endDate, "its Update Route");
+
+    const campaigns = await db.Campaign.update(
+      {
+        campaignName: campaignTitle,
+        campaignStart: startDate,
+        campaignEnd: endDate,
+        campaignInfo: campaignInfo,
+        campaignStatus: "Scheduled",
       },
-    });
-    //  startJob(campaign.id, session, campaign.campaignStart);
-    endJob(campaign.id, session, campaign.campaignEnd);
-
+      { where: { storeId: session.id, id: id } }
+    );
+    await starJob(id, session, startDate);
+    // await enJob(id, session, endDate);
+    Data = [...campaigns];
     Status = 200;
-    Message = " Crone Job Test Successfully";
+    Message = " Campain update Successfully";
     Err = " Looking Good";
   } catch (err) {
-    console.log("Test Crone job", err);
+    console.log("updateCampaigns", err);
     Status = 404;
     Message = "Following Path Not Found";
     Err = err;
@@ -528,4 +595,4 @@ export const testCroneJob = async (req, res) => {
       Err,
     },
   });
-}
+};

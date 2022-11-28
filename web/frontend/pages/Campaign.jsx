@@ -9,7 +9,7 @@ export default function Campaign() {
 const navigate = useNavigate();
   return (
     <>
-      <TitleBar
+      {/* <TitleBar
         title="Campaignes"
         primaryAction={{
           content: "Save",
@@ -26,7 +26,7 @@ const navigate = useNavigate();
             },
           },
         ]}
-      />
+      /> */}
 
       <CampaignSection />
     </>
