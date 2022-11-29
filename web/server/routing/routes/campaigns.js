@@ -7,8 +7,9 @@ import {
   updateCampaigns,
   deleteCampaignsById,
   getCampaignsByStatus,
-  testCroneJob,
   reSchedulAllJobs,
+  testCroneJob,
+  ttest,
 } from "../services/shopify/campaigns.js";
 import "colors";
 const router = express.Router();
@@ -30,6 +31,8 @@ router.put("/updateCampaigns", updateCampaigns);
 router.delete("/deleteCampaignsById", deleteCampaignsById);
 
 ////  
-router.put("/testCroneJob" , testCroneJob);
+router.put("/testCroneJob", testCroneJob);
+router.get("/test", ttest);
+ 
  
 export default router;

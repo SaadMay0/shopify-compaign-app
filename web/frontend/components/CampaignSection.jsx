@@ -35,6 +35,7 @@ export function CampaignSection() {
   const fetch = useAuthenticatedFetch();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [redirect, setRedirect] = useState(false);
   const [resourcePickerInitialSelection, setResourceInitialSelection] =
     useState([]);
 
@@ -456,13 +457,16 @@ export function CampaignSection() {
         .then((data) => {
           console.log("createCampaign ======>", data.Response.Data);
           if (data.Response.Status == 200) {
+            // setRedirect(data.Response.redirect);
+            setResourceInitialSelection(data.Response.Data);
+            setCampaignInfo(data.Response.Data);
             setCampaignInfo(data.Response.Data);
             setToastContent(data.Response.Message);
             setToastIsError(false);
             setToastActive(true);
 
             setTimeout(() => {
-              navigate("/dashboard");
+              data.Response.redirect ? navigate("/dashboard") : null;
             }, 1000);
           } else {
             setToastContent(data.Response.Message);
@@ -515,6 +519,7 @@ export function CampaignSection() {
         .then((data) => {
           console.log("updateCampaigns ======>", data.Response.Data);
           if (data.Response.Status == 200) {
+            // setRedirect(data.Response.redirect);
             setCampaignInfo(data.Response.Data);
             setToastContent(data.Response.Message);
             setToastIsError(false);
@@ -522,7 +527,7 @@ export function CampaignSection() {
             setIsLoading(true);
 
             setTimeout(() => {
-              navigate("/dashboard");
+              data.Response.redirect ? navigate("/dashboard") : null;
             }, 1000);
           } else {
             setToastContent(data.Response.Message);
@@ -536,6 +541,27 @@ export function CampaignSection() {
       console.log(`${error}`);
     }
   }
+
+   async function ttest() {
+   
+     try {
+       
+       await fetch("/api/campaign/test", {
+         method: "GET",
+         headers: {
+           "Content-Type": "application/json;charset=UTF-8",
+         },
+       })
+         .then((response) => response.json())
+         .then((data) => {
+           console.log("ttest ======>", data);
+
+           return data;
+         });
+     } catch (error) {
+       console.log(`${error}`);
+     }
+   }
 
   return (
     <>
@@ -585,7 +611,8 @@ export function CampaignSection() {
             content: "Cancel",
             // accessibilityLabel: "Secondary action label",
             onAction: () => {
-              navigate("/dashboard");
+              ttest();
+              // navigate("/dashboard");
             },
           },
         ]}

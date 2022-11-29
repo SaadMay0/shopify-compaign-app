@@ -2,7 +2,10 @@ import { Shopify } from "@shopify/shopify-api";
 import Sequelize from "sequelize";
 import db from "../../../db/models/postgres/index.js";
 import { getCollectionProducts } from "../../../shopify/rest_api/collection.js";
-import { getProduct } from "../../../shopify/rest_api/product.js";
+import {
+  getProduct,
+  getCollectionProductByClint,
+} from "../../../shopify/rest_api/product.js";
 import {
   startJob,
   endJob,
@@ -106,6 +109,7 @@ export const newCampaigns = async (req, res) => {
   let Data = [];
   let Status;
   let Message;
+  let redirect;
   let Err;
   try {
     const {
@@ -147,29 +151,100 @@ export const newCampaigns = async (req, res) => {
       });
 
       if (toDate <= startDate) {
-        if (cheeck.length == 0) {
-          const [row, created] = await db.Campaign.findOrCreate({
-            where: { storeId: session.id, campaignName: campaignTitle },
-            defaults: {
-              campaignName: campaignTitle,
-              campaignStatus: "Scheduled",
-              campaignStart: startDate,
-              campaignEnd: endDate,
-              campaignInfo: campaignInfo,
-              storeId: session.id,
-            },
+        // let allCampaign = await db.Campaign.findAll({
+        //   where: {
+        //     storeId: session.id,
+        //   },
+        // });
+
+        let allProductsOfThisCampaignInfo = [];
+
+        let ProductExistes = [];
+
+        cheeck?.map(async (campaign) => {
+          if (
+            campaign.campaignInfo.map((campaignInf) => {
+              campaignInf.allVariants.map((variants) => {
+                let dbVariantId = variants.id;
+                console.log(variants.id, "Campaign VariantID");
+                campaignInfo.map((ele) => {
+                  ele.allVariants.map((varId) => {
+                    if (
+                      varId.id == dbVariantId 
+                    ) {
+                      ProductExistes.push(varId.id);
+                    }
+                    // allProductsOfThisCampaignInfo.push(varId.id);
+                  });
+                });
+              });
+            })
+          ) {
+          }
+        });
+        console.log(ProductExistes, "<======>");
+        if ( ProductExistes.length == 0) {
+          campaignInfo.map((ele) => {
+            ele.allVariants.map((varId) => {
+              allProductsOfThisCampaignInfo.push(varId.id);
+            });
           });
-          console.log(row.id, "Row Id ");
-          Data = [row];
-          Status = 200;
-          Message = " Campain Created Successfully";
-          Err = " Looking Good";
-          await startJob(row.id, session, row.campaignStart);
-          await endJob(row.id, session, row.campaignEnd);
+
+          const uniqueArr = new Set([...allProductsOfThisCampaignInfo]);
+
+          console.log(
+            allProductsOfThisCampaignInfo,
+            "+++++++++++++++++++++++++++",
+            uniqueArr.size < allProductsOfThisCampaignInfo.length,
+            uniqueArr.size,
+            allProductsOfThisCampaignInfo.length,
+            "+++++++++++++++++++++++++++"
+          );
+
+          // if (uniqueArr.size < allProductsOfThisCampaignInfo.length) {
+          //   console.log("uniqueArr");
+          // }
+
+          // if (ProductExistes.length >= 1) {
+          //   Data = campaignInfo;
+          //   redirect = false;
+          //   Status = 200;
+          //   Message = "Some products are exist in other campaign";
+          //   Err = " Looking Good";
+          // } else {
+            if (uniqueArr.size < allProductsOfThisCampaignInfo.length) {
+              Data = campaignInfo;
+              redirect = false;
+              Status = 200;
+              Message = "some products are repeated in this campaign";
+              Err = " Looking Good";
+            } else {
+              const [row, created] = await db.Campaign.findOrCreate({
+                where: { storeId: session.id, campaignName: campaignTitle },
+                defaults: {
+                  campaignName: campaignTitle,
+                  campaignStatus: "Scheduled",
+                  campaignStart: startDate,
+                  campaignEnd: endDate,
+                  campaignInfo: campaignInfo,
+                  storeId: session.id,
+                },
+              });
+              console.log(row.id, "Row Id ");
+              Data = [row];
+              redirect = true;
+              Status = 200;
+              Message = " Campain Created Successfully";
+              Err = " Looking Good";
+              await startJob(row.id, session, row.campaignStart);
+              await endJob(row.id, session, row.campaignEnd);
+            }
+          // }
         } else {
           Data = null;
           Status = 401;
           Message = "Already have an Campaign between you selected Date";
+          redirect = false;
           Err = "Duplication not allow";
         }
         // console.log(endDate, "Start Campaign*******", startDate, toDate);
@@ -178,6 +253,7 @@ export const newCampaigns = async (req, res) => {
 
         Data = null;
         Status = 401;
+        redirect = false;
         Message =
           "Start Campaign Date or Time must be greater then now Date or time ";
         Err = "Invalid Date or Time";
@@ -185,6 +261,7 @@ export const newCampaigns = async (req, res) => {
     } else {
       Data = null;
       Status = 401;
+      redirect = false;
       Message =
         "End Campaign Date or Time must be less then Start Date or time";
       Err = "Invalid Date or Time";
@@ -192,6 +269,7 @@ export const newCampaigns = async (req, res) => {
   } catch (err) {
     console.log("newCampaigns", err);
     Status = 404;
+    redirect = false;
     Message = "Following Path Not Found";
     Err = err;
   }
@@ -200,6 +278,7 @@ export const newCampaigns = async (req, res) => {
     Response: {
       Data,
       Status,
+      redirect,
       Message,
       Err,
     },
@@ -324,6 +403,7 @@ export const updateCampaigns = async (req, res) => {
   let Data = [];
   let Status;
   let Message;
+  let redirect;
   let Err;
   try {
     const {
@@ -354,7 +434,7 @@ export const updateCampaigns = async (req, res) => {
       "YYYY-MM-DD hh:mm:ss a"
     ).format();
 
-    console.log(startDate<endDate, "its Update Route!!!!!!!!!!!!");
+    console.log(startDate < endDate, "its Update Route!!!!!!!!!!!!");
 
     if (startDate < endDate) {
       const cheeck = await db.Campaign.findAll({
@@ -365,27 +445,103 @@ export const updateCampaigns = async (req, res) => {
           storeId: session.id,
         },
       });
-      console.log(toDate <= startDate,"1!!!!!!!!!!");
+      console.log(toDate <= startDate, "1!!!!!!!!!!");
       if (toDate <= startDate) {
         if (cheeck.length == 0) {
-          const campaigns = await db.Campaign.update(
-            {
-              campaignName: campaignTitle,
-              campaignStart: startDate,
-              campaignEnd: endDate,
-              campaignInfo: campaignInfo,
-              campaignStatus: "Scheduled",
+          let allCampaign = await db.Campaign.findAll({
+            where: {
+              storeId: session.id,
             },
-            { where: { storeId: session.id, id: id } }
+          });
+
+          let allProductsOfThisCampaignInfo = [];
+
+          let ProductExistes = [];
+
+          allCampaign?.map(async (campaign) => {
+            console.log(campaign.campaignInfo, "<======>");
+            if (
+              campaign.campaignInfo.map((campaignInf) => {
+                campaignInf.allVariants.map((variants) => {
+                  let dbVariantId = variants.id;
+                  console.log(variants.id, "Campaign VariantID");
+                  campaignInfo.map((ele) => {
+                    ele.allVariants.map((varId) => {
+                      console.log(
+                        varId.id == dbVariantId &&
+                          campaign.campaignStatus == "Active",
+
+                        varId.id == dbVariantId,
+                        campaign.campaignStatus == "Active",
+                        campaign.campaignStatus
+                      );
+                      if (varId.id == dbVariantId&&
+                          campaign.campaignStatus == "Active") {
+                        ProductExistes.push(varId.id);
+                      }
+                      // allProductsOfThisCampaignInfo.push(varId.id);
+                    });
+                  });
+                });
+              })
+            ) {
+            }
+          });
+
+          campaignInfo.map((ele) => {
+            ele.allVariants.map((varId) => {
+              allProductsOfThisCampaignInfo.push(varId.id);
+            });
+          });
+
+          const uniqueArr = new Set([...allProductsOfThisCampaignInfo]);
+
+          console.log(
+            allProductsOfThisCampaignInfo,
+            "+++++++++++++++++++++++++++",
+            uniqueArr.size < allProductsOfThisCampaignInfo.length,
+            uniqueArr.size,
+            allProductsOfThisCampaignInfo.length,
+            "+++++++++++++++++++++++++++"
           );
-          await startJob(id, session, startDate);
-          await endJob(id, session, endDate);
-          Data = [...campaigns];
-          Status = 200;
-          Message = " Campain update Successfully";
-          Err = " Looking Good";
+
+          if (ProductExistes.length >= 1) {
+            console.log(ProductExistes, "ProductExistes&&&&&&&&&&&&>>>>>>");
+            Data = campaignInfo;
+            redirect = false;
+            Status = 200;
+            Message = "Some products are exist in other campaign";
+            Err = " Looking Good";
+          } else {
+            if (uniqueArr.size < allProductsOfThisCampaignInfo.length) {
+              Data = campaignInfo;
+              redirect = false;
+              Status = 200;
+              Message = "some products are repeated in this campaign";
+              Err = " Looking Good";
+            } else {
+              const campaigns = await db.Campaign.update(
+                {
+                  campaignName: campaignTitle,
+                  campaignStart: startDate,
+                  campaignEnd: endDate,
+                  campaignInfo: campaignInfo,
+                  campaignStatus: "Scheduled",
+                },
+                { where: { storeId: session.id, id: id } }
+              );
+              await startJob(id, session, startDate);
+              await endJob(id, session, endDate);
+              Data = [...campaigns];
+              redirect = true;
+              Status = 200;
+              Message = " Campain update Successfully";
+              Err = " Looking Good";
+            }
+          }
         } else {
           Data = null;
+          redirect = false;
           Status = 401;
           Message = "Already have an Campaign between you selected Date";
           Err = "Duplication not allow";
@@ -394,12 +550,14 @@ export const updateCampaigns = async (req, res) => {
         console.log("else Part Is working");
 
         Data = null;
+        redirect = false;
         Status = 401;
         Message = "Start Campaign Date or Time must be greater ";
         Err = "Invalid Date or Time";
       }
     } else {
       Data = null;
+      redirect = false;
       Status = 401;
       Message =
         "End Campaign Date or Time must be less then Start Date or time";
@@ -407,6 +565,7 @@ export const updateCampaigns = async (req, res) => {
     }
   } catch (err) {
     console.log("updateCampaigns", err);
+    redirect = false;
     Status = 404;
     Message = "Following Path Not Found";
     Err = err;
@@ -415,6 +574,7 @@ export const updateCampaigns = async (req, res) => {
   res.status(200).send({
     Response: {
       Data,
+      redirect,
       Status,
       Message,
       Err,
@@ -596,3 +756,14 @@ export const testCroneJob = async (req, res) => {
     },
   });
 };
+
+export const ttest = async (req, res) => {
+  try {
+    console.log("TTest Rout is working**************");
+    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+    // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
+    getCollectionProductByClint(session, "427946115350");
+  } catch (err) {
+    
+  }
+}
