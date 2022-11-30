@@ -314,14 +314,18 @@ export function CampaignSection() {
   ];
 
   // *******************************************************
-
+// console.log(updateCampaign,"[[[[[[");
   useEffect(() => {
-    if (window.location.search.length>13) {
+    // console.log(window.location.search.length,updateCampaign, "{{{{", window.location.search);
+    if (
+      window.location.search.length < 50 &&
+      window.location.search.length > 15
+    ) {
       setUpdateCampaign(true);
       getCampain();
     }
   }, []);
-
+ 
   // Server Requests
   async function getCampainInfo(ids, campaignInfo) {
     try {
@@ -433,6 +437,7 @@ export function CampaignSection() {
     campaignEndMinute,
     campaignEndTime
   ) {
+    console.log("createCampaign is Work");
     try {
       let obj = {
         campaignTitle,
@@ -493,6 +498,7 @@ export function CampaignSection() {
     campaignEndMinute,
     campaignEndTime
   ) {
+    console.log("updateCampaigns is Work");
     let id = window.location.search.split("=").pop();
     try {
       let obj = {
@@ -542,26 +548,26 @@ export function CampaignSection() {
     }
   }
 
-   async function ttest() {
+  //  async function ttest() {
    
-     try {
+  //    try {
        
-       await fetch("/api/campaign/test", {
-         method: "GET",
-         headers: {
-           "Content-Type": "application/json;charset=UTF-8",
-         },
-       })
-         .then((response) => response.json())
-         .then((data) => {
-           console.log("ttest ======>", data);
+  //      await fetch("/api/campaign/test", {
+  //        method: "GET",
+  //        headers: {
+  //          "Content-Type": "application/json;charset=UTF-8",
+  //        },
+  //      })
+  //        .then((response) => response.json())
+  //        .then((data) => {
+  //          console.log("ttest ======>", data);
 
-           return data;
-         });
-     } catch (error) {
-       console.log(`${error}`);
-     }
-   }
+  //          return data;
+  //        });
+  //    } catch (error) {
+  //      console.log(`${error}`);
+  //    }
+  //  }
 
   return (
     <>
@@ -611,8 +617,8 @@ export function CampaignSection() {
             content: "Cancel",
             // accessibilityLabel: "Secondary action label",
             onAction: () => {
-              ttest();
-              // navigate("/dashboard");
+              // ttest();
+              navigate("/dashboard");
             },
           },
         ]}
