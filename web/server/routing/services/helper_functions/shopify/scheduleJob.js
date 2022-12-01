@@ -11,7 +11,7 @@ import { getCollectionProductsArr } from "./campaigns.js";
 import { getProduct } from "../../../../shopify/rest_api/product.js";
 import cron from "node-cron";
 
-export const startJob = async (id, session, campaignStart) => {
+export const startJob = async (session, id, campaignStart) => {
   let dateOfStart = new Date(campaignStart);
 
   let startedDate = dateOfStart.toISOString().split("T").shift();
@@ -59,53 +59,54 @@ export const startJob = async (id, session, campaignStart) => {
           let discount;
           let costDiscount;
 
+          await Promise.all()
+
+
+
           await Promise.all(
             campaign.campaignInfo.map(async (ele) => {
               console.log(ele, "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-              discount = ele.campaignDiscount;
+              discount = ele.campaignDiscount; 
               costDiscount = ele.campaignCostDiscount;
 
               await Promise.all(
-                ele.allVariants.map(async (productId) => {
-                  if (ele.vendorsSelect.includes(`${productId.vendor}`)) {
-                    let singleProduct = await getProductVariantByGraphql(
-                      session,
-                      productId.id
-                    );
-                    console.log(
-                      // productId,
-                      // ele.vendorsSelect,
-                      "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-                      // productId.vendor,
-                      // ele.vendorsSelect.includes(`${productId.vendor}`)
-                    );
+                ele.selectesVariants.map(async (productId) => {
+                  // if (ele.vendorsSelect.includes(`${productId.vendor}`)) {
+                  let singleProduct = await getProductVariantByGraphql(
+                    session,
+                    productId.id
+                  );
+                  console.log(
+                    // productId,
+                    // ele.vendorsSelect,
+                    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+                    // productId.vendor,
+                    // ele.vendorsSelect.includes(`${productId.vendor}`)
+                  );
 
-                    console.log(
-                      singleProduct.displayName,
-                      "******************"
-                    );
+                  console.log(singleProduct.displayName, "******************");
 
-                    let cost = Number(
-                      singleProduct.inventoryItem.unitCost.amount
-                    );
-                    let price = Number(singleProduct.price);
-                    let compareAt = Number(singleProduct.compareAtPrice);
+                  let cost = Number(
+                    singleProduct.inventoryItem.unitCost.amount
+                  );
+                  let price = Number(singleProduct.price);
+                  let compareAt = Number(singleProduct.compareAtPrice);
 
-                    let disCost = cost - cost * (costDiscount / 100);
-                    let disPrice = price - price * (discount / 100);
-                    let disCompareAt = compareAt - compareAt * (discount / 100);
+                  let disCost = cost - cost * (costDiscount / 100);
+                  let disPrice = price - price * (discount / 100);
+                  let disCompareAt = compareAt - compareAt * (discount / 100);
 
-                    await variantsUpdate(
-                      session,
-                      productId.id,
-                      disCost,
-                      disPrice,
-                      disCompareAt
-                    );
-                    campaign.campaignStatus = "Active";
-                    campaign.save();
-                    console.log("Update DB worke Done !! At StartJob=======");
-                  }
+                  await variantsUpdate(
+                    session,
+                    productId.id,
+                    disCost,
+                    disPrice,
+                    disCompareAt
+                  );
+                  campaign.campaignStatus = "Active";
+                  campaign.save();
+                  console.log("Update DB worke Done !! At StartJob=======");
+                  // }
                 })
               );
             })
@@ -125,7 +126,7 @@ export const startJob = async (id, session, campaignStart) => {
   }
 };
 
-export const endJob = async (id, session, campaignEnd) => {
+export const endJob = async (session, id,  campaignEnd) => {
   let dateOfEnd = new Date(campaignEnd);
 
   let campaignEndDate1 = dateOfEnd.toISOString().split("T").shift();
@@ -179,40 +180,37 @@ export const endJob = async (id, session, campaignEnd) => {
               costDiscount = ele.campaignCostDiscount;
 
               await Promise.all(
-                ele.allVariants.map(async (productId) => {
-                  if (ele.vendorsSelect.includes(`${productId.vendor}`)) {
-                    let singleProduct = await getProductVariantByGraphql(
-                      session,
-                      productId.id
-                    );
+                ele.selectesVariants.map(async (productId) => {
+                  // if (ele.vendorsSelect.includes(`${productId.vendor}`)) {
+                  let singleProduct = await getProductVariantByGraphql(
+                    session,
+                    productId.id
+                  );
 
-                    console.log(
-                      singleProduct.displayName,
-                      "******************"
-                    );
+                  console.log(singleProduct.displayName, "******************");
 
-                    let cost = Number(
-                      singleProduct.inventoryItem.unitCost.amount
-                    );
-                    let price = Number(singleProduct.price);
-                    let compareAt = Number(singleProduct.compareAtPrice);
+                  let cost = Number(
+                    singleProduct.inventoryItem.unitCost.amount
+                  );
+                  let price = Number(singleProduct.price);
+                  let compareAt = Number(singleProduct.compareAtPrice);
 
-                    let disCost = cost / (1 - costDiscount / 100);
-                    let disPrice = price / (1 - discount / 100);
-                    let disCompareAt = compareAt / (1 - discount / 100);
+                  let disCost = cost / (1 - costDiscount / 100);
+                  let disPrice = price / (1 - discount / 100);
+                  let disCompareAt = compareAt / (1 - discount / 100);
 
-                    await variantsUpdate(
-                      session,
-                      productId.id,
-                      disCost,
-                      disPrice,
-                      disCompareAt
-                    );
+                  await variantsUpdate(
+                    session,
+                    productId.id,
+                    disCost,
+                    disPrice,
+                    disCompareAt
+                  );
 
-                    campaign.campaignStatus = "Expired";
-                    campaign.save();
-                    console.log("Update DB worke Done !!  at endJob=======");
-                  }
+                  campaign.campaignStatus = "Expired";
+                  campaign.save();
+                  console.log("Update DB worke Done !!  at endJob=======");
+                  // }
                 })
               );
             })
@@ -230,82 +228,73 @@ export const endJob = async (id, session, campaignEnd) => {
   }
 };
 
-export const start = async (id, session) => {
+export const start = async (session, id) => {
   try {
-    let task = cron.schedule(` 1 * * * * *`, async () => {
-      let campaign = await db.Campaign.findOne({
-        where: {
-          storeId: session.id,
-          id,
-          campaignStatus: "Scheduled",
-        },
-      });
-      console.log("schedule Condition First Start =======");
-
-      let discount;
-      let costDiscount;
-
-      await Promise.all(
-        campaign.campaignInfo.map(async (ele) => {
-          console.log(ele, "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-          discount = ele.campaignDiscount;
-          costDiscount = ele.campaignCostDiscount;
-
-          await Promise.all(
-            ele.allVariants.map(async (productId) => {
-              if (ele.vendorsSelect.includes(`${productId.vendor}`)) {
-                let singleProduct = await getProductVariantByGraphql(
-                  session,
-                  productId.id
-                );
-                console.log(
-                  // productId,
-                  // ele.vendorsSelect,
-                  "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
-                  // productId.vendor,
-                  // ele.vendorsSelect.includes(`${productId.vendor}`)
-                );
-
-                console.log(
-                  singleProduct.displayName,
-                  "****************** START"
-                );
-
-                let cost = Number(singleProduct.inventoryItem.unitCost.amount);
-                let price = Number(singleProduct.price);
-                let compareAt = Number(singleProduct.compareAtPrice);
-
-                let disCost = cost - cost * (costDiscount / 100);
-                let disPrice = price - price * (discount / 100);
-                let disCompareAt = compareAt - compareAt * (discount / 100);
-
-                await variantsUpdate(
-                  session,
-                  productId.id,
-                  disCost,
-                  disPrice,
-                  disCompareAt
-                );
-                campaign.campaignStatus = "Active";
-                campaign.save();
-                console.log("Update DB worke Done !! At Start=======");
-              }
-            })
-          );
-        })
-      );
-
-      console.log(">>>>>>task.stop Start <<<<<<<");
-
-      task.stop();
+    let campaign = await db.Campaign.findOne({
+      where: {
+        storeId: session.id,
+        id,
+        campaignStatus: "Scheduled",
+      },
     });
+    console.log("schedule Condition First Start =======");
+
+    let discount;
+    let costDiscount;
+
+    await Promise.all(
+      campaign.campaignInfo.map(async (ele) => {
+        console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+        discount = ele.campaignDiscount;
+        costDiscount = ele.campaignCostDiscount;
+
+        await Promise.all(
+          ele.selectesVariants.map(async (productId) => {
+            // if (ele.vendorsSelect.includes(`${productId.vendor}`)) {
+            let singleProduct = await getProductVariantByGraphql(
+              session,
+              productId.id
+            );
+            // console.log(
+            //   productId,
+            //   ele.vendorsSelect,
+            //   "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%",
+            //   productId.vendor,
+            //   ele.vendorsSelect.includes(`${productId.vendor}`)
+            // );
+
+            console.log(singleProduct.displayName, "****************** START");
+
+            let cost = Number(singleProduct.inventoryItem.unitCost.amount);
+            let price = Number(singleProduct.price);
+            let compareAt = Number(singleProduct.compareAtPrice);
+
+            let disCost = cost - cost * (costDiscount / 100);
+            let disPrice = price - price * (discount / 100);
+            let disCompareAt = compareAt - compareAt * (discount / 100);
+
+            await variantsUpdate(
+              session,
+              productId.id,
+              disCost,
+              disPrice,
+              disCompareAt
+            );
+            campaign.campaignStatus = "Active";
+            campaign.save();
+            console.log("Update DB worke Done !! At Start =======");
+            // }
+          })
+        );
+      })
+    );
   } catch (err) {
     console.log("scheduled Start Error", err);
   }
 };
 
-export const end = async (id, session) => {
-  console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+export const end = async (session, id) => {
+  // console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 
   try {
     let campaign = await db.Campaign.findOne({
@@ -328,38 +317,35 @@ export const end = async (id, session) => {
           costDiscount = ele.campaignCostDiscount;
 
           await Promise.all(
-            ele.allVariants.map(async (productId) => {
-              if (ele.vendorsSelect.includes(`${productId.vendor}`)) {
-                let singleProduct = await getProductVariantByGraphql(
-                  session,
-                  productId.id
-                );
+            ele.selectesVariants.map(async (productId) => {
+              // if (ele.vendorsSelect.includes(`${productId.vendor}`)) {
+              let singleProduct = await getProductVariantByGraphql(
+                session,
+                productId.id
+              );
 
-                console.log(
-                  singleProduct.displayName,
-                  "******************  END"
-                );
+              console.log(singleProduct.displayName, "******************  END");
 
-                let cost = Number(singleProduct.inventoryItem.unitCost.amount);
-                let price = Number(singleProduct.price);
-                let compareAt = Number(singleProduct.compareAtPrice);
+              let cost = Number(singleProduct.inventoryItem.unitCost.amount);
+              let price = Number(singleProduct.price);
+              let compareAt = Number(singleProduct.compareAtPrice);
 
-                let disCost = cost / (1 - costDiscount / 100);
-                let disPrice = price / (1 - discount / 100);
-                let disCompareAt = compareAt / (1 - discount / 100);
+              let disCost = cost / (1 - costDiscount / 100);
+              let disPrice = price / (1 - discount / 100);
+              let disCompareAt = compareAt / (1 - discount / 100);
 
-                await variantsUpdate(
-                  session,
-                  productId.id,
-                  disCost,
-                  disPrice,
-                  disCompareAt
-                );
+              await variantsUpdate(
+                session,
+                productId.id,
+                disCost,
+                disPrice,
+                disCompareAt
+              );
 
-                campaign.campaignStatus = "Expired";
-                campaign.save();
-                console.log("Update DB worke Done !!  at end=======");
-              }
+              campaign.campaignStatus = "Expired";
+              campaign.save();
+              console.log("Update DB worke Done !!  at end=======");
+              // }
             })
           );
         })
@@ -372,7 +358,7 @@ export const end = async (id, session) => {
   }
 };
 
-export const starJob = async (id, session, campaignStart) => {
+export const starJob = async (session, id, campaignStart) => {
   let dateOfStart = new Date(campaignStart);
 
   let startedDate = dateOfStart.toISOString().split("T").shift();
@@ -429,54 +415,54 @@ export const starJob = async (id, session, campaignStart) => {
               costDiscount = ele.campaignCostDiscount;
 
               await Promise.all(
-                ele.allVariants.map(async (productId) => {
+                ele.selectesVariants.map(async (productId) => {
                   console.log(productId.id, "***********llll*******");
 
-                  if (ele.vendorSelect.includes(`${productId.vendor}`)) {
-                    let singleProduct = await getProductVariantByGraphql(
-                      session,
-                      productId.id
-                    );
+                  // if (ele.vendorSelect.includes(`${productId.vendor}`)) {
+                  let singleProduct = await getProductVariantByGraphql(
+                    session,
+                    productId.id
+                  );
 
-                    let cost = Number(
-                      singleProduct.inventoryItem.unitCost.amount
-                    );
-                    let price = Number(singleProduct.price);
-                    let compareAt = Number(singleProduct.compareAtPrice);
+                  let cost = Number(
+                    singleProduct.inventoryItem.unitCost.amount
+                  );
+                  let price = Number(singleProduct.price);
+                  let compareAt = Number(singleProduct.compareAtPrice);
 
-                    console.log(
-                      cost,
-                      price,
-                      compareAt,
-                      "======",
-                      costDiscount,
-                      discount,
-                      "productIds>>>>>>>>>>>><<<<<<<<",
-                      singleProduct
-                    );
-                    // let disCost = cost / (1 - costDiscount / 100);
-                    // let disPrice = price / (1 - discount / 100);
-                    // let disCompareAt = compareAt / (1 - discount / 100);
+                  console.log(
+                    cost,
+                    price,
+                    compareAt,
+                    "======",
+                    costDiscount,
+                    discount,
+                    "productIds>>>>>>>>>>>><<<<<<<<",
+                    singleProduct
+                  );
+                  // let disCost = cost / (1 - costDiscount / 100);
+                  // let disPrice = price / (1 - discount / 100);
+                  // let disCompareAt = compareAt / (1 - discount / 100);
 
-                    let disCost = cost - cost * (costDiscount / 100);
-                    let disPrice = price - price * (discount / 100);
-                    let disCompareAt = compareAt - compareAt * (discount / 100);
+                  let disCost = cost - cost * (costDiscount / 100);
+                  let disPrice = price - price * (discount / 100);
+                  let disCompareAt = compareAt - compareAt * (discount / 100);
 
-                    await variantsUpdate(
-                      session,
-                      productId.id,
-                      disCost,
-                      disPrice,
-                      disCompareAt
-                    );
-                    console.log("Update DB worke=======");
+                  await variantsUpdate(
+                    session,
+                    productId.id,
+                    disCost,
+                    disPrice,
+                    disCompareAt
+                  );
+                  console.log("Update DB worke=======");
 
-                    console.log("Campaign ****************");
+                  console.log("Campaign ****************");
 
-                    campaign.campaignStatus = "Active";
-                    campaign.save();
-                    console.log("Update DB worke Done !! At StartJob=======");
-                  }
+                  campaign.campaignStatus = "Active";
+                  campaign.save();
+                  console.log("Update DB worke Done !! At StartJob=======");
+                  // }
                 })
               );
             })
@@ -496,7 +482,7 @@ export const starJob = async (id, session, campaignStart) => {
   }
 };
 
-export const enJob = async (id, session, campaignEnd) => {
+export const enJob = async (session, id, campaignEnd) => {
   let dateOfEnd = new Date(campaignEnd);
 
   let campaignEndDate1 = dateOfEnd.toISOString().split("T").shift();

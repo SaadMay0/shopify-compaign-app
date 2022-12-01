@@ -137,7 +137,7 @@ export const getCollectionProductByClint = async (session, collectionId) => {
     );
     // allVariants = new Set([...allVariants]);
     return { allVariants, vendor, vendorSelect };
-  } catch (err) {
+  } catch (err) { 
     console.log(` Catch Error of Get All Products By Clint = ${err.name}`, err);
   }
 };

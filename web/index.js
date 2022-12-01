@@ -86,17 +86,17 @@ export async function createServer(
     billing: billingSettings,
   });
 
-  //https://d90c-110-39-147-226.ngrok.io?shop=saad-checkout-ui-ext.myshopify.com&host=c2FhZC1jaGVja291dC11aS1leHQubXlzaG9waWZ5LmNvbS9hZG1pbg
+  // https://b72e-110-39-147-226.ngrok.io?shop=saad-checkout-ui-ext.myshopify.com&host=c2FhZC1jaGVja291dC11aS1leHQubXlzaG9waWZ5LmNvbS9hZG1pbg
   console.log(process.env.HOST);
 
   // All endpoints after this point will require an active session
   // app.use(express.json({ limit: "50mb" }));
   // app.use(express.urlencoded({ extended: false }));
-  // mountRoutes(app); 
+  // mountRoutes(app);
 
   app.use(
     "/api/*",
-    verifyRequest(app, { 
+    verifyRequest(app, {
       billing: billingSettings,
     })
   );

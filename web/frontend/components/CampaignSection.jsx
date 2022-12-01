@@ -17,6 +17,7 @@ import {
   Spinner,
   OptionList,
   Popover,
+  Banner,
   // TitleBar,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
@@ -314,7 +315,7 @@ export function CampaignSection() {
   ];
 
   // *******************************************************
-// console.log(updateCampaign,"[[[[[[");
+  // console.log(updateCampaign,"[[[[[[");
   useEffect(() => {
     // console.log(window.location.search.length,updateCampaign, "{{{{", window.location.search);
     if (
@@ -325,7 +326,7 @@ export function CampaignSection() {
       getCampain();
     }
   }, []);
- 
+
   // Server Requests
   async function getCampainInfo(ids, campaignInfo) {
     try {
@@ -378,8 +379,7 @@ export function CampaignSection() {
             let startDate = new Date(campaignStart);
             let endDate = new Date(campaignEnd);
 
-
-             let startedDate = startDate.toISOString().split("T").shift();
+            let startedDate = startDate.toISOString().split("T").shift();
             console.log(
               startDate,
               "************startDate***********",
@@ -549,9 +549,9 @@ export function CampaignSection() {
   }
 
   //  async function ttest() {
-   
+
   //    try {
-       
+
   //      await fetch("/api/campaign/test", {
   //        method: "GET",
   //        headers: {
@@ -690,7 +690,22 @@ export function CampaignSection() {
                 <div style={{ padding: "5% 50%" }}>
                   <Spinner accessibilityLabel="Spinner example" size="small" />
                 </div>
-              ) : campaignInfo.length == 0 ? null : (
+              ) : campaignInfo.length == 0 ? (
+                <>
+                  <div style={{ height: "10px" }}></div>
+                  <Banner
+                    title="Before making a campaign, it's important "
+                    status="warning"
+                  >
+                    {/* Once a campaign registers. The new product is not allowed to
+                    add to the campaign after the creation of the campaign new
+                      product not add to the collection or campaign */}
+                    Once a campaign registers then the new product is not
+                    allowed to add to the campaign so make sure that all
+                    collections are up to date
+                  </Banner>
+                </>
+              ) : (
                 <IndexTable
                   resourceName={resourceName}
                   itemCount={resourcePickerInitialSelection.length}
