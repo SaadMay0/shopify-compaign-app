@@ -74,8 +74,8 @@ export default function Dashboard() {
         primaryAction={{
           content: "New Campaign",
           onAction: () => {
-             navigate("/campaign");
-            console.log("Campaign Button Click")
+            navigate("/campaign");
+            console.log("Campaign Button Click");
           },
         }}
       />

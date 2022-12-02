@@ -140,11 +140,10 @@ export const newCampaigns = async (req, res) => {
 
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
     // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
- 
 
-    let updatedCampaignInfo = []
-    
-    campaignInfo.map(item => {
+    let updatedCampaignInfo = [];
+
+    campaignInfo.map((item) => {
       let selectesVariants = [];
       item.allVariants.map((obj) => {
         if (item.vendorsSelect.includes(`${obj.vendor}`)) {
@@ -158,9 +157,8 @@ export const newCampaigns = async (req, res) => {
       };
       updatedCampaignInfo.push(newObj);
     });
-    
 
-// campaignInfo = updatedCampaignInfo;
+    // campaignInfo = updatedCampaignInfo;
 
     console.log(
       campaignInfo,
@@ -214,9 +212,9 @@ export const newCampaigns = async (req, res) => {
               // console.log(campaign.campaignInfo, "<======>");
 
               campaign.campaignInfo.map((campaignInf) => {
-                 if (cheeckBreak) {
-                   return;
-                 }
+                if (cheeckBreak) {
+                  return;
+                }
                 campaignInf.selectesVariants.map((variants) => {
                   let dbVariantId = variants.id;
                   if (cheeckBreak) {
@@ -641,25 +639,21 @@ export const updateCampaigns = async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
     // const session = await Shopify.Utils.loadOfflineSession(req.query.shop);
 
+    let updatedCampaignInfo = [];
 
-
-
-        let updatedCampaignInfo = [];
-
-        campaignInfo.map((item) => {
-          let selectesVariants = [];
-          item.allVariants.map((obj) => {
-            if (item.vendorsSelect.includes(`${obj.vendor}`)) {
-              selectesVariants.push(obj);
-            }
-          });
-          let newObj = {
-            ...item,
-            selectesVariants: selectesVariants,
-          };
-          updatedCampaignInfo.push(newObj);
-        });
-
+    campaignInfo.map((item) => {
+      let selectesVariants = [];
+      item.allVariants.map((obj) => {
+        if (item.vendorsSelect.includes(`${obj.vendor}`)) {
+          selectesVariants.push(obj);
+        }
+      });
+      let newObj = {
+        ...item,
+        selectesVariants: selectesVariants,
+      };
+      updatedCampaignInfo.push(newObj);
+    });
 
     let toDate = moment(new Date(), "YYYY-MM-DD hh:mm:ss a").format();
 
@@ -695,146 +689,149 @@ export const updateCampaigns = async (req, res) => {
         // console.log(toDate <= startDate, "1!!!!!!!!!!");
         if (toDate <= startDate) {
           // if (cheeck.length == 0) {
-            // let allCampaign = await db.Campaign.findAll({
-            //   where: {
-            //     storeId: session.id,
-            //   },
-            // });
+          // let allCampaign = await db.Campaign.findAll({
+          //   where: {
+          //     storeId: session.id,
+          //   },
+          // });
 
-            let allProductsOfThisCampaignInfo = [];
+          let allProductsOfThisCampaignInfo = [];
 
           let ProductExistes = [];
-          let ProductExistes2 = []
+          let ProductExistes2 = [];
           let cheeckBreak = false;
+          let UpdateId;
           Promise.all(
             cheeck?.map(async (campaign) => {
-
               if (cheeckBreak) {
                 return;
               }
               // console.log(campaign.campaignInfo, "<======>");
-              
+
               campaign.campaignInfo.map((campaignInf) => {
-                   if (cheeckBreak) {
-                     return;
-                   }
+                if (cheeckBreak) {
+                  return;
+                }
                 campaignInf.selectesVariants.map((variants) => {
-                     if (cheeckBreak) {
-                       return;
-                     }
-                    let dbVariantId = variants.id;
-                    // console.log(variants.id, "Campaign VariantID");
+                  if (cheeckBreak) {
+                    return;
+                  }
+                  let dbVariantId = variants.id;
+                  // console.log(variants.id, "Campaign VariantID");
                   updatedCampaignInfo.map((ele) => {
-                       if (cheeckBreak) {
-                         return;
-                       }
-                      // console.log("updatedCampaignInfo*****",ele);
-                      ele.selectesVariants.map((varId) => {
+                    if (cheeckBreak) {
+                      return;
+                    }
+                    // console.log("updatedCampaignInfo*****",ele);
+                    ele.selectesVariants.map((varId) => {
+                      // console.log("ele.selectesVariants********",varId.id);
 
-                        // console.log("ele.selectesVariants********",varId.id);
+                      // console.log(
+                      //   varId.id == dbVariantId &&
+                      //     campaign.campaignStatus == "Active",
 
-                        // console.log(
-                        //   varId.id == dbVariantId &&
-                        //     campaign.campaignStatus == "Active",
+                      //   varId.id == dbVariantId,
 
-                        //   varId.id == dbVariantId,
+                      //   campaign.campaignStatus == "Active",
+                      //   campaign.campaignStatus
+                      // );
+                      if (
+                        varId.id == dbVariantId &&
+                        campaign.campaignStatus == "Active"
+                      ) {
+                        ProductExistes.push(varId.id);
+                        cheeckBreak = true;
+                        return;
+                      }
 
-                        //   campaign.campaignStatus == "Active",
-                        //   campaign.campaignStatus
-                        // );
-                        if (
-                          varId.id == dbVariantId &&
-                          campaign.campaignStatus == "Active"
-                        ) {
-                          ProductExistes.push(varId.id);
-                          cheeckBreak = true;
-                          return;
-                        }
-
-
-                        if (
-                          varId.id == dbVariantId 
-                        ) {
-                          // console.log("ProductExistes2 Pass @@@@@@@@@");
-                          ProductExistes2.push(varId.id);
-                          cheeckBreak = true;
-                          return
-                        }
-                        // allProductsOfThisCampaignInfo.push(varId.id);
-                      });
+                      if (varId.id == dbVariantId) {
+                        // console.log("ProductExistes2 Pass @@@@@@@@@");
+                        ProductExistes2.push(varId.id);
+                        UpdateId = campaign.id;
+                        cheeckBreak = true;
+                        return;
+                      }
+                      // allProductsOfThisCampaignInfo.push(varId.id);
                     });
                   });
-                })
-            }));
-
-            updatedCampaignInfo.map((ele) => {
-              ele.selectesVariants.map((varId) => {
-                allProductsOfThisCampaignInfo.push(varId.id);
+                });
               });
+            })
+          );
+
+          updatedCampaignInfo.map((ele) => {
+            ele.selectesVariants.map((varId) => {
+              allProductsOfThisCampaignInfo.push(varId.id);
             });
+          });
 
-            const uniqueArr = new Set([...allProductsOfThisCampaignInfo]);
+          const uniqueArr = new Set([...allProductsOfThisCampaignInfo]);
 
-            // console.log(
-            //   allProductsOfThisCampaignInfo,
-            //   "+++++++++++++++++++++++++++",
-            //   uniqueArr.size < allProductsOfThisCampaignInfo.length,
-            //   uniqueArr.size,
-            //   allProductsOfThisCampaignInfo.length,
-            //   "+++++++++++++++++++++++++++"
-            // );
+          // console.log(
+          //   allProductsOfThisCampaignInfo,
+          //   "+++++++++++++++++++++++++++",
+          //   uniqueArr.size < allProductsOfThisCampaignInfo.length,
+          //   uniqueArr.size,
+          //   allProductsOfThisCampaignInfo.length,
+          //   "+++++++++++++++++++++++++++"
+          // );
 
-            console.log(
-              ProductExistes,
-              ProductExistes.length,
-              "ProductExistes&&&&&&&&&&&&>>>>>>",
-              ProductExistes2,
-              ProductExistes2.length,
-              "All Variants length,",
-              allProductsOfThisCampaignInfo.length
-            );
-            if (ProductExistes.length >= 1) {
+          console.log(
+            ProductExistes,
+            ProductExistes.length,
+            "ProductExistes&&&&&&&&&&&&>>>>>>",
+            ProductExistes2,
+            ProductExistes2.length,
+            "All Variants length,",
+            allProductsOfThisCampaignInfo.length
+          );
+          if (ProductExistes.length >= 1) {
+            Data = campaignInfo;
+            redirect = false;
+            Status = 200;
+            Message = "Some products are exist in Active campaign";
+            Err = " Looking Good";
+          } else {
+            if (cheeck.length == 1 && UpdateId == id) {
+              console.log(
+                "========================Updated Id and Found Id Are Same=================="
+              );
+              ProductExistes2 = [];
+            }
+            if (ProductExistes2.length >= 1) {
               Data = campaignInfo;
               redirect = false;
               Status = 200;
-              Message = "Some products are exist in Active campaign";
+              Message = "Already have a campaign with some Products and time";
               Err = " Looking Good";
             } else {
-              if (ProductExistes2.length >= 1) {
+              if (uniqueArr.size < allProductsOfThisCampaignInfo.length) {
                 Data = campaignInfo;
                 redirect = false;
                 Status = 200;
-                Message = "Already have a campaign with some Products and time";
+                Message = "some products are repeated in this campaign";
                 Err = " Looking Good";
               } else {
-                if (uniqueArr.size < allProductsOfThisCampaignInfo.length) {
-                  Data = campaignInfo;
-                  redirect = false;
-                  Status = 200;
-                  Message = "some products are repeated in this campaign";
-                  Err = " Looking Good";
-                } else {
-                  const campaigns = await db.Campaign.update(
-                    {
-                      campaignName: campaignTitle,
-                      campaignStart: startDate,
-                      campaignEnd: endDate,
-                      campaignInfo: updatedCampaignInfo,
-                      campaignStatus: "Scheduled",
-                    },
-                    { where: { storeId: session.id, id: id } }
-                  );
-                  await startJob(session, id, startDate);
-                  await endJob(session, id, endDate);
-                  Data = [...campaigns];
-                  redirect = true;
-                  Status = 200;
-                  Message = " Campain update Successfully";
-                  Err = " Looking Good";
-                }
+                const campaigns = await db.Campaign.update(
+                  {
+                    campaignName: campaignTitle,
+                    campaignStart: startDate,
+                    campaignEnd: endDate,
+                    campaignInfo: updatedCampaignInfo,
+                    campaignStatus: "Scheduled",
+                  },
+                  { where: { storeId: session.id, id: id } }
+                );
+                await startJob(session, id, startDate);
+                await endJob(session, id, endDate);
+                Data = [...campaigns];
+                redirect = true;
+                Status = 200;
+                Message = " Campain update Successfully";
+                Err = " Looking Good";
               }
-
             }
+          }
           // } else {
           //   Data = null;
           //   redirect = false;

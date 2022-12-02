@@ -18,6 +18,8 @@ import {
   OptionList,
   Popover,
   Banner,
+  Frame,
+  Loading,
   // TitleBar,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
@@ -322,6 +324,7 @@ export function CampaignSection() {
       window.location.search.length < 50 &&
       window.location.search.length > 15
     ) {
+      setIsLoading(true)
       setUpdateCampaign(true);
       getCampain();
     }
@@ -398,7 +401,7 @@ export function CampaignSection() {
             endHour = endHour > 12 ? Number(endHour) - 12 : endHour;
             let start = startDate.toISOString().split("T").shift();
             let end = endDate.toISOString().split("T").shift();
-            setIsLoading(true);
+            // setIsLoading(true);
             setResourceInitialSelection(campaignInfo);
             setCampaignInfo(campaignInfo);
             setCompignTitle(campaignName);
@@ -416,6 +419,7 @@ export function CampaignSection() {
             setToastActive(true);
           }
           setIsLoading(false);
+          // setUpdateCampaign(true)
 
           // console.log("getCollectionProduct get Upsell *******************");
           return data;
@@ -571,20 +575,32 @@ export function CampaignSection() {
 
   return (
     <>
+      {isLoading  ? (
+        <div style={{ height: "1px" }}>
+          <Frame>
+            <Loading />
+          </Frame>
+        </div>
+      ) : null}
+
       <TitleBar
         title="Campaign"
         primaryAction={{
           content: "Save",
           onAction: () => {
             // navigate("/campaign");
+
             if (
               campaignTitle &&
               campaignInfo &&
               campaignStartDate &&
               campaignEndDate
             ) {
+              setIsLoading(true);
               console.log("Passss");
-              updateCampaign
+              isLoading
+                ? null
+                : updateCampaign
                 ? updateCampaigns(
                     campaignTitle,
                     campaignInfo,
@@ -754,7 +770,10 @@ export function CampaignSection() {
                 campaignEndDate
               ) {
                 console.log("Passss");
-                updateCampaign
+                setIsLoading(true);
+                isLoading
+                  ? null
+                  : updateCampaign
                   ? updateCampaigns(
                       campaignTitle,
                       campaignInfo,

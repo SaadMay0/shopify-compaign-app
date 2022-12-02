@@ -6,6 +6,8 @@ import {
   Button,
   Spinner,
   ButtonGroup,
+  Loading,
+  Frame,
 } from "@shopify/polaris";
 
 import { ToastComponent } from "./Tost";
@@ -17,7 +19,7 @@ export function CampaignTable({
   setBannerTitle,
   setBannerStatus,
   bannerToggleActive,
-  setBannerDescription,
+  setBannerDescription, 
 }) {
   const navigate = useNavigate();
   const fetch = useAuthenticatedFetch();
@@ -229,6 +231,13 @@ export function CampaignTable({
 
   return (
     <>
+      {isLoading ? (
+        <div style={{ height: "1px" }}>
+          <Frame>
+            <Loading />
+          </Frame>
+        </div>
+      ) : null}
       <IndexTable
         resourceName={resourceName}
         itemCount={campaigns.length}
@@ -242,8 +251,10 @@ export function CampaignTable({
         selectable={false}
       >
         {rowMarkup}
+    
       </IndexTable>
       {toastActive ? renderToast : null}
+      
     </>
   );
 }

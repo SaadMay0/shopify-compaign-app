@@ -17,12 +17,6 @@ import mountRoutes from "./server/routing/routes/index.js";
 import webhooks from "./server/routing/routes/webhooks/index.js";
 import { reSchedulAllJobs } from "./server/routing/services/shopify/campaigns.js";
 
- 
-
-
-
-
-
 const USE_ONLINE_TOKENS = false;
 const { DATABASE } = config;
 
@@ -59,8 +53,6 @@ const BILLING_SETTINGS = {
   // currencyCode: "USD",
   // interval: BillingInterval.OneTime,
 };
- 
-
 
 // export for test use only
 export async function createServer(
@@ -86,7 +78,7 @@ export async function createServer(
     billing: billingSettings,
   });
 
-  // https://b72e-110-39-147-226.ngrok.io?shop=saad-checkout-ui-ext.myshopify.com&host=c2FhZC1jaGVja291dC11aS1leHQubXlzaG9waWZ5LmNvbS9hZG1pbg
+  // https://eea2-110-39-147-226.ngrok.io?shop=saad-checkout-ui-ext.myshopify.com&host=c2FhZC1jaGVja291dC11aS1leHQubXlzaG9waWZ5LmNvbS9hZG1pbg
   console.log(process.env.HOST);
 
   // All endpoints after this point will require an active session
@@ -167,5 +159,5 @@ export async function createServer(
 }
 
 createServer().then(({ app }) => {
-  app.listen(PORT)
+  app.listen(PORT);
 });
