@@ -59,10 +59,6 @@ export const startJob = async (session, id, campaignStart) => {
           let discount;
           let costDiscount;
 
-          await Promise.all()
-
-
-
           await Promise.all(
             campaign.campaignInfo.map(async (ele) => {
               console.log(ele, "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
