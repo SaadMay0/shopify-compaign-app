@@ -78,12 +78,15 @@ export const getProductVariantByGraphql = async (session, id) => {
   }`,
     });
 
-      // console.log(data.body.data.productVariant, "Data is here");
+      // console.log(
+      //   data.body.extensions.cost.throttleStatus.currentlyAvailable,
+      //   "Data is here"
+      // );
     if (data.body.data) {
       return data.body.data.productVariant;
     } else {
       return data;
-    }
+    } 
   } catch (err) {
     console.log(
       ` Catch Error of get products Graphql  = ${err.name}`,

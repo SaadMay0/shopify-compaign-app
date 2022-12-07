@@ -13,47 +13,65 @@ export const variantsUpdate = async (
       session.accessToken
     );
 
-    const data = await client.query({
-      data: {
-        query: `mutation productVariantUpdate($input: ProductVariantInput!) {
-      productVariantUpdate(input: $input) {
-        productVariant {
-          id
-          title
-          inventoryPolicy
-          inventoryQuantity
-          inventoryItem {
-            unitCost {
-          amount,
-        },
-        },
-          price
-          compareAtPrice
+    async function makeMutation(id, cost, price, compareAtPrice) {
+      
+      return await client.query({
+        data: {
+          query: `mutation productVariantUpdate($input: ProductVariantInput!) {
+        productVariantUpdate(input: $input) {
+          productVariant {
+            id
+            title
+            inventoryPolicy
+            inventoryQuantity
+            inventoryItem {
+              unitCost {
+            amount,
+          },
+          },
+            price
+            compareAtPrice
+          }
+          userErrors {
+            field
+            message
+          }
         }
-        userErrors {
-          field
-          message
-        }
-      }
-    }`,
-        variables: {
-          input: {
-            id: id,
-            inventoryItem: {
-              // unitCost: {
-              //   amount: cost,
-              // },
-              cost: cost,
-              tracked: true,
+      }`,
+          variables: {
+            input: {
+              id: id,
+              inventoryItem: {
+                // unitCost: {
+                //   amount: cost,
+                // },
+                cost: cost,
+                tracked: true,
+              },
+              price: price,
+              compareAtPrice: compareAtPrice || " ",
             },
-            price: price,
-            compareAtPrice: compareAtPrice || " ",
           },
         },
-      },
-    });
-    // console.log(data.response);
-    return data;
+      });
+    }
+    
+    let data = await makeMutation(id, cost, price, compareAtPrice);
+    
+    let mutationCost = data.body.extensions.cost.actualQueryCost;
+    let remainMutation =
+      data.body.extensions.cost.throttleStatus.currentlyAvailable;
+    
+    let nextMutation = Number(mutationCost)*3 > remainMutation
+
+    // console.log(
+    //   // data.body.extensions,
+    //   "Update Variants Function",
+    //   mutationCost,
+    //   remainMutation,
+    //   nextMutation
+    // );
+    return nextMutation;
   } catch (err) {
     console.log(` Catch Error ofvariantsUpdate = ${err.name}`, err.response);
   }
