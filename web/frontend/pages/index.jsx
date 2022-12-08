@@ -1,86 +1,104 @@
-import {
-  Card,
-  Page,
-  Layout,
-  TextContainer,
-  Image,
-  Stack,
-  Link,
-  Heading,
-} from "@shopify/polaris";
+import { useState, useCallback } from "react";
+import { Card, Page, Tabs, Layout } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
+import { BannerComponent, CampaignTable } from "../components";
 
-import { trophyImage } from "../assets";
-
-// import { ProductsCard } from "../components";
-
+import { useAuthenticatedFetch } from "../hooks";
+import {  useNavigate } from "@shopify/app-bridge-react";
 export default function HomePage() {
+  const navigate = useNavigate();
+
+  const fetch = useAuthenticatedFetch();
+  const [selected, setSelected] = useState(1);
+
+  // Banner component States
+  const [bannerActive, setBannerActive] = useState(false);
+  const [bannerTitle, setBannerTitle] = useState("Orde Placed");
+  const [bannerStatus, setBannerStatus] = useState("success");
+  const [bannerDescription, setBannerDescription] = useState("success");
+  const bannerToggleActive = useCallback(
+    () => setBannerActive((active) => !active),
+    []
+  );
+
+  const handleTabChange = useCallback(
+    (selectedTabIndex) => setSelected(selectedTabIndex),
+    []
+  );
+  // Banner End
+
+  const tabs = [
+    {
+      id: "",
+      content: "All",
+      // accessibilityLabel: "All Campaign",
+      panelID: "all-campaign",
+    },
+    // {
+    //   id: "draft",
+    //   content: "Draft",
+    //   panelID: "draft-campaign",
+    // },
+    {
+      id: "scheduled",
+      content: "Scheduled",
+      // accessibilityLabel: "Scheduled Campaign",
+      panelID: "scheduled-campaign",
+    },
+    {
+      id: "active",
+      content: "Active",
+      panelID: "active-campaign",
+    },
+    {
+      id: "expired",
+      content: "Expired",
+      panelID: "expired-campaign",
+    },
+  ];
+
+  const renderBanner = (
+    <BannerComponent
+      active={bannerActive}
+      title={bannerTitle}
+      status={bannerStatus}
+      Description={bannerDescription}
+      toggleActive={bannerToggleActive}
+    />
+  );
   return (
-    <Page narrowWidth>
-      <TitleBar title="App name" primaryAction={null} />
-      <Layout>
-        <Layout.Section>
-          <Card sectioned>
-            <Stack
-              wrap={false}
-              spacing="extraTight"
-              distribution="trailing"
-              alignment="center"
-            >
-              <Stack.Item fill>
-                <TextContainer spacing="loose">
-                  <Heading>Nice work on building a Shopify app 🎉</Heading>
-                  <p>
-                    Your app is ready to explore! It contains everything you
-                    need to get started including the{" "}
-                    <Link url="https://polaris.shopify.com/" external>
-                      Polaris design system
-                    </Link>
-                    ,{" "}
-                    <Link url="https://shopify.dev/api/admin-graphql" external>
-                      Shopify Admin API
-                    </Link>
-                    , and{" "}
-                    <Link
-                      url="https://shopify.dev/apps/tools/app-bridge"
-                      external
-                    >
-                      App Bridge
-                    </Link>{" "}
-                    UI library and components.
-                  </p>
-                  <p>
-                    Ready to go? Start populating your app with some sample
-                    products to view and test in your store.{" "}
-                  </p>
-                  <p>
-                    Learn more about building out your app in{" "}
-                    <Link
-                      url="https://shopify.dev/apps/getting-started/add-functionality"
-                      external
-                    >
-                      this Shopify tutorial
-                    </Link>{" "}
-                    📚{" "}
-                  </p>
-                </TextContainer>
-              </Stack.Item>
-              <Stack.Item>
-                <div style={{ padding: "0 20px" }}>
-                  <Image
-                    source={trophyImage}
-                    alt="Nice work on building a Shopify app"
-                    width={120}
+    <>
+      <TitleBar
+        title="Campaignes"
+        primaryAction={{
+          content: "New Campaign",
+          onAction: () => {
+            navigate("/campaign");
+            console.log("Campaign Button Click");
+          },
+        }}
+      />
+      <Page>
+        {renderBanner}
+        <br />
+        <Layout>
+          <Layout.Section>
+            <Card>
+              <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
+                <Card.Section>
+                  <CampaignTable
+                    tab={tabs[selected]}
+                    setBannerTitle={setBannerTitle}
+                    setBannerStatus={setBannerStatus}
+                    bannerToggleActive={bannerToggleActive}
+                    setBannerDescription={setBannerDescription}
                   />
-                </div>
-              </Stack.Item>
-            </Stack>
-          </Card>
-        </Layout.Section>
-        <Layout.Section>
-          {/* <ProductsCard /> */}
-        </Layout.Section>
-      </Layout>
-    </Page>
+                </Card.Section>
+              </Tabs>
+            </Card>
+          </Layout.Section>
+        </Layout>
+      </Page>
+    </>
   );
 }

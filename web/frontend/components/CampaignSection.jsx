@@ -475,7 +475,7 @@ export function CampaignSection() {
             setToastActive(true);
 
             setTimeout(() => {
-              data.Response.redirect ? navigate("/dashboard") : null;
+              data.Response.redirect ? navigate("/") : null;
             }, 1000);
           } else {
             setToastContent(data.Response.Message);
@@ -537,7 +537,7 @@ export function CampaignSection() {
             setIsLoading(true);
 
             setTimeout(() => {
-              data.Response.redirect ? navigate("/dashboard") : null;
+              data.Response.redirect ? navigate("/") : null;
             }, 1000);
           } else {
             setToastContent(data.Response.Message);
@@ -634,7 +634,7 @@ export function CampaignSection() {
             // accessibilityLabel: "Secondary action label",
             onAction: () => {
               // ttest();
-              navigate("/dashboard");
+              navigate("/");
             },
           },
         ]}
@@ -806,7 +806,7 @@ export function CampaignSection() {
               content: "Cancel",
               // destructive: true,
               onAction: () => {
-                navigate("/dashboard");
+                navigate("/");
               },
             },
           ]}

@@ -21,11 +21,7 @@ export default function App() {
             <NavigationMenu
               navigationLinks={[
                 {
-                  label: "Dashboard",
-                  destination: "/dashboard",
-                },
-                {
-                  label: "Campaign Section",
+                  label: "New Campaign",
                   destination: "/campaign",
                 },
               ]}
