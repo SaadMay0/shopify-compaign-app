@@ -65,7 +65,8 @@ export async function createServer(
   webhooks(app);
 
   console.log("===============================================");
-  // console.log(app);
+
+  // console.log(process.env.SHOPIFY_API_KEY);
   setTimeout(async () => {
     await reSchedulAllJobs();
   }, 1000);
