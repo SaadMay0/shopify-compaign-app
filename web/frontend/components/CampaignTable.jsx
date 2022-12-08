@@ -170,7 +170,6 @@ export function CampaignTable({
 
   // server Request
 
-  console.log(process.env.SHOPIFY_API_KEY, "process.env.SHOPIFY_API_KEY=======>");
 
   useEffect(() => {
     searchCampainByStatus();
