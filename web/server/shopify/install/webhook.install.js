@@ -14,7 +14,7 @@ const installWebhooks = async (session) => {
     await Promise.all(
       TOPICS.map(async (topic) => {
         const type = topic.split("/").join("_");
-        console.log(" installWebhooks topic", topic);
+        console.log(topic," installWebhooks");
 
         await createWebhook(session, {
           address: `${process.env.HOST}/api/v1.0/webhook/${type}`,

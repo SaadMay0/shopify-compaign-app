@@ -66,7 +66,6 @@ export async function createServer(
 
   console.log("===============================================");
 
-  console.log(process.env.SHOPIFY_API_KEY);
   setTimeout(async () => {
     await reSchedulAllJobs();
   }, 1000);
@@ -77,9 +76,9 @@ export async function createServer(
 
   applyAuthMiddleware(app, {
     billing: billingSettings,
-  });
+  }); 
 
-  // https://77e1-110-39-147-226.ngrok.io?shop=saad-checkout-ui-ext.myshopify.com&host=c2FhZC1jaGVja291dC11aS1leHQubXlzaG9waWZ5LmNvbS9hZG1pbg
+  // https://071b-110-39-147-226.ngrok.io?shop=saad-checkout-ui-ext.myshopify.com&host=c2FhZC1jaGVja291dC11aS1leHQubXlzaG9waWZ5LmNvbS9hZG1pbg
   console.log(process.env.HOST);
 
   // All endpoints after this point will require an active session

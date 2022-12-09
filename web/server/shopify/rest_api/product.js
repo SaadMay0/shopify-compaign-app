@@ -96,7 +96,6 @@ export const getCollectionProductByClint = async (session, collectionId) => {
       limit: limit,
     };
 
-    //  let allVariants = [];
 
     for (let index = 0; index < makeRequest; index++) {
       console.log("Next Page");
@@ -116,6 +115,7 @@ export const getCollectionProductByClint = async (session, collectionId) => {
             Name: ele.title,
             id: variants.admin_graphql_api_id,
             vendor: ele.vendor,
+            updateProductValue : false,
           });
         });
 
@@ -132,10 +132,8 @@ export const getCollectionProductByClint = async (session, collectionId) => {
     console.log(
       allVariants.length,
       "****************allVariants************"
-      // });
-      // new Set([...allVariants])
+      
     );
-    // allVariants = new Set([...allVariants]);
     return { allVariants, vendor, vendorSelect };
   } catch (err) { 
     console.log(` Catch Error of Get All Products By Clint = ${err.name}`, err);
@@ -159,7 +157,6 @@ export const getAllCollectionesProductsCount = async (
 
         productCounts = productCounts + Number(count.count);
 
-        //  console.log(count, "count====", productCounts);
       })
     );
 

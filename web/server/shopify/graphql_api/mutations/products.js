@@ -64,13 +64,7 @@ export const variantsUpdate = async (
     
     let nextMutation = Number(mutationCost)*3 > remainMutation
 
-    // console.log(
-    //   // data.body.extensions,
-    //   "Update Variants Function",
-    //   mutationCost,
-    //   remainMutation,
-    //   nextMutation
-    // );
+
     return nextMutation;
   } catch (err) {
     console.log(` Catch Error ofvariantsUpdate = ${err.name}`, err.response);

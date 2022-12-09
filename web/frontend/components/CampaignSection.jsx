@@ -233,7 +233,7 @@ export function CampaignSection() {
 
   const hourSortOptions = [
     { value: "88", label: "hh" },
-    { value: "0", label: "00" },
+    // { value: "0", label: "00" },
     { value: "1", label: "01" },
     { value: "2", label: "02" },
     { value: "3", label: "03" },
