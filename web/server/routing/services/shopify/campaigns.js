@@ -1188,23 +1188,24 @@ export const reSchedulAllJobs = async (req, res) => {
         if (toDate < startDate && ele.campaignStatus == "Scheduled") {
           console.log("*******reSchedulAllJobs that not Scheduled********");
           await startJob(session, ele.id, ele.campaignStart);
-           ele.campaignEnd == null ? null: await endJob(session, ele.id, ele.campaignEnd);
-         // await endJob(session, ele.id, ele.campaignEnd);
+          ele.campaignEnd == null
+            ? null
+            : await endJob(session, ele.id, ele.campaignEnd);
+          // await endJob(session, ele.id, ele.campaignEnd);
         }
 
-        if (
-          toDate > startDate &&
-          ele.campaignStatus == "Scheduled" 
-        ) {
+        if (toDate > startDate && ele.campaignStatus == "Scheduled") {
           console.log("*******Start Campaign that Not Started********");
-         // await endJob(session, ele.id, ele.campaignEnd);
-         ele.campaignEnd == null ? null: await endJob(session, ele.id, ele.campaignEnd);
+          // await endJob(session, ele.id, ele.campaignEnd);
+          ele.campaignEnd == null
+            ? null
+            : await endJob(session, ele.id, ele.campaignEnd);
           await start(session, ele.id);
         }
 
         if (toDate > endDate && ele.campaignStatus == "Active") {
           console.log("*******End Campaign that Not End********");
-           ele.campaignEnd == null ? null:await end(session, ele.id);
+          ele.campaignEnd == null ? null : await end(session, ele.id);
           // await end(session, ele.id);
         }
 

@@ -369,7 +369,6 @@ export function CampaignSection2() {
     { value: "PM", label: "PM" },
   ];
 
-
   useEffect(() => {
     if (
       window.location.search.length < 50 &&
@@ -511,8 +510,7 @@ export function CampaignSection2() {
             setCampaignEndMinute(endMinute.toString());
             setCampaignEndTime(endTime);
             setBannerDescription(campaignMessage);
-            campaignStatus == "Failed" ?setBannerActive(true):null
-            ;
+            campaignStatus == "Failed" ? setBannerActive(true) : null;
           } else {
             setToastContent(data.Response.Message);
             setToastIsError(true);
@@ -703,9 +701,7 @@ export function CampaignSection2() {
                     campaignEndTime,
                     selected
                   );
-            }
-            else {
-              
+            } else {
               setToastContent("All fields are mandatory");
               setToastIsError(false);
               setToastActive(true);

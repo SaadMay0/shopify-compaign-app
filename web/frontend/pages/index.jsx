@@ -4,7 +4,7 @@ import { TitleBar } from "@shopify/app-bridge-react";
 import { BannerComponent, CampaignTable } from "../components";
 
 import { useAuthenticatedFetch } from "../hooks";
-import {  useNavigate } from "@shopify/app-bridge-react";
+import { useNavigate } from "@shopify/app-bridge-react";
 export default function HomePage() {
   const navigate = useNavigate();
 
@@ -68,37 +68,37 @@ export default function HomePage() {
     />
   );
 
-      async function setDefaultPrices() {
-        try {
-          await fetch(`api/campaign/setAllDefaultPrices`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json;charset=UTF-8",
-            },
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              console.log(data, "stopCampaign ==>");
-              if (data.Response.Status == 200) {
-                //  setCampaigns(data.Response.Data);
-                setToastContent(data.Response.Message);
-                setToastIsError(false);
-                setToastActive(true);
-                setIsLoading(true);
-                searchCampainByStatus();
-              } else {
-                console.log("else part run");
-                setToastContent(data.Response.Message);
-                setToastIsError(false);
-                setToastActive(true);
-                setIsLoading(true);
-              }
-              setIsLoading(false);
-            });
-        } catch (error) {
-          console.log(`${error}`);
-        }
-      }
+  async function setDefaultPrices() {
+    try {
+      await fetch(`api/campaign/setAllDefaultPrices`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data, "stopCampaign ==>");
+          if (data.Response.Status == 200) {
+            //  setCampaigns(data.Response.Data);
+            setToastContent(data.Response.Message);
+            setToastIsError(false);
+            setToastActive(true);
+            setIsLoading(true);
+            searchCampainByStatus();
+          } else {
+            console.log("else part run");
+            setToastContent(data.Response.Message);
+            setToastIsError(false);
+            setToastActive(true);
+            setIsLoading(true);
+          }
+          setIsLoading(false);
+        });
+    } catch (error) {
+      console.log(`${error}`);
+    }
+  }
 
   return (
     <>
@@ -127,19 +127,15 @@ export default function HomePage() {
         <Layout>
           <Layout.Section>
             <Card>
-              <Tabs
-                tabs={tabs}
-                selected={selected}
-                onSelect={handleTabChange}
-              >
+              <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
                 {/* <Card.Section> */}
-                  <CampaignTable 
-                    tab={tabs[selected]}
-                    // setBannerTitle={setBannerTitle}
-                    // setBannerStatus={setBannerStatus}
-                    // bannerToggleActive={bannerToggleActive}
-                    // setBannerDescription={setBannerDescription}
-                  />
+                <CampaignTable
+                  tab={tabs[selected]}
+                  // setBannerTitle={setBannerTitle}
+                  // setBannerStatus={setBannerStatus}
+                  // bannerToggleActive={bannerToggleActive}
+                  // setBannerDescription={setBannerDescription}
+                />
                 {/* </Card.Section> */}
               </Tabs>
             </Card>

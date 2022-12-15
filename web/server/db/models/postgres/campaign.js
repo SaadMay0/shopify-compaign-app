@@ -10,17 +10,16 @@ export default (sequelize, DataTypes) => {
     static associate(models) {
       /**
        *  define association here Like This
-       * 
+       *
        * Campaign.belongsTo(models.Preferences, {
        *   foreignKey: { name: "storeId", allowNull: true },
        *   onDelete: "CASCADE",
        * })
        */
-        Campaign.belongsTo(models.Preferences, {
-          foreignKey: { name: "storeId", allowNull: true },
-          onDelete: "CASCADE",
-        })
-
+      Campaign.belongsTo(models.Preferences, {
+        foreignKey: { name: "storeId", allowNull: true },
+        onDelete: "CASCADE",
+      });
     }
   }
   Campaign.init(
@@ -57,6 +56,10 @@ export default (sequelize, DataTypes) => {
         allowNull: true,
         type: DataTypes.DATE,
       },
+      campaignMessage: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       campaignInfo: {
         type: DataTypes.JSON,
         // get: function () {
@@ -65,10 +68,6 @@ export default (sequelize, DataTypes) => {
         // set: function (val) {
         //   return this.setDataValue("campaignInfo", JSON.stringify(val));
         // },
-      },
-      campaignMessage: {
-        type: DataTypes.STRING,
-        allowNull: true,
       },
       storeId: {
         type: DataTypes.STRING,

@@ -395,9 +395,6 @@ export const startJob = async (session, id, campaignStart) => {
     let task = cron.schedule(
       ` 1 ${startedMinute} ${startedHour} ${dd} ${startedDate.split("-")[1]} *`,
       async () => {
-
-
-
         let campaign = await db.Campaign.findOne({
           where: {
             storeId: session.id,
@@ -447,18 +444,17 @@ export const startJob = async (session, id, campaignStart) => {
                 },
               }
             );
-            
           } else {
-            
             await updateCampaignInfoArr(session, id);
             console.log(
               "@@@@@@@@@@@@@@@@@@@@@@@@@@@@Now Its update the Vales in shopify@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
             );
             await updateProductPricesInShoify(session, id);
           }
-
         } else {
-          console.log("************ Whant  Again schedule StartJob ****************");
+          console.log(
+            "************ Whant  Again schedule StartJob ****************"
+          );
           await startJob(campaign.id, session, campaign.campaignStart);
         }
 

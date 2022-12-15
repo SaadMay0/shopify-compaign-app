@@ -35,12 +35,12 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: true,
       },
-      campaignInfo: {
-        type: Sequelize.JSON,
-      },
       campaignMessage: {
         type: Sequelize.STRING,
         allowNull: true,
+      },
+      campaignInfo: {
+        type: Sequelize.JSON,
       },
       storeId: {
         type: Sequelize.STRING,
@@ -72,6 +72,5 @@ module.exports = {
 
     // await queryInterface.dropAllTables();
     await queryInterface.dropTable("Campaign");
-
   },
 };
