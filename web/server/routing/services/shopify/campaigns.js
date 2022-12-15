@@ -268,7 +268,7 @@ export const newCampaigns = async (req, res) => {
                           [Op.lt]: startedDate,
                         },
                       },
-                    ], 
+                    ],
                   },
                   {
                     campaignEnd: {
@@ -399,7 +399,10 @@ export const newCampaigns = async (req, res) => {
                 Message = " Campain Created Successfully";
                 Err = " Looking Good";
                 await startJob(session, row.id, row.campaignStart);
-                await endJob(session, row.id, row.campaignEnd);
+                endedDate == null
+                  ? null
+                  : await endJob(session, row.id, row.campaignEnd);
+                // await endJob(session, row.id, row.campaignEnd);
               }
             }
           }
@@ -568,13 +571,13 @@ export const startCampaign = async (req, res) => {
     const allCampaign = await db.Campaign.findAll({
       where: {
         storeId: session.id,
-        // id: id, 
+        // id: id,
         campaignStatus: "Active",
       },
     });
 
     if (allCampaign.length > 0) {
-      console.log(allCampaign.length,"<===Active Campaign Length");
+      console.log(allCampaign.length, "<===Active Campaign Length");
       Status = 200;
       Message = "Already have a campaign active";
       Err = " Looking Good";
@@ -586,9 +589,7 @@ export const startCampaign = async (req, res) => {
           // campaignStatus: "Expired",
         },
       });
-      if (
-        findCampaign.campaignMessage == "Updated campaignInfo"
-      ) {
+      if (findCampaign.campaignMessage == "Updated campaignInfo") {
         console.log("Updated campaignInfo message====>***********************");
         await updateProductPricesInShoify(session, id);
       } else {
@@ -952,7 +953,7 @@ export const updateCampaigns = async (req, res) => {
           let cheeckBreak = false;
           let UpdateId;
 
-          // let campaignStart 
+          // let campaignStart
           // let campaignEnd
           Promise.all(
             cheeck?.map(async (campaign) => {
@@ -988,9 +989,8 @@ export const updateCampaigns = async (req, res) => {
                       }
 
                       // if (varId.id == dbVariantId && campaignStart < startedDate || campaignStart > startedDate) {
-                        // if(!campaignEnd==null && campaignEnd > endedDate)
-                        if (varId.id == dbVariantId ) {
-
+                      // if(!campaignEnd==null && campaignEnd > endedDate)
+                      if (varId.id == dbVariantId) {
                         ProductExistes2.push(varId.id);
                         UpdateId = campaign.id;
                         cheeckBreak = true;
@@ -1064,7 +1064,9 @@ export const updateCampaigns = async (req, res) => {
                   { where: { storeId: session.id, id: id } }
                 );
                 await startJob(session, id, startDate);
-                await endJob(session, id, endDate);
+                endedDate == null ? null : await endJob(session, id, endDate);
+                // await endJob(session, id, endDate);
+
                 Data = [...campaigns];
                 redirect = true;
                 Status = 200;
@@ -1072,7 +1074,7 @@ export const updateCampaigns = async (req, res) => {
                 Err = " Looking Good";
               }
             }
-          } 
+          }
         } else {
           Data = null;
           redirect = false;
@@ -1173,44 +1175,46 @@ export const reSchedulAllJobs = async (req, res) => {
   try {
     let campaign = await db.Campaign.findAll({});
 
-    // await Promise.all(
-    //   campaign.map(async (ele) => {
-    //     const session = await Shopify.Utils.loadOfflineSession(
-    //       ele.storeId.split("_").pop()
-    //     );
+    await Promise.all(
+      campaign.map(async (ele) => {
+        const session = await Shopify.Utils.loadOfflineSession(
+          ele.storeId.split("_").pop()
+        );
 
-    //     let toDate = new Date();
-    //     let startDate = new Date(ele.campaignStart);
-    //     let endDate = new Date(ele.campaignEnd);
+        let toDate = new Date();
+        let startDate = new Date(ele.campaignStart);
+        let endDate = new Date(ele.campaignEnd);
 
-    //     if (toDate < startDate && ele.campaignStatus == "Scheduled") {
-    //       console.log("*******reSchedulAllJobs that not Scheduled********");
-    //       await startJob(session, ele.id, ele.campaignStart);
-    //       await endJob(session, ele.id, ele.campaignEnd);
-    //     }
+        if (toDate < startDate && ele.campaignStatus == "Scheduled") {
+          console.log("*******reSchedulAllJobs that not Scheduled********");
+          await startJob(session, ele.id, ele.campaignStart);
+           ele.campaignEnd == null ? null: await endJob(session, ele.id, ele.campaignEnd);
+         // await endJob(session, ele.id, ele.campaignEnd);
+        }
 
-    //     if (
-    //       toDate > startDate &&
-    //       ele.campaignStatus == "Scheduled" &&
-    //       endDate > toDate
-    //     ) {
-    //       console.log("*******Start Campaign that Not Started********");
-    //       await endJob(session, ele.id, ele.campaignEnd);
-    //       await start(session, ele.id);
-    //     }
+        if (
+          toDate > startDate &&
+          ele.campaignStatus == "Scheduled" 
+        ) {
+          console.log("*******Start Campaign that Not Started********");
+         // await endJob(session, ele.id, ele.campaignEnd);
+         ele.campaignEnd == null ? null: await endJob(session, ele.id, ele.campaignEnd);
+          await start(session, ele.id);
+        }
 
-    //     if (toDate > endDate && ele.campaignStatus == "Active") {
-    //       console.log("*******End Campaign that Not End********");
-    //       await end(session, ele.id);
-    //     }
+        if (toDate > endDate && ele.campaignStatus == "Active") {
+          console.log("*******End Campaign that Not End********");
+           ele.campaignEnd == null ? null:await end(session, ele.id);
+          // await end(session, ele.id);
+        }
 
-    //     if (toDate > endDate && ele.campaignStatus == "Scheduled") {
-    //       console.log(
-    //         "*******reScheduled  Not Scheduled Due to Time Out********"
-    //       );
-    //     }
-    //   })
-    // );
+        if (toDate > endDate && ele.campaignStatus == "Scheduled") {
+          console.log(
+            "*******reScheduled  Not Scheduled Due to Time Out********"
+          );
+        }
+      })
+    );
 
     Data = campaign;
     Status = 200;
