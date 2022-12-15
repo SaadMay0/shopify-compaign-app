@@ -18,7 +18,7 @@ export function BannerComponent({
     <Banner
       title={title}
       status={status}
-      action={{ content: "Print label" }}
+      // action={{ content: "Print label" }}
       onDismiss={() => {
         toggleActive();
       }}

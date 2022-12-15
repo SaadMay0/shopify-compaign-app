@@ -8,6 +8,7 @@ import {
   ButtonGroup,
   Loading,
   Frame,
+  Card,
 } from "@shopify/polaris";
 
 import { ToastComponent } from "./Tost";
@@ -16,10 +17,10 @@ import { useAuthenticatedFetch } from "../hooks";
 import { useNavigate } from "@shopify/app-bridge-react";
 export function CampaignTable({
   tab,
-  setBannerTitle,
-  setBannerStatus,
-  bannerToggleActive,
-  setBannerDescription, 
+  // setBannerTitle,
+  // setBannerStatus,
+  // bannerToggleActive,
+  // setBannerDescription,
 }) {
   const navigate = useNavigate();
   const fetch = useAuthenticatedFetch();
@@ -33,15 +34,15 @@ export function CampaignTable({
 
   // Toast Component Start
 
-   const [toastActive, setToastActive] = useState(false);
-   const [toastContent, setToastContent] = useState("");
-   const [toastIsError, setToastIsError] = useState(false);
+  const [toastActive, setToastActive] = useState(false);
+  const [toastContent, setToastContent] = useState("");
+  const [toastIsError, setToastIsError] = useState(false);
 
   //Callback
- const toastToggleActive = useCallback(
-   () => setToastActive((active) => !active),
-   []
- );
+  const toastToggleActive = useCallback(
+    () => setToastActive((active) => !active),
+    []
+  );
 
   // Tost Component End
   // const [bannerActive, setBannerActive] = useState(true);
@@ -117,19 +118,54 @@ export function CampaignTable({
             <TextStyle>{ele.campaignStatus}</TextStyle>
           </IndexTable.Cell>
           <IndexTable.Cell>
-            <TextStyle>{`${new Date(
-              ele.campaignStart
-            ).toLocaleString()}`}</TextStyle>
+            <TextStyle>
+              {`${new Date(ele.campaignStart).toLocaleString()}`}
+            </TextStyle>
           </IndexTable.Cell>
           <IndexTable.Cell>
-            <TextStyle>{`${new Date(
-              ele.campaignEnd
-            ).toLocaleString()}`}</TextStyle>
+            <TextStyle>
+              {ele.campaignEnd
+                ? `${new Date(ele.campaignEnd).toLocaleString()}`
+                : "Not Defined"}
+            </TextStyle>
           </IndexTable.Cell>
 
           <IndexTable.Cell>
-            <ButtonGroup>
-              {ele.campaignStatus == "Active" ? null : (
+            {ele.campaignStatus == "Active" ? (
+              <ButtonGroup>
+                <Button
+                  primary
+                  onClick={(e) => {
+                    e.stopPropagation(e);
+                    setIsLoading(true);
+                    stopCampaign(`${ele.id}`);
+                  }}
+                >
+                  End
+                </Button>
+                <Button
+                  primary
+                  onClick={(e) => {
+                    e.stopPropagation(e);
+                    setIsLoading(true);
+                    deleteCampaign(`${ele.id}`);
+                  }}
+                >
+                  Delete
+                </Button>
+              </ButtonGroup>
+            ) : (
+              <ButtonGroup>
+                <Button
+                  primary
+                  onClick={(e) => {
+                    e.stopPropagation(e);
+                    setIsLoading(true);
+                    startCampaign(`${ele.id}`);
+                  }}
+                >
+                  Start
+                </Button>
                 <Button
                   primary
                   onClick={(e) => {
@@ -140,28 +176,18 @@ export function CampaignTable({
                 >
                   Update
                 </Button>
-              )}
-              {/* <Button
-                primary
-                onClick={(e) => {
-                  e.stopPropagation(e);
-                  setIsLoading(true);
-                  navigate(`/campaign?id=${ele.id}`);
-                }}
-              >
-                Update
-              </Button> */}
-              <Button
-                primary
-                onClick={(e) => {
-                  e.stopPropagation(e);
-                  setIsLoading(true);
-                  deleteCampaign(`${ele.id}`);
-                }}
-              >
-                Delete
-              </Button>
-            </ButtonGroup>
+                <Button
+                  primary
+                  onClick={(e) => {
+                    e.stopPropagation(e);
+                    setIsLoading(true);
+                    deleteCampaign(`${ele.id}`);
+                  }}
+                >
+                  Delete
+                </Button>
+              </ButtonGroup>
+            )}
           </IndexTable.Cell>
         </IndexTable.Row>
       </>
@@ -169,7 +195,6 @@ export function CampaignTable({
   });
 
   // server Request
-
 
   useEffect(() => {
     searchCampainByStatus();
@@ -185,7 +210,6 @@ export function CampaignTable({
       })
         .then((response) => response.json())
         .then((data) => {
-          
           if (data.Response.Status == 200) {
             setCampaigns(data.Response.Data);
           } else {
@@ -211,17 +235,81 @@ export function CampaignTable({
           console.log(data, "all search");
           if (data.Response.Status == 200) {
             //  setCampaigns(data.Response.Data);
-             setToastContent(data.Response.Message);
-             setToastIsError(false);
-             setToastActive(true);
-             setIsLoading(true);
+            setToastContent(data.Response.Message);
+            setToastIsError(false);
+            setToastActive(true);
+            setIsLoading(true);
             searchCampainByStatus();
           } else {
             console.log("else part run");
-             setToastContent(data.Response.Message);
-             setToastIsError(false);
-             setToastActive(true);
-             setIsLoading(true);
+            setToastContent(data.Response.Message);
+            setToastIsError(false);
+            setToastActive(true);
+            setIsLoading(true);
+          }
+          setIsLoading(false);
+        });
+    } catch (error) {
+      console.log(`${error}`);
+    }
+  }
+
+  async function startCampaign(id) {
+    try {
+      await fetch(`api/campaign/startCampaign?id=${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data, "startCampaign ==>");
+          if (data.Response.Status == 200) {
+            //  setCampaigns(data.Response.Data);
+            setToastContent(data.Response.Message);
+            setToastIsError(false);
+            setToastActive(true);
+            setIsLoading(true);
+            searchCampainByStatus();
+          } else {
+            console.log("else part run");
+            setToastContent(data.Response.Message);
+            setToastIsError(false);
+            setToastActive(true);
+            setIsLoading(true);
+          }
+          setIsLoading(false);
+        });
+    } catch (error) {
+      console.log(`${error}`);
+    }
+  }
+
+  async function stopCampaign(id) {
+    try {
+      await fetch(`api/campaign/stopCampaign?id=${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data, "stopCampaign ==>");
+          if (data.Response.Status == 200) {
+            //  setCampaigns(data.Response.Data);
+            setToastContent(data.Response.Message);
+            setToastIsError(false);
+            setToastActive(true);
+            setIsLoading(true);
+            searchCampainByStatus();
+          } else {
+            console.log("else part run");
+            setToastContent(data.Response.Message);
+            setToastIsError(false);
+            setToastActive(true);
+            setIsLoading(true);
           }
           setIsLoading(false);
         });
@@ -239,23 +327,27 @@ export function CampaignTable({
           </Frame>
         </div>
       ) : null}
-      <IndexTable
-        resourceName={resourceName}
-        itemCount={campaigns.length}
-        selectedItemsCount={
-          allResourcesSelected ? "All" : selectedResources.length
-        }
-        lastColumnSticky
-        onSelectionChange={handleSelectionChange}
-        loading={isLoading}
-        headings={tableHeaderTitles}
-        selectable={false}
-      >
-        {rowMarkup}
-    
-      </IndexTable>
+
+      <Card>
+        <Card.Section>
+          <IndexTable
+            resourceName={resourceName}
+            itemCount={campaigns.length}
+            selectedItemsCount={
+              allResourcesSelected ? "All" : selectedResources.length
+            }
+            lastColumnSticky
+            onSelectionChange={handleSelectionChange}
+            loading={isLoading}
+            headings={tableHeaderTitles}
+            selectable={false}
+          >
+            {rowMarkup}
+          </IndexTable>
+        </Card.Section>
+      </Card>
+
       {toastActive ? renderToast : null}
-      
     </>
   );
 }

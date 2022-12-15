@@ -45,22 +45,30 @@ export default (sequelize, DataTypes) => {
       campaignStatus: {
         type: DataTypes.STRING,
       },
-      campaignStart: {
+      campaignOption: {
         allowNull: false,
+        type: DataTypes.STRING,
+      },
+      campaignStart: {
+        allowNull: true,
         type: DataTypes.DATE,
       },
       campaignEnd: {
-        allowNull: false,
+        allowNull: true,
         type: DataTypes.DATE,
       },
       campaignInfo: {
-        type: DataTypes.TEXT,
-        get: function () {
-          return JSON.parse(this.getDataValue("campaignInfo"));
-        },
-        set: function (val) {
-          return this.setDataValue("campaignInfo", JSON.stringify(val));
-        },
+        type: DataTypes.JSON,
+        // get: function () {
+        //   return JSON.parse(this.getDataValue("campaignInfo"));
+        // },
+        // set: function (val) {
+        //   return this.setDataValue("campaignInfo", JSON.stringify(val));
+        // },
+      },
+      campaignMessage: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
       storeId: {
         type: DataTypes.STRING,

@@ -20,23 +20,27 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      // campaignOrders: {
-      //   type: Sequelize.INTEGER,
-      // },
-      // campaignSales: {
-      //   type: Sequelize.FLOAT,
-      // },
       campaignStatus: {
+        type: Sequelize.STRING,
+      },
+      campaignOption: {
+        allowNull: false,
         type: Sequelize.STRING,
       },
       campaignStart: {
         type: Sequelize.DATE,
+        allowNull: true,
       },
       campaignEnd: {
         type: Sequelize.DATE,
+        allowNull: true,
       },
       campaignInfo: {
-        type: Sequelize.TEXT,
+        type: Sequelize.JSON,
+      },
+      campaignMessage: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       storeId: {
         type: Sequelize.STRING,

@@ -14,7 +14,6 @@ export const variantsUpdate = async (
     );
 
     async function makeMutation(id, cost, price, compareAtPrice) {
-      
       return await client.query({
         data: {
           query: `mutation productVariantUpdate($input: ProductVariantInput!) {
@@ -55,16 +54,16 @@ export const variantsUpdate = async (
         },
       });
     }
-    
+
     let data = await makeMutation(id, cost, price, compareAtPrice);
-    
+
     let mutationCost = data.body.extensions.cost.actualQueryCost;
     let remainMutation =
       data.body.extensions.cost.throttleStatus.currentlyAvailable;
-    
-    let nextMutation = Number(mutationCost)*3 > remainMutation
 
+    let nextMutation = Number(mutationCost) * 3 > remainMutation;
 
+    console.log(nextMutation, "remainMutation===>", remainMutation);
     return nextMutation;
   } catch (err) {
     console.log(` Catch Error ofvariantsUpdate = ${err.name}`, err.response);

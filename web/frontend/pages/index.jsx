@@ -34,11 +34,7 @@ export default function HomePage() {
       // accessibilityLabel: "All Campaign",
       panelID: "all-campaign",
     },
-    // {
-    //   id: "draft",
-    //   content: "Draft",
-    //   panelID: "draft-campaign",
-    // },
+
     {
       id: "scheduled",
       content: "Scheduled",
@@ -55,6 +51,11 @@ export default function HomePage() {
       content: "Expired",
       panelID: "expired-campaign",
     },
+    {
+      id: "failed",
+      content: "Failed",
+      panelID: "failed-campaign",
+    },
   ];
 
   const renderBanner = (
@@ -66,6 +67,39 @@ export default function HomePage() {
       toggleActive={bannerToggleActive}
     />
   );
+
+      async function setDefaultPrices() {
+        try {
+          await fetch(`api/campaign/setAllDefaultPrices`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8",
+            },
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data, "stopCampaign ==>");
+              if (data.Response.Status == 200) {
+                //  setCampaigns(data.Response.Data);
+                setToastContent(data.Response.Message);
+                setToastIsError(false);
+                setToastActive(true);
+                setIsLoading(true);
+                searchCampainByStatus();
+              } else {
+                console.log("else part run");
+                setToastContent(data.Response.Message);
+                setToastIsError(false);
+                setToastActive(true);
+                setIsLoading(true);
+              }
+              setIsLoading(false);
+            });
+        } catch (error) {
+          console.log(`${error}`);
+        }
+      }
+
   return (
     <>
       <TitleBar
@@ -77,6 +111,15 @@ export default function HomePage() {
             console.log("Campaign Button Click");
           },
         }}
+        secondaryActions={[
+          {
+            content: "Set Default Prices",
+            onAction: () => {
+              setDefaultPrices();
+              console.log("setDefaultPrices Button Click");
+            },
+          },
+        ]}
       />
       <Page>
         {renderBanner}
@@ -84,16 +127,20 @@ export default function HomePage() {
         <Layout>
           <Layout.Section>
             <Card>
-              <Tabs tabs={tabs} selected={selected} onSelect={handleTabChange}>
-                <Card.Section>
-                  <CampaignTable
+              <Tabs
+                tabs={tabs}
+                selected={selected}
+                onSelect={handleTabChange}
+              >
+                {/* <Card.Section> */}
+                  <CampaignTable 
                     tab={tabs[selected]}
-                    setBannerTitle={setBannerTitle}
-                    setBannerStatus={setBannerStatus}
-                    bannerToggleActive={bannerToggleActive}
-                    setBannerDescription={setBannerDescription}
+                    // setBannerTitle={setBannerTitle}
+                    // setBannerStatus={setBannerStatus}
+                    // bannerToggleActive={bannerToggleActive}
+                    // setBannerDescription={setBannerDescription}
                   />
-                </Card.Section>
+                {/* </Card.Section> */}
               </Tabs>
             </Card>
           </Layout.Section>

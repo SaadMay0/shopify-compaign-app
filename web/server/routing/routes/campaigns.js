@@ -8,6 +8,9 @@ import {
   deleteCampaignsById,
   getCampaignsByStatus,
   reSchedulAllJobs,
+  startCampaign,
+  stopCampaign,
+  stopAllCampaignAndSetDefaultValues,
 } from "../services/shopify/campaigns.js";
 import "colors";
 const router = express.Router();
@@ -16,6 +19,9 @@ router.get("/getCampaigns", getCampaigns);
 router.get("/getCampaignsById", getCampaignsById);
 router.get("/getCampaignsByStatus", getCampaignsByStatus);
 router.get("/reSchedulAllJobs", reSchedulAllJobs);
+router.get("/startCampaign", startCampaign);
+router.get("/stopCampaign", stopCampaign);
+router.get("/setAllDefaultPrices",stopAllCampaignAndSetDefaultValues)
 // POST
 
 router.post("/CampaignInfo", getCampaignInfo);
