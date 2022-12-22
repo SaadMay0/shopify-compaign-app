@@ -571,7 +571,7 @@ export function CampaignSection2() {
             setCampaignInfo(data.Response.Data);
             setCampaignInfo(data.Response.Data);
             setToastContent(data.Response.Message);
-            setToastIsError(false);
+            setToastIsError(true);
             setToastActive(true);
 
             setTimeout(() => {
@@ -634,7 +634,7 @@ export function CampaignSection2() {
             // setRedirect(data.Response.redirect);
             setCampaignInfo(data.Response.Data);
             setToastContent(data.Response.Message);
-            setToastIsError(false);
+            setToastIsError(true);
             setToastActive(true);
             setIsLoading(true);
 
@@ -703,7 +703,7 @@ export function CampaignSection2() {
                   );
             } else {
               setToastContent("All fields are mandatory");
-              setToastIsError(false);
+              setToastIsError(true);
               setToastActive(true);
             }
           },
@@ -904,7 +904,7 @@ export function CampaignSection2() {
                     );
               } else {
                 setToastContent("All fields are mandatory");
-                setToastIsError(false);
+                setToastIsError(true);
                 setToastActive(true);
               }
             },

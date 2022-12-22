@@ -560,6 +560,7 @@ export const getCampaignsByStatus = async (req, res) => {
 
 export const startCampaign = async (req, res) => {
   console.log("===> startCampaign its work ****");
+  res.status(200).send({});
   let Data = [];
   let Status;
   let Message;
@@ -579,7 +580,7 @@ export const startCampaign = async (req, res) => {
     if (allCampaign.length > 0) {
       console.log(allCampaign.length, "<===Active Campaign Length");
       Status = 200;
-      Message = "Already have a campaign active";
+      Message = "Already have a campaign active"; 
       Err = " Looking Good";
     } else {
       const findCampaign = await db.Campaign.findOne({
@@ -601,8 +602,9 @@ export const startCampaign = async (req, res) => {
           findCampaign.campaignStatus == "Active"
         );
         Status = 200;
-        Message = "Starting the campaign is under process";
-        Err = " Looking Good";
+        // Message = "Starting the campaign is under process";
+        Message = " Campaign start successfully";
+        Err = " Looking Good"; 
       }
     }
   } catch (err) {
@@ -612,22 +614,24 @@ export const startCampaign = async (req, res) => {
     Err = err;
   }
 
-  res.status(200).send({
-    Response: {
-      Data,
-      Status,
-      Message,
-      Err,
-    },
-  });
+  // res.status(200).send({
+  //   Response: {
+  //     Data,
+  //     Status,
+  //     Message,
+  //     Err,
+  //   },
+  // });
+  
 };
 
 export const stopCampaign = async (req, res) => {
   console.log("===> stopCampaign its work");
+  res.status(200).send({});
   let Data = [];
   let Status;
   let Message;
-  let Err;
+  let Err; 
   try {
     const { id } = req.query;
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
@@ -642,11 +646,13 @@ export const stopCampaign = async (req, res) => {
     if (!findCampaign.campaignStatus == "Active") return null;
     findCampaign.isCampaignStart = true;
     await findCampaign.save();
+
     await end(session, id);
 
     console.log("its Destroy data");
     Status = 200;
-    Message = "stopping the campaign is under process";
+    // Message = "stopping the campaign is under process";
+    Message = " Campaign end successfully";
     Err = " Looking Good";
   } catch (err) {
     console.log("stopCampaign", err);
@@ -655,14 +661,14 @@ export const stopCampaign = async (req, res) => {
     Err = err;
   }
 
-  res.status(200).send({
-    Response: {
-      Data,
-      Status,
-      Message,
-      Err,
-    },
-  });
+  // res.status(200).send({
+  //   Response: {
+  //     Data,
+  //     Status,
+  //     Message,
+  //     Err,
+  //   },
+  // });
 };
 
 export const stopAllCampaignAndSetDefaultValues = async (req, res) => {

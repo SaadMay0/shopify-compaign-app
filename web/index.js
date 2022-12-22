@@ -143,7 +143,7 @@ export async function createServer(
       const embeddedUrl = Shopify.Utils.getEmbeddedAppUrl(req);
 
       return res.redirect(embeddedUrl + req.path);
-    }
+    } 
 
     const htmlFile = join(
       isProd ? PROD_INDEX_PATH : DEV_INDEX_PATH,

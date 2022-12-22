@@ -248,14 +248,14 @@ export function CampaignTable({
           if (data.Response.Status == 200) {
             //  setCampaigns(data.Response.Data);
             setToastContent(data.Response.Message);
-            setToastIsError(false);
+            setToastIsError(true);
             setToastActive(true);
             setIsLoading(true);
             searchCampainByStatus();
           } else {
             console.log("else part run");
             setToastContent(data.Response.Message);
-            setToastIsError(false);
+            setToastIsError(true);
             setToastActive(true);
             setIsLoading(true);
           }
@@ -279,17 +279,17 @@ export function CampaignTable({
           console.log(data, "startCampaign ==>");
           if (data.Response.Status == 200) {
             //  setCampaigns(data.Response.Data);
-            setToastContent(data.Response.Message);
-            setToastIsError(false);
-            setToastActive(true);
-            setIsLoading(true);
+            // setToastContent(data.Response.Message);
+            // setToastIsError(true);
+            // setToastActive(true);
+            // setIsLoading(true);
             searchCampainByStatus();
           } else {
             console.log("else part run");
-            setToastContent(data.Response.Message);
-            setToastIsError(false);
-            setToastActive(true);
-            setIsLoading(true);
+            // setToastContent(data.Response.Message);
+            // setToastIsError(true);
+            // setToastActive(true);
+            // setIsLoading(true);
           }
           setIsLoading(false);
         });
@@ -299,7 +299,7 @@ export function CampaignTable({
   }
 
   async function stopCampaign(id) {
-    try {
+    try { 
       await fetch(`api/campaign/stopCampaign?id=${id}`, {
         method: "GET",
         headers: {
@@ -311,17 +311,17 @@ export function CampaignTable({
           console.log(data, "stopCampaign ==>");
           if (data.Response.Status == 200) {
             //  setCampaigns(data.Response.Data);
-            setToastContent(data.Response.Message);
-            setToastIsError(false);
-            setToastActive(true);
-            setIsLoading(true);
+            // setToastContent(data.Response.Message);
+            // setToastIsError(true);
+            // setToastActive(true);
+            // setIsLoading(true);
             searchCampainByStatus();
           } else {
             console.log("else part run");
-            setToastContent(data.Response.Message);
-            setToastIsError(false);
-            setToastActive(true);
-            setIsLoading(true);
+            // setToastContent(data.Response.Message);
+            // setToastIsError(true);
+            // setToastActive(true);
+            // setIsLoading(true);
           }
           setIsLoading(false);
         });
