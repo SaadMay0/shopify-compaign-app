@@ -445,7 +445,6 @@ export const startJob = async (session, id, campaignStart) => {
               }
             );
           } else {
-
             await db.Campaign.update(
               {
                 isCampaignStart: true,
@@ -563,4 +562,3 @@ export const end = async (session, id) => {
     console.log("scheduled End Error", err);
   }
 };
- 

@@ -76,7 +76,7 @@ export async function createServer(
 
   applyAuthMiddleware(app, {
     billing: billingSettings,
-  }); 
+  });
 
   // https://1810-110-39-147-226.ngrok.io?shop=saad-checkout-ui-ext.myshopify.com&host=c2FhZC1jaGVja291dC11aS1leHQubXlzaG9waWZ5LmNvbS9hZG1pbg
   // await new Promise(resolve => setTimeout(resolve, 1000))

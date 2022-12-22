@@ -593,9 +593,8 @@ export const startCampaign = async (req, res) => {
         console.log("Updated campaignInfo message====>***********************");
         await updateProductPricesInShoify(session, id);
       } else {
-
         findCampaign.isCampaignStart = true;
-       await findCampaign.save()
+        await findCampaign.save();
         await start(session, id);
         console.log(
           "its startCampaign data",
@@ -643,7 +642,7 @@ export const stopCampaign = async (req, res) => {
     if (!findCampaign.campaignStatus == "Active") return null;
     findCampaign.isCampaignStart = true;
     await findCampaign.save();
-    await end(session, id); 
+    await end(session, id);
 
     console.log("its Destroy data");
     Status = 200;
@@ -1099,7 +1098,8 @@ export const updateCampaigns = async (req, res) => {
       Data = campaignInfo;
       Status = 200;
       redirect = false;
-      Message = "The number of products in the Campaign is exceeded the limit  ";
+      Message =
+        "The number of products in the Campaign is exceeded the limit  ";
       Err = "Products exceeded the limit";
     }
   } catch (err) {
@@ -1180,47 +1180,47 @@ export const reSchedulAllJobs = async (req, res) => {
   try {
     let campaign = await db.Campaign.findAll({});
 
-    // await Promise.all(
-    //   campaign.map(async (ele) => {
-    //     const session = await Shopify.Utils.loadOfflineSession(
-    //       ele.storeId.split("_").pop()
-    //     );
+    await Promise.all(
+      campaign.map(async (ele) => {
+        const session = await Shopify.Utils.loadOfflineSession(
+          ele.storeId.split("_").pop()
+        );
 
-    //     let toDate = new Date();
-    //     let startDate = new Date(ele.campaignStart);
-    //     let endDate = new Date(ele.campaignEnd);
+        let toDate = new Date();
+        let startDate = new Date(ele.campaignStart);
+        let endDate = new Date(ele.campaignEnd);
 
-    //     if (toDate < startDate && ele.campaignStatus == "Scheduled") {
-    //       console.log("*******reSchedulAllJobs that not Scheduled********");
-    //       await startJob(session, ele.id, ele.campaignStart);
-    //       ele.campaignEnd == null
-    //         ? null
-    //         : await endJob(session, ele.id, ele.campaignEnd);
-    //       // await endJob(session, ele.id, ele.campaignEnd);
-    //     }
+        if (toDate < startDate && ele.campaignStatus == "Scheduled") {
+          console.log("*******reSchedulAllJobs that not Scheduled********");
+          await startJob(session, ele.id, ele.campaignStart);
+          ele.campaignEnd == null
+            ? null
+            : await endJob(session, ele.id, ele.campaignEnd);
+          // await endJob(session, ele.id, ele.campaignEnd);
+        }
 
-    //     if (toDate > startDate && ele.campaignStatus == "Scheduled") {
-    //       console.log("*******Start Campaign that Not Started********");
-    //       // await endJob(session, ele.id, ele.campaignEnd);
-    //       ele.campaignEnd == null
-    //         ? null
-    //         : await endJob(session, ele.id, ele.campaignEnd);
-    //       await start(session, ele.id);
-    //     }
+        if (toDate > startDate && ele.campaignStatus == "Scheduled") {
+          console.log("*******Start Campaign that Not Started********");
+          // await endJob(session, ele.id, ele.campaignEnd);
+          ele.campaignEnd == null
+            ? null
+            : await endJob(session, ele.id, ele.campaignEnd);
+          await start(session, ele.id);
+        }
 
-    //     if (toDate > endDate && ele.campaignStatus == "Active") {
-    //       console.log("*******End Campaign that Not End********");
-    //       ele.campaignEnd == null ? null : await end(session, ele.id);
-    //       // await end(session, ele.id);
-    //     }
+        if (toDate > endDate && ele.campaignStatus == "Active") {
+          console.log("*******End Campaign that Not End********");
+          ele.campaignEnd == null ? null : await end(session, ele.id);
+          // await end(session, ele.id);
+        }
 
-    //     if (toDate > endDate && ele.campaignStatus == "Scheduled") {
-    //       console.log(
-    //         "*******reScheduled  Not Scheduled Due to Time Out********"
-    //       );
-    //     }
-    //   })
-    // );
+        if (toDate > endDate && ele.campaignStatus == "Scheduled") {
+          console.log(
+            "*******reScheduled  Not Scheduled Due to Time Out********"
+          );
+        }
+      })
+    );
 
     Data = campaign;
     Status = 200;

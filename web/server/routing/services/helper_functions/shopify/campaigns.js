@@ -205,11 +205,9 @@ export const setDefaultProductPricesInShoify = async (session, id) => {
     });
 
     if (campaign) {
-
       if (!created) {
-        
         campaign.isCampaignStart = true;
-          await campaign.save();
+        await campaign.save();
       }
       for (let ele of campaign.campaignInfo) {
         console.log(
@@ -275,12 +273,12 @@ export const setDefaultProductPricesOfAllCampaign = async (session) => {
         storeId: session.id,
         campaignStatus: "Active",
         campaignMessage: "gracefully updated the price in Shopify",
-      }, 
+      },
     });
 
     console.log("campaign========>", campaign[0].id);
 
-    if (campaign.length == 0) return false; 
+    if (campaign.length == 0) return false;
 
     for (let items of campaign) {
       console.log("********** Get Next Campaign *********");

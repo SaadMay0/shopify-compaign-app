@@ -626,7 +626,7 @@ export function CampaignSection2() {
           "Content-Type": "application/json;charset=UTF-8",
         },
         body: JSON.stringify(obj),
-      }) 
+      })
         .then((response) => response.json())
         .then((data) => {
           console.log("updateCampaigns ======>", data.Response.Data);
@@ -638,7 +638,7 @@ export function CampaignSection2() {
             setToastActive(true);
             setIsLoading(true);
 
-            setTimeout(() => { 
+            setTimeout(() => {
               data.Response.redirect ? navigate("/") : null;
             }, 3000);
           } else {
