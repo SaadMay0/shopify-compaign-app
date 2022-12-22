@@ -35,12 +35,14 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: true,
       },
+      isCampaignStart: {
+        allowNull: false,
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+      },
       campaignMessage: {
         type: Sequelize.STRING,
         allowNull: true,
-      },
-      campaignInfo: {
-        type: Sequelize.JSON,
       },
       storeId: {
         type: Sequelize.STRING,
@@ -51,6 +53,9 @@ module.exports = {
           key: "id",
           as: "storeId",
         },
+      },
+      campaignInfo: {
+        type: Sequelize.JSON,
       },
       createdAt: {
         allowNull: false,

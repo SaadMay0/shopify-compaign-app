@@ -115,9 +115,11 @@ export function CampaignTable({
             <TextStyle variation="strong">{ele.campaignName}</TextStyle>
           </IndexTable.Cell>
           <IndexTable.Cell>
-            <TextStyle>{ele.campaignStatus}</TextStyle>
+            <TextStyle>
+              {ele.isCampaignStart ? "Under processing" : ele.campaignStatus}
+            </TextStyle>
           </IndexTable.Cell>
-          <IndexTable.Cell>
+          <IndexTable.Cell> 
             <TextStyle>
               {`${new Date(ele.campaignStart).toLocaleString()}`}
             </TextStyle>
@@ -135,6 +137,8 @@ export function CampaignTable({
               <ButtonGroup>
                 <Button
                   primary
+                  disabled={ele.isCampaignStart}
+                  loading={ele.isCampaignStart}
                   onClick={(e) => {
                     e.stopPropagation(e);
                     setIsLoading(true);
@@ -145,6 +149,8 @@ export function CampaignTable({
                 </Button>
                 <Button
                   primary
+                  disabled={ele.isCampaignStart}
+                  loading={ele.isCampaignStart}
                   onClick={(e) => {
                     e.stopPropagation(e);
                     setIsLoading(true);
@@ -158,6 +164,8 @@ export function CampaignTable({
               <ButtonGroup>
                 <Button
                   primary
+                  disabled={ele.isCampaignStart}
+                  loading={ele.isCampaignStart}
                   onClick={(e) => {
                     e.stopPropagation(e);
                     setIsLoading(true);
@@ -168,6 +176,8 @@ export function CampaignTable({
                 </Button>
                 <Button
                   primary
+                  disabled={ele.isCampaignStart}
+                  loading={ele.isCampaignStart}
                   onClick={(e) => {
                     e.stopPropagation(e);
                     setIsLoading(true);
@@ -178,6 +188,8 @@ export function CampaignTable({
                 </Button>
                 <Button
                   primary
+                  disabled={ele.isCampaignStart}
+                  loading={ele.isCampaignStart}
                   onClick={(e) => {
                     e.stopPropagation(e);
                     setIsLoading(true);

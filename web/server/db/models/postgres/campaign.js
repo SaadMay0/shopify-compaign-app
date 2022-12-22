@@ -56,9 +56,22 @@ export default (sequelize, DataTypes) => {
         allowNull: true,
         type: DataTypes.DATE,
       },
+      isCampaignStart: {
+        allowNull: false,
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
       campaignMessage: {
         type: DataTypes.STRING,
         allowNull: true,
+      },
+      storeId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        references: {
+          model: "store",
+          key: "id",
+        },
       },
       campaignInfo: {
         type: DataTypes.JSON,
@@ -68,14 +81,6 @@ export default (sequelize, DataTypes) => {
         // set: function (val) {
         //   return this.setDataValue("campaignInfo", JSON.stringify(val));
         // },
-      },
-      storeId: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        references: {
-          model: "store",
-          key: "id",
-        },
       },
       createdAt: {
         allowNull: false,

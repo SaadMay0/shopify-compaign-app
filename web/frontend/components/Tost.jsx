@@ -5,7 +5,7 @@ export function ToastComponent({ toggleActive, active, content, error }) {
     <Toast
       content={content}
       error={error}
-      duration={4000}
+      duration={6000}
       onDismiss={toggleActive}
     />
   ) : null;

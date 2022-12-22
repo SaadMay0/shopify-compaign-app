@@ -445,6 +445,19 @@ export const startJob = async (session, id, campaignStart) => {
               }
             );
           } else {
+
+            await db.Campaign.update(
+              {
+                isCampaignStart: true,
+              },
+              {
+                where: {
+                  id: id,
+                  storeId: session.id,
+                },
+              }
+            );
+
             await updateCampaignInfoArr(session, id);
             console.log(
               "@@@@@@@@@@@@@@@@@@@@@@@@@@@@Now Its update the Vales in shopify@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
@@ -550,3 +563,4 @@ export const end = async (session, id) => {
     console.log("scheduled End Error", err);
   }
 };
+ 

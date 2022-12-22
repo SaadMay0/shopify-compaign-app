@@ -168,6 +168,7 @@ export const updateProductPricesInShoify = async (session, id) => {
       }
       if (!created) {
         campaign.campaignStatus = "Active";
+        campaign.isCampaignStart = false;
         campaign.campaignMessage = "gracefully updated the price in Shopify";
         await campaign.save();
       }
@@ -181,6 +182,7 @@ export const updateProductPricesInShoify = async (session, id) => {
       );
 
       campaign.campaignStatus = "Failed";
+      campaign.isCampaignStart = false;
       campaign.campaignMessage =
         "It cannot be able to update the price on Shopify due to some reason, ";
       await campaign.save();
@@ -203,6 +205,12 @@ export const setDefaultProductPricesInShoify = async (session, id) => {
     });
 
     if (campaign) {
+
+      if (!created) {
+        
+        campaign.isCampaignStart = true;
+          await campaign.save();
+      }
       for (let ele of campaign.campaignInfo) {
         console.log(
           "$$$$$$$$$$$$$$ Get Next Collection Of campaign for variants Update $$$$$$$$$$$$$$$$$$$"
@@ -235,6 +243,7 @@ export const setDefaultProductPricesInShoify = async (session, id) => {
       }
       if (!created) {
         campaign.campaignStatus = "Expired";
+        campaign.isCampaignStart = false;
         (campaign.campaignMessage =
           "gracefully updated default price in Shopify"),
           await campaign.save();
@@ -266,15 +275,26 @@ export const setDefaultProductPricesOfAllCampaign = async (session) => {
         storeId: session.id,
         campaignStatus: "Active",
         campaignMessage: "gracefully updated the price in Shopify",
-      },
+      }, 
     });
 
     console.log("campaign========>", campaign[0].id);
 
-    if (campaign.length == 0) return false;
+    if (campaign.length == 0) return false; 
 
     for (let items of campaign) {
       console.log("********** Get Next Campaign *********");
+      await db.Campaign.update(
+        {
+          isCampaignStart: true,
+        },
+        {
+          where: {
+            storeId: items.storeId,
+            id: items.id,
+          },
+        }
+      );
       for (let ele of items.campaignInfo) {
         console.log(
           "$$$$$$$$$$$$$$ Get Next Collection Of campaign for variants Update $$$$$$$$$$$$$$$$$$$"
@@ -315,6 +335,7 @@ export const setDefaultProductPricesOfAllCampaign = async (session) => {
         {
           campaignStatus: "Expired",
           campaignMessage: "gracefully updated default price in Shopify",
+          isCampaignStart: false,
         },
         {
           where: {

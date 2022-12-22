@@ -64,7 +64,7 @@ export const getCampaignInfo = async (req, res) => {
   } catch (err) {
     console.log("getCampaignInfo", err);
     Status = 404;
-    Message = "Following Path Not Found";
+    Message = "Serer Error";
     Err = err;
   }
 
@@ -358,14 +358,14 @@ export const newCampaigns = async (req, res) => {
             Data = campaignInfo;
             redirect = false;
             Status = 200;
-            Message = "Some products are exist in Active campaign";
+            Message = "Some products are exist in Active Campaign";
             Err = " Looking Good";
           } else {
             if (ProductExistes2.length >= 1) {
               Data = campaignInfo;
               redirect = false;
               Status = 200;
-              Message = "Already have a campaign with some Products and time";
+              Message = "Already have a campaign with same Products or Time";
               Err = " Looking Good";
             } else {
               if (uniqueArr.size < allProductsOfThisCampaignInfo.length) {
@@ -396,7 +396,7 @@ export const newCampaigns = async (req, res) => {
                 Data = [row];
                 redirect = true;
                 Status = 200;
-                Message = " Campain Created Successfully";
+                Message = "Campaign Created Successfully";
                 Err = " Looking Good";
                 await startJob(session, row.id, row.campaignStart);
                 endedDate == null
@@ -411,7 +411,7 @@ export const newCampaigns = async (req, res) => {
           Status = 401;
           redirect = false;
           Message =
-            "Start Campaign Date or Time must be greater then now Date or time ";
+            "The Started  Date or Time must be greater than today's date or  time";
           Err = "Invalid Date or Time";
         }
       } else {
@@ -419,21 +419,21 @@ export const newCampaigns = async (req, res) => {
         Status = 401;
         redirect = false;
         Message =
-          "End Campaign Date or Time must be less then Start Date or time";
+          "The end Date or Time must be greater than the start Date or Time";
         Err = "Invalid Date or Time";
       }
     } else {
       Data = campaignInfo;
       Status = 200;
       redirect = false;
-      Message = "Number of product in Campaign is exceeded the limit  ";
+      Message = "The number of products in the Campaign exceeded the limit.";
       Err = "Products exceeded the limit";
     }
   } catch (err) {
     console.log("newCampaigns", err);
     Status = 404;
     redirect = false;
-    Message = "Following Path Not Found";
+    Message = "Serer Error";
     Err = err;
   }
 
@@ -466,7 +466,7 @@ export const getCampaigns = async (req, res) => {
   } catch (err) {
     console.log("get All Campaign", err);
     Status = 404;
-    Message = "Following Path Not Found";
+    Message = "Serer Error";
     Err = err;
   }
 
@@ -502,7 +502,7 @@ export const getCampaignsById = async (req, res) => {
   } catch (err) {
     console.log("getCampaignsById", err);
     Status = 404;
-    Message = "Following Path Not Found";
+    Message = "Serer Error";
     Err = err;
   }
 
@@ -544,7 +544,7 @@ export const getCampaignsByStatus = async (req, res) => {
   } catch (err) {
     console.log("getCampaignsByStatus", err);
     Status = 404;
-    Message = "Following Path Not Found";
+    Message = "Serer Error";
     Err = err;
   }
 
@@ -593,20 +593,23 @@ export const startCampaign = async (req, res) => {
         console.log("Updated campaignInfo message====>***********************");
         await updateProductPricesInShoify(session, id);
       } else {
+
+        findCampaign.isCampaignStart = true;
+       await findCampaign.save()
         await start(session, id);
         console.log(
           "its startCampaign data",
           findCampaign.campaignStatus == "Active"
         );
         Status = 200;
-        Message = "Start the Campaign Successfully";
+        Message = "Starting the campaign is under process";
         Err = " Looking Good";
       }
     }
   } catch (err) {
     console.log("startCampaign", err);
     Status = 404;
-    Message = "Following Path Not Found";
+    Message = "Serer Error";
     Err = err;
   }
 
@@ -638,17 +641,18 @@ export const stopCampaign = async (req, res) => {
       },
     });
     if (!findCampaign.campaignStatus == "Active") return null;
-
-    await end(session, id);
+    findCampaign.isCampaignStart = true;
+    await findCampaign.save();
+    await end(session, id); 
 
     console.log("its Destroy data");
     Status = 200;
-    Message = "Stop the Campaign Successfully";
+    Message = "stopping the campaign is under process";
     Err = " Looking Good";
   } catch (err) {
     console.log("stopCampaign", err);
     Status = 404;
-    Message = "Following Path Not Found";
+    Message = "Serer Error";
     Err = err;
   }
 
@@ -693,7 +697,7 @@ export const stopAllCampaignAndSetDefaultValues = async (req, res) => {
   } catch (err) {
     console.log("stopAllCampaignAndSetDefaultValues", err);
     Status = 404;
-    Message = "Following Path Not Found";
+    Message = "Serer Error";
     Err = err;
   }
 
@@ -1070,7 +1074,7 @@ export const updateCampaigns = async (req, res) => {
                 Data = [...campaigns];
                 redirect = true;
                 Status = 200;
-                Message = " Campain update Successfully";
+                Message = " Campaign updated Successfully";
                 Err = " Looking Good";
               }
             }
@@ -1079,7 +1083,8 @@ export const updateCampaigns = async (req, res) => {
           Data = null;
           redirect = false;
           Status = 401;
-          Message = "Start Campaign Date or Time must be greater ";
+          Message =
+            "The Started  Date or Time must be greater than today's date or  time";
           Err = "Invalid Date or Time";
         }
       } else {
@@ -1087,21 +1092,21 @@ export const updateCampaigns = async (req, res) => {
         redirect = false;
         Status = 401;
         Message =
-          "End Campaign Date or Time must be less then Start Date or time";
+          "The end Date or Time must be greater than the start Date or Time";
         Err = "Invalid Date or Time";
       }
     } else {
       Data = campaignInfo;
       Status = 200;
       redirect = false;
-      Message = "Number of product in Campaign is exceeded the limit  ";
+      Message = "The number of products in the Campaign is exceeded the limit  ";
       Err = "Products exceeded the limit";
     }
   } catch (err) {
     console.log("updateCampaigns", err);
     redirect = false;
     Status = 404;
-    Message = "Following Path Not Found";
+    Message = "Serer Error";
     Err = err;
   }
 
@@ -1152,7 +1157,7 @@ export const deleteCampaignsById = async (req, res) => {
   } catch (err) {
     console.log("deleteCampaignsById", err);
     Status = 404;
-    Message = "Following Path Not Found";
+    Message = "Serer Error";
     Err = err;
   }
 
@@ -1175,47 +1180,47 @@ export const reSchedulAllJobs = async (req, res) => {
   try {
     let campaign = await db.Campaign.findAll({});
 
-    await Promise.all(
-      campaign.map(async (ele) => {
-        const session = await Shopify.Utils.loadOfflineSession(
-          ele.storeId.split("_").pop()
-        );
+    // await Promise.all(
+    //   campaign.map(async (ele) => {
+    //     const session = await Shopify.Utils.loadOfflineSession(
+    //       ele.storeId.split("_").pop()
+    //     );
 
-        let toDate = new Date();
-        let startDate = new Date(ele.campaignStart);
-        let endDate = new Date(ele.campaignEnd);
+    //     let toDate = new Date();
+    //     let startDate = new Date(ele.campaignStart);
+    //     let endDate = new Date(ele.campaignEnd);
 
-        if (toDate < startDate && ele.campaignStatus == "Scheduled") {
-          console.log("*******reSchedulAllJobs that not Scheduled********");
-          await startJob(session, ele.id, ele.campaignStart);
-          ele.campaignEnd == null
-            ? null
-            : await endJob(session, ele.id, ele.campaignEnd);
-          // await endJob(session, ele.id, ele.campaignEnd);
-        }
+    //     if (toDate < startDate && ele.campaignStatus == "Scheduled") {
+    //       console.log("*******reSchedulAllJobs that not Scheduled********");
+    //       await startJob(session, ele.id, ele.campaignStart);
+    //       ele.campaignEnd == null
+    //         ? null
+    //         : await endJob(session, ele.id, ele.campaignEnd);
+    //       // await endJob(session, ele.id, ele.campaignEnd);
+    //     }
 
-        if (toDate > startDate && ele.campaignStatus == "Scheduled") {
-          console.log("*******Start Campaign that Not Started********");
-          // await endJob(session, ele.id, ele.campaignEnd);
-          ele.campaignEnd == null
-            ? null
-            : await endJob(session, ele.id, ele.campaignEnd);
-          await start(session, ele.id);
-        }
+    //     if (toDate > startDate && ele.campaignStatus == "Scheduled") {
+    //       console.log("*******Start Campaign that Not Started********");
+    //       // await endJob(session, ele.id, ele.campaignEnd);
+    //       ele.campaignEnd == null
+    //         ? null
+    //         : await endJob(session, ele.id, ele.campaignEnd);
+    //       await start(session, ele.id);
+    //     }
 
-        if (toDate > endDate && ele.campaignStatus == "Active") {
-          console.log("*******End Campaign that Not End********");
-          ele.campaignEnd == null ? null : await end(session, ele.id);
-          // await end(session, ele.id);
-        }
+    //     if (toDate > endDate && ele.campaignStatus == "Active") {
+    //       console.log("*******End Campaign that Not End********");
+    //       ele.campaignEnd == null ? null : await end(session, ele.id);
+    //       // await end(session, ele.id);
+    //     }
 
-        if (toDate > endDate && ele.campaignStatus == "Scheduled") {
-          console.log(
-            "*******reScheduled  Not Scheduled Due to Time Out********"
-          );
-        }
-      })
-    );
+    //     if (toDate > endDate && ele.campaignStatus == "Scheduled") {
+    //       console.log(
+    //         "*******reScheduled  Not Scheduled Due to Time Out********"
+    //       );
+    //     }
+    //   })
+    // );
 
     Data = campaign;
     Status = 200;
@@ -1224,7 +1229,7 @@ export const reSchedulAllJobs = async (req, res) => {
   } catch (err) {
     console.log("reSchedulAllJobs Err", err);
     Status = 404;
-    Message = "Following Path Not Found";
+    Message = "Serer Error";
     Err = err;
   }
 };
