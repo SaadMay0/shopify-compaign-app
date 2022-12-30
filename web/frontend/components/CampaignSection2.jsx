@@ -759,15 +759,15 @@ export function CampaignSection2() {
                     value: "schedule_campaign",
                   },
                   {
-                    label: "Schedule campaign without an end date",
+                    label: "Schedule a campaign without an end date",
                     value: "schedule_without_end_date",
                   },
                   {
-                    label: "Start campaign right away  with an end date",
+                    label: "Start the campaign right away  with an end date",
                     value: "with_end_date",
                   },
                   {
-                    label: "Start campaign right away  without an end date",
+                    label: "Start the campaign right away  without an end date",
                     value: "without_end_date",
                   },
                 ]}

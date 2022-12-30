@@ -266,17 +266,17 @@ export const setDefaultProductPricesInShoify = async (session, id) => {
   }
 };
 
-export const setDefaultProductPricesOfAllCampaign = async (session) => {
+export const setDefaultProductPricesOfAllCampaign = async (session, campaign) => {
   try {
-    const campaign = await db.Campaign.findAll({
-      where: {
-        storeId: session.id,
-        campaignStatus: "Active",
-        campaignMessage: "gracefully updated the price in Shopify",
-      },
-    });
+    // const campaign = await db.Campaign.findAll({
+    //   where: {
+    //     storeId: session.id,
+    //     campaignStatus: "Active",
+    //     campaignMessage: "gracefully updated the price in Shopify",
+    //   },
+    // });
 
-    console.log("campaign========>", campaign[0].id);
+    console.log("campaign========>", campaign.length);
 
     if (campaign.length == 0) return false;
 
@@ -293,6 +293,7 @@ export const setDefaultProductPricesOfAllCampaign = async (session) => {
           },
         }
       );
+      // return true;
       for (let ele of items.campaignInfo) {
         console.log(
           "$$$$$$$$$$$$$$ Get Next Collection Of campaign for variants Update $$$$$$$$$$$$$$$$$$$"
@@ -349,7 +350,7 @@ export const setDefaultProductPricesOfAllCampaign = async (session) => {
       "setDefaultProductPricesOfAllCampaign in db DB worke Done !! At StartJob======="
     );
 
-    return true;
+    // return true;
   } catch (err) {
     console.log("Catch Error setDefaultProductPricesOfAllCampaign ", err);
   }

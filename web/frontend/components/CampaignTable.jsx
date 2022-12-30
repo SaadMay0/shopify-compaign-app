@@ -17,6 +17,7 @@ import { useAuthenticatedFetch } from "../hooks";
 import { useNavigate } from "@shopify/app-bridge-react";
 export function CampaignTable({
   tab,
+  defaultButton,
   // setBannerTitle,
   // setBannerStatus,
   // bannerToggleActive,
@@ -27,6 +28,7 @@ export function CampaignTable({
 
   const [isLoading, setIsLoading] = useState(true);
 
+  const [defaultBu, setdefaultBu] = useState(true)
   const [campaigns, setCampaigns] = useState([]);
   // const [preferences, setpreferences] = useState();
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
@@ -119,7 +121,7 @@ export function CampaignTable({
               {ele.isCampaignStart ? "Under processing" : ele.campaignStatus}
             </TextStyle>
           </IndexTable.Cell>
-          <IndexTable.Cell> 
+          <IndexTable.Cell>
             <TextStyle>
               {`${new Date(ele.campaignStart).toLocaleString()}`}
             </TextStyle>
@@ -208,6 +210,18 @@ export function CampaignTable({
 
   // server Request
 
+  // let count = 0;
+
+  // console.log(defaultBu,"Table Page*****", defaultButton);
+
+  // if (defaultBu && defaultButton) {
+  //   console.log("Print on defaultButton true");
+  //   // defaultButton = false;
+  //   count = 1;
+  // }
+  // setdefaultBu(false);
+  // defaultButton = false;
+
   useEffect(() => {
     searchCampainByStatus();
   }, [isLoading]);
@@ -279,17 +293,18 @@ export function CampaignTable({
           console.log(data, "startCampaign ==>");
           if (data.Response.Status == 200) {
             //  setCampaigns(data.Response.Data);
-            // setToastContent(data.Response.Message);
-            // setToastIsError(true);
-            // setToastActive(true);
-            // setIsLoading(true);
+            setToastContent(data.Response.Message);
+            setToastIsError(true);
+            setToastActive(true);
+            setIsLoading(true);
             searchCampainByStatus();
           } else {
             console.log("else part run");
-            // setToastContent(data.Response.Message);
-            // setToastIsError(true);
-            // setToastActive(true);
-            // setIsLoading(true);
+            setToastContent(data.Response.Message);
+            setToastIsError(true);
+            setToastActive(true);
+            setIsLoading(true);
+            searchCampainByStatus();
           }
           setIsLoading(false);
         });
@@ -299,7 +314,7 @@ export function CampaignTable({
   }
 
   async function stopCampaign(id) {
-    try { 
+    try {
       await fetch(`api/campaign/stopCampaign?id=${id}`, {
         method: "GET",
         headers: {
@@ -311,17 +326,18 @@ export function CampaignTable({
           console.log(data, "stopCampaign ==>");
           if (data.Response.Status == 200) {
             //  setCampaigns(data.Response.Data);
-            // setToastContent(data.Response.Message);
-            // setToastIsError(true);
-            // setToastActive(true);
-            // setIsLoading(true);
+            setToastContent(data.Response.Message);
+            setToastIsError(true);
+            setToastActive(true);
+            setIsLoading(true);
             searchCampainByStatus();
           } else {
             console.log("else part run");
-            // setToastContent(data.Response.Message);
-            // setToastIsError(true);
-            // setToastActive(true);
-            // setIsLoading(true);
+            setToastContent(data.Response.Message);
+            setToastIsError(true);
+            setToastActive(true);
+            setIsLoading(true);
+            searchCampainByStatus();
           }
           setIsLoading(false);
         });

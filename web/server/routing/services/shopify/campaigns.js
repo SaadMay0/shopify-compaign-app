@@ -560,11 +560,11 @@ export const getCampaignsByStatus = async (req, res) => {
 
 export const startCampaign = async (req, res) => {
   console.log("===> startCampaign its work ****");
-  res.status(200).send({});
-  let Data = [];
-  let Status;
-  let Message;
-  let Err;
+  // res.status(200).send({});
+  // let Data = [];
+  // let Status;
+  // let Message;
+  // let Err;
   try {
     const { id } = req.query;
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
@@ -579,9 +579,14 @@ export const startCampaign = async (req, res) => {
 
     if (allCampaign.length > 0) {
       console.log(allCampaign.length, "<===Active Campaign Length");
-      Status = 200;
-      Message = "Already have a campaign active"; 
-      Err = " Looking Good";
+      res.status(200).send({
+        Response: {
+          Status : 200,
+          Message : "Already have a campaign active",
+          Err : " Looking Good",
+
+        }
+      })
     } else {
       const findCampaign = await db.Campaign.findOne({
         where: {
@@ -592,26 +597,47 @@ export const startCampaign = async (req, res) => {
       });
       if (findCampaign.campaignMessage == "Updated campaignInfo") {
         console.log("Updated campaignInfo message====>***********************");
+        findCampaign.isCampaignStart = true;
+        await findCampaign.save();
+         res.status(200).send({
+           Response: {
+             Status: 200,
+             // Message : "Starting the campaign is under process",
+             Message: " Campaign start successfully",
+             Err: " Looking Good",
+           },
+         });
         await updateProductPricesInShoify(session, id);
       } else {
         findCampaign.isCampaignStart = true;
         await findCampaign.save();
+
+         res.status(200).send({
+           Response: {
+             
+             Status : 200,
+             // Message : "Starting the campaign is under process",
+             Message : " Campaign start successfully",
+             Err : " Looking Good",
+           },
+         });
+
         await start(session, id);
         console.log(
           "its startCampaign data",
           findCampaign.campaignStatus == "Active"
         );
-        Status = 200;
-        // Message = "Starting the campaign is under process";
-        Message = " Campaign start successfully";
-        Err = " Looking Good"; 
       }
     }
   } catch (err) {
     console.log("startCampaign", err);
-    Status = 404;
-    Message = "Serer Error";
-    Err = err;
+     res.status(200).send({
+       Response: {
+         Status : 404,
+         Message : "Serer Error",
+         Err : err,
+       },
+     });
   }
 
   // res.status(200).send({
@@ -622,16 +648,15 @@ export const startCampaign = async (req, res) => {
   //     Err,
   //   },
   // });
-  
 };
 
 export const stopCampaign = async (req, res) => {
   console.log("===> stopCampaign its work");
-  res.status(200).send({});
-  let Data = [];
-  let Status;
-  let Message;
-  let Err; 
+  // res.status(200).send({});
+  // let Data = [];
+  // let Status;
+  // let Message;
+  // let Err;
   try {
     const { id } = req.query;
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
@@ -644,21 +669,32 @@ export const stopCampaign = async (req, res) => {
       },
     });
     if (!findCampaign.campaignStatus == "Active") return null;
+
     findCampaign.isCampaignStart = true;
     await findCampaign.save();
+
+     res.status(200).send({
+       Response: {
+         Status : 200,
+         // Message : "stopping the campaign is under process",
+         Message : " Campaign end successfully",
+         Err : " Looking Good",
+         
+       },
+     });
 
     await end(session, id);
 
     console.log("its Destroy data");
-    Status = 200;
-    // Message = "stopping the campaign is under process";
-    Message = " Campaign end successfully";
-    Err = " Looking Good";
   } catch (err) {
     console.log("stopCampaign", err);
-    Status = 404;
-    Message = "Serer Error";
-    Err = err;
+     res.status(200).send({
+       Response: {
+         Status : 404,
+         Message : "Serer Error",
+         Err : err,
+       },
+     });
   }
 
   // res.status(200).send({
@@ -673,26 +709,48 @@ export const stopCampaign = async (req, res) => {
 
 export const stopAllCampaignAndSetDefaultValues = async (req, res) => {
   console.log("===> stopAllCampaignAndSetDefaultValues its work");
-  let Data = [];
-  let Status;
-  let Message;
-  let Err;
+  // let Data = [];
+  // let Status;
+  // let Message;
+  // let Err;
   try {
     // const { id } = req.query;
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
 
-    let result = await setDefaultProductPricesOfAllCampaign(session);
+    const campaign = await db.Campaign.findAll({
+      where: {
+        storeId: session.id,
+        campaignStatus: "Active",
+        campaignMessage: "gracefully updated the price in Shopify",
+      },
+    });
 
-    if (result) {
+    
+    if (campaign.length> 0 ) {
       console.log("stopAllCampaignAndSetDefaultValues data");
-      Status = 200;
-      Message = "Your Request is under process it Takes a couple of minutes";
-      Err = " Looking Good";
+      await db.Campaign.update(
+        { isCampaignStart: true },
+        {
+          where: {
+            storeId: session.id,
+            campaignStatus: "Active",
+            campaignMessage: "gracefully updated the price in Shopify",
+          },
+        }
+      );
+      res.status(200).send({
+        Status : 200,
+        Message : "Your Request is under process it Takes a couple of minutes",
+        Err : " Looking Good",
+      });
+       await setDefaultProductPricesOfAllCampaign(session, campaign);
     } else {
       console.log("stopAllCampaignAndSetDefaultValues data");
-      Status = 200;
-      Message = "Already products up to date";
-      Err = " Looking Good";
+      res.status(200).send({
+        Status : 200,
+        Message : " There is not any active Campaign ",
+        Err : " Looking Good",
+      }) 
     }
 
     // console.log("stopAllCampaignAndSetDefaultValues data");
@@ -701,19 +759,21 @@ export const stopAllCampaignAndSetDefaultValues = async (req, res) => {
     // Err = " Looking Good";
   } catch (err) {
     console.log("stopAllCampaignAndSetDefaultValues", err);
-    Status = 404;
-    Message = "Serer Error";
-    Err = err;
+    res.status(200).send({
+      Status : 404,
+      Message : "Serer Error",
+      Err : err,
+    })
   }
 
-  res.status(200).send({
-    Response: {
-      Data,
-      Status,
-      Message,
-      Err,
-    },
-  });
+  // res.status(200).send({
+  //   Response: {
+  //     Data,
+  //     Status,
+  //     Message,
+  //     Err,
+  //   },
+  // });
 };
 
 export const updateCampaigns = async (req, res) => {

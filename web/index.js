@@ -78,7 +78,7 @@ export async function createServer(
     billing: billingSettings,
   });
 
-  // https://1810-110-39-147-226.ngrok.io?shop=saad-checkout-ui-ext.myshopify.com&host=c2FhZC1jaGVja291dC11aS1leHQubXlzaG9waWZ5LmNvbS9hZG1pbg
+  // https://83af-110-39-147-226.ngrok.io?shop=saad-checkout-ui-ext.myshopify.com&host=c2FhZC1jaGVja291dC11aS1leHQubXlzaG9waWZ5LmNvbS9hZG1pbg
   // await new Promise(resolve => setTimeout(resolve, 1000))
   console.log(process.env.HOST);
 
@@ -143,7 +143,7 @@ export async function createServer(
       const embeddedUrl = Shopify.Utils.getEmbeddedAppUrl(req);
 
       return res.redirect(embeddedUrl + req.path);
-    } 
+    }
 
     const htmlFile = join(
       isProd ? PROD_INDEX_PATH : DEV_INDEX_PATH,
