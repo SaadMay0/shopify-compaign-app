@@ -228,7 +228,7 @@ export function CampaignSection() {
 
   const resourceName = {
     singular: "Campaign",
-    plural: "Campaignes",
+    plural: "Campaigns",
   };
 
   const hourSortOptions = [

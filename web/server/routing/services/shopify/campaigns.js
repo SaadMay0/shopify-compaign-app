@@ -457,7 +457,10 @@ export const getCampaigns = async (req, res) => {
   try {
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
     const campaigns = await db.Campaign.findAll({
-      where: { storeId: session.id },
+      order: [["campaignStart", "ASC"]],
+      where: {
+        storeId: session.id,
+      },
     });
     Data = [...campaigns];
     Status = 200;
@@ -527,9 +530,14 @@ export const getCampaignsByStatus = async (req, res) => {
     const session = await Shopify.Utils.loadCurrentSession(req, res, false);
     let campaign;
 
+   let toDate = moment(new Date(), "YYYY-MM-DD hh:mm:ss a").format();
+
     if (tab == "All") {
       campaign = await db.Campaign.findAll({
-        where: { storeId: session.id },
+        order: [["campaignStart", "ASC"]],
+        where: {
+          storeId: session.id,
+        },
       });
     } else {
       campaign = await db.Campaign.findAll({

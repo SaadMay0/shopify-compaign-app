@@ -4,12 +4,20 @@ import {
   TextStyle,
   useIndexResourceState,
   Button,
-  Spinner,
+  // Spinner,
   ButtonGroup,
   Loading,
   Frame,
   Card,
+  Tooltip,
+  Icon,
 } from "@shopify/polaris";
+import {
+  DeleteMajor,
+  EditMajor,
+  PlayMajor,
+  PauseMajor,
+} from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { ToastComponent } from "./Tost";
 // import {PropCampaign} from "./PropCampaign"
@@ -17,7 +25,7 @@ import { useAuthenticatedFetch } from "../hooks";
 import { useNavigate } from "@shopify/app-bridge-react";
 export function CampaignTable({
   tab,
-  defaultButton,
+  // defaultButton,
   // setBannerTitle,
   // setBannerStatus,
   // bannerToggleActive,
@@ -28,7 +36,7 @@ export function CampaignTable({
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const [defaultBu, setdefaultBu] = useState(true);
+  // const [defaultBu, setdefaultBu] = useState(true);
   const [campaigns, setCampaigns] = useState([]);
   // const [preferences, setpreferences] = useState();
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
@@ -58,7 +66,7 @@ export function CampaignTable({
   // const [selectedResourcesState,setSelectedResourcesState] = useState("selectedResources");
 
   const [tableHeaderTitles, setTableHeaderTitles] = useState([
-    { key: "campaignName", title: "Campaignes" },
+    { key: "campaignName", title: "Campaigns" },
     // { key: "campaignOrders", title: "Orders" },
     // { key: "campaignSales", title: "Sales" },
     { key: "campaignStatus", title: "Status" },
@@ -136,72 +144,109 @@ export function CampaignTable({
 
           <IndexTable.Cell>
             {ele.campaignStatus == "Active" ? (
-              <ButtonGroup>
-                <Button
-                  primary
-                  disabled={ele.isCampaignStart}
-                  loading={ele.isCampaignStart}
-                  onClick={(e) => {
-                    e.stopPropagation(e);
-                    setIsLoading(true);
-                    stopCampaign(`${ele.id}`);
-                  }}
-                >
-                  End
-                </Button>
-                <Button
-                  primary
-                  disabled={ele.isCampaignStart}
-                  loading={ele.isCampaignStart}
-                  onClick={(e) => {
-                    e.stopPropagation(e);
-                    setIsLoading(true);
-                    deleteCampaign(`${ele.id}`);
-                  }}
-                >
-                  Delete
-                </Button>
-              </ButtonGroup>
+              <div style={{ width: "200px" }}>
+                <ButtonGroup>
+                  <Tooltip
+                    content="Stop"
+                    dismissOnMouseOut
+                    preferredPosition="above"
+                  >
+                    <Button
+                      destructive
+                      disabled={ele.isCampaignStart}
+                      loading={ele.isCampaignStart}
+                      onClick={(e) => {
+                        e.stopPropagation(e);
+                        setIsLoading(true);
+                        stopCampaign(`${ele.id}`);
+                      }}
+                    >
+                      {/* End */}
+                      <Icon source={PauseMajor} />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip
+                    content="Delete"
+                    dismissOnMouseOut
+                    preferredPosition="above"
+                  >
+                    <Button
+                      destructive
+                      disabled={ele.isCampaignStart}
+                      loading={ele.isCampaignStart}
+                      onClick={(e) => {
+                        e.stopPropagation(e);
+                        setIsLoading(true);
+                        deleteCampaign(`${ele.id}`);
+                      }}
+                    >
+                      <Icon source={DeleteMajor} />
+                      {/* Delete** */}
+                    </Button>
+                  </Tooltip>
+                </ButtonGroup>
+              </div>
             ) : (
-              <ButtonGroup>
-                <Button
-                  primary
-                  disabled={ele.isCampaignStart}
-                  loading={ele.isCampaignStart}
-                  onClick={(e) => {
-                    e.stopPropagation(e);
-                    setIsLoading(true);
-                    startCampaign(`${ele.id}`);
-                  }}
-                >
-                  Start
-                </Button>
-                <Button
-                  primary
-                  disabled={ele.isCampaignStart}
-                  loading={ele.isCampaignStart}
-                  onClick={(e) => {
-                    e.stopPropagation(e);
-                    setIsLoading(true);
-                    navigate(`/campaign?id=${ele.id}`);
-                  }}
-                >
-                  Update
-                </Button>
-                <Button
-                  primary
-                  disabled={ele.isCampaignStart}
-                  loading={ele.isCampaignStart}
-                  onClick={(e) => {
-                    e.stopPropagation(e);
-                    setIsLoading(true);
-                    deleteCampaign(`${ele.id}`);
-                    // cheackStatus();
-                  }}
-                >
-                  Delete
-                </Button>
-              </ButtonGroup>
+              <div style={{ width: "200px" }}>
+                <ButtonGroup>
+                  <Tooltip
+                    content="Start"
+                    dismissOnMouseOut
+                    preferredPosition="above"
+                  >
+                    <Button
+                      primary
+                      disabled={ele.isCampaignStart}
+                      loading={ele.isCampaignStart}
+                      onClick={(e) => {
+                        e.stopPropagation(e);
+                        setIsLoading(true);
+                        startCampaign(`${ele.id}`);
+                      }}
+                    >
+                      {/* Start */}
+                      <Icon source={PlayMajor} />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip
+                    content="Update"
+                    dismissOnMouseOut
+                    preferredPosition="above"
+                  >
+                    <Button
+                      primary
+                      disabled={ele.isCampaignStart}
+                      loading={ele.isCampaignStart}
+                      onClick={(e) => {
+                        e.stopPropagation(e);
+                        setIsLoading(true);
+                        navigate(`/campaign?id=${ele.id}`);
+                      }}
+                    >
+                      {/* Update */}
+                      <Icon source={EditMajor} />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip
+                    content="Delete"
+                    dismissOnMouseOut
+                    preferredPosition="above"
+                  >
+                    <Button
+                      destructive
+                      disabled={ele.isCampaignStart}
+                      loading={ele.isCampaignStart}
+                      onClick={(e) => {
+                        e.stopPropagation(e);
+                        setIsLoading(true);
+                        deleteCampaign(`${ele.id}`);
+                      }}
+                    >
+                      <Icon source={DeleteMajor} />
+                    </Button>
+                  </Tooltip>
+                </ButtonGroup>
+              </div>
             )}
           </IndexTable.Cell>
         </IndexTable.Row>
@@ -237,7 +282,7 @@ export function CampaignTable({
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log(data, "=====cheackStatus>>>");
+          // console.log(data, "=====cheackStatus>>>");
           if (data.Response.Status == 200) {
             // setCampaigns(data.Response.Data);
             searchCampainByStatus();
@@ -247,7 +292,7 @@ export function CampaignTable({
             setIsLoading(true);
           } else {
             searchCampainByStatus();
-            console.log("else part run");
+            // console.log("else part run");
             setToastContent(data.Response.Message);
             setToastIsError(true);
             setToastActive(true);
@@ -273,7 +318,7 @@ export function CampaignTable({
           if (data.Response.Status == 200) {
             setCampaigns(data.Response.Data);
           } else {
-            console.log("else part run");
+            // console.log("else part run");
           }
           setIsLoading(false);
         });
@@ -292,7 +337,7 @@ export function CampaignTable({
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log(data, "all search");
+          // console.log(data, "all search");
           if (data.Response.Status == 200) {
             //  setCampaigns(data.Response.Data);
             // searchCampainByStatus();
@@ -301,7 +346,7 @@ export function CampaignTable({
             setToastActive(true);
             setIsLoading(true);
           } else {
-            console.log("else part run");
+            // console.log("else part run");
             // searchCampainByStatus();
             setToastContent(data.Response.Message);
             setToastIsError(true);
@@ -325,7 +370,7 @@ export function CampaignTable({
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log(data, "startCampaign ==>");
+          // console.log(data, "startCampaign ==>");
           if (data.Response.Status == 200) {
             //  setCampaigns(data.Response.Data);
             searchCampainByStatus();
@@ -335,7 +380,7 @@ export function CampaignTable({
             setIsLoading(true);
             cheackStatus(id);
           } else {
-            console.log("else part run");
+            // console.log("else part run");
             searchCampainByStatus();
             setToastContent(data.Response.Message);
             setToastIsError(true);
@@ -360,7 +405,7 @@ export function CampaignTable({
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log(data, "stopCampaign ==>");
+          // console.log(data, "stopCampaign ==>");
           if (data.Response.Status == 200) {
             //  setCampaigns(data.Response.Data);
             searchCampainByStatus();
@@ -370,7 +415,7 @@ export function CampaignTable({
             setIsLoading(true);
             cheackStatus(id);
           } else {
-            console.log("else part run");
+            // console.log("else part run");
             searchCampainByStatus();
             setToastContent(data.Response.Message);
             setToastIsError(true);
@@ -385,8 +430,6 @@ export function CampaignTable({
     }
   }
 
-
-
   async function setDefaultPrices() {
     try {
       await fetch(`api/campaign/setAllDefaultPrices`, {
@@ -397,7 +440,7 @@ export function CampaignTable({
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log(data, "setDefaultPrices ==>");
+          // console.log(data, "setDefaultPrices ==>");
           if (data.Status == 200) {
             //  setCampaigns(data.Response.Data);
             searchCampainByStatus();
@@ -409,7 +452,7 @@ export function CampaignTable({
             // setDefaultButton(true);
             // searchCampainByStatus(tabs[selected]);
           } else {
-            console.log("else part run");
+            // console.log("else part run");
             searchCampainByStatus();
             setToastContent(data.Message);
             setToastIsError(true);
@@ -431,12 +474,12 @@ export function CampaignTable({
   return (
     <>
       <TitleBar
-        title="Campaignes"
+        title="Campaigns"
         primaryAction={{
           content: "New Campaign",
           onAction: () => {
             navigate("/campaign");
-            console.log("Campaign Button Click");
+            // console.log("Campaign Button Click");
           },
         }}
         secondaryActions={[
@@ -447,7 +490,7 @@ export function CampaignTable({
               setIsLoading(true);
 
               setDefaultPrices();
-              console.log("setDefaultPrices Button Click");
+              // console.log("setDefaultPrices Button Click");
             },
           },
         ]}

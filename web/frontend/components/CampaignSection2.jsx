@@ -71,14 +71,14 @@ export function CampaignSection2() {
   //  ChoiceList State
   const [selected, setSelected] = useState(["schedule_campaign"]);
 
-  console.log(
-    campaignStartDate,
-    campaignStartHour,
-    campaignStartMinute,
-    campaignStartTime,
-    "Start Campaign *******",
-    selected
-  );
+  // console.log(
+  //   campaignStartDate,
+  //   campaignStartHour,
+  //   campaignStartMinute,
+  //   campaignStartTime,
+  //   "Start Campaign *******",
+  //   selected
+  // );
 
   // Banner component States
   const [bannerActive, setBannerActive] = useState(false);
@@ -166,21 +166,21 @@ export function CampaignSection2() {
   // Functions
 
   const handleCampaignPriceChange = (arrayIndex) => (ele) => {
-    console.log(ele, "handleCampaignProductsPriceChange");
+    // console.log(ele, "handleCampaignProductsPriceChange");
     campaignInfo[arrayIndex].campaignCostDiscount = ele;
 
     setCampaignInfo([...campaignInfo]);
   };
 
   const handleCampaignDicountChange = (arrayIndex) => (ele) => {
-    console.log(ele, "handleCampaignProductsDicountChange");
+    // console.log(ele, "handleCampaignProductsDicountChange");
     campaignInfo[arrayIndex].campaignDiscount = ele;
 
     setCampaignInfo([...campaignInfo]);
   };
 
   const handleCampaignVendorsChange = (arrayIndex) => (ele, index) => {
-    console.log(ele, "handleCampaignVendorsChange");
+    // console.log(ele, "handleCampaignVendorsChange");
     campaignInfo[arrayIndex].vendorsSelect = ele;
 
     setCampaignInfo([...campaignInfo]);
@@ -194,7 +194,7 @@ export function CampaignSection2() {
     return (
       <Button
         onClick={(e) => {
-          console.log("buttom", ele.popoverActive);
+          // console.log("buttom", ele.popoverActive);
           campaignInfo[index].popoverActive = !ele.popoverActive;
           setCampaignInfo([...campaignInfo]);
         }}
@@ -251,7 +251,7 @@ export function CampaignSection2() {
           />
         </IndexTable.Cell>
         <IndexTable.Cell>
-          <Button primary onClick={handleSelectionsDelete(index)}>
+          <Button destructive onClick={handleSelectionsDelete(index)}>
             Deleted
           </Button>
         </IndexTable.Cell>
@@ -282,7 +282,7 @@ export function CampaignSection2() {
 
   const resourceName = {
     singular: "Campaign",
-    plural: "Campaignes",
+    plural: "Campaigns",
   };
 
   const hourSortOptions = [
@@ -397,7 +397,7 @@ export function CampaignSection2() {
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log("getCampainInfo ======>", data.Response.Data);
+          // console.log("getCampainInfo ======>", data.Response.Data);
           if (data.Response.Status == 200) {
             setCampaignInfo(data.Response.Data);
           } else {
@@ -449,17 +449,19 @@ export function CampaignSection2() {
             let endyy = endDate.getFullYear();
 
             let startedDate = startDate.toISOString().split("T").shift();
-            console.log(
-              // dd,
-              startDate.toLocaleString().split("/").shift(),
-              "************startDate***********",
-              startdd,
-              startmm,
-              startyy
-            );
+            // console.log(
+            //   // dd,
+            //   startDate.toLocaleString().split("/").shift(),
+            //   "************startDate***********",
+            //   startdd,
+            //   startmm,
+            //   startyy
+            // );
 
             startmm = startmm < 10 ? `0${startmm}` : startmm;
+            startdd = startdd < 10 ? `0${startdd}` : startdd;
             endmm = endmm < 10 ? `0${endmm}` : endmm;
+            enddd = enddd < 10 ? `0${enddd}` : enddd;
 
             let startHour = startDate.getHours();
             let startMinute = startDate.getMinutes();
@@ -475,14 +477,14 @@ export function CampaignSection2() {
             // endHour == 0 ? "12" : endHour;
             let start = `${startyy}-${startmm}-${startdd}`;
             let end = `${endyy}-${endmm}-${enddd}`;
-            console.log(
-              // typeof startHour,
-              `${startyy}-${startmm}-${startdd}`,
-              // startHour == 0 ? "1" : startHour,
-              "************StartDate And EndDate***********",
-              // typeof endHour
-              `${endyy}-${endmm}-${enddd}`,
-            );
+            // console.log(
+            //   // typeof startHour,
+            //   `${startyy}-${startmm}-${startdd}`,
+            //   // startHour == 0 ? "1" : startHour,
+            //   "************StartDate And EndDate***********",
+            //   // typeof endHour
+            //   `${endyy}-${endmm}-${enddd}`,
+            // );
             // setIsLoading(true);
             // *****************************************************
             campaignOption == "schedule_campaign"
@@ -546,7 +548,7 @@ export function CampaignSection2() {
     campaignEndTime,
     selected
   ) {
-    console.log("createCampaign is Work");
+    // console.log("createCampaign is Work");
     try {
       let obj = {
         campaignTitle,
@@ -570,7 +572,7 @@ export function CampaignSection2() {
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log("createCampaign ======>", data.Response.Data);
+          // console.log("createCampaign ======>", data.Response.Data);
           if (data.Response.Status == 200) {
             // setRedirect(data.Response.redirect);
             setResourceInitialSelection(data.Response.Data);
@@ -609,7 +611,7 @@ export function CampaignSection2() {
     campaignEndTime,
     selected
   ) {
-    console.log("updateCampaigns is Work");
+    // console.log("updateCampaigns is Work");
     let id = window.location.search.split("=").pop();
     try {
       let obj = {
@@ -635,7 +637,7 @@ export function CampaignSection2() {
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log("updateCampaigns ======>", data.Response.Data);
+          // console.log("updateCampaigns ======>", data.Response.Data);
           if (data.Response.Status == 200) {
             // setRedirect(data.Response.redirect);
             setCampaignInfo(data.Response.Data);
@@ -677,7 +679,7 @@ export function CampaignSection2() {
           onAction: () => {
             if (campaignTitle && campaignInfo) {
               setIsLoading(true);
-              console.log("Passss");
+              // console.log("Passss");
               isLoading
                 ? null
                 : updateCampaign
@@ -749,7 +751,7 @@ export function CampaignSection2() {
                 type="text"
                 value={campaignTitle}
                 onChange={handleCampaignTitleTextChange}
-                helpText="Only you will See this Name or Title"
+                helpText="Only you will see this Name or Title"
                 autoComplete="text"
               />
             </Card>
@@ -758,7 +760,7 @@ export function CampaignSection2() {
           <Layout.Section>
             <Card sectioned>
               <ChoiceList
-                title="When does the campaign start or Stop"
+                title="When does the campaign start or stop"
                 choices={[
                   {
                     label: "Schedule campaign",
@@ -826,7 +828,7 @@ export function CampaignSection2() {
                   setResourceState(true);
                 }}
               >
-                Select Campaign Products
+                Select campaign products
               </Button>
               {isLoading ? (
                 <div style={{ padding: "5% 50%" }}>
@@ -842,7 +844,7 @@ export function CampaignSection2() {
                     { title: "Vendors" },
                     { title: "Cost Discount" },
                     { title: "Price Discount" },
-                    { title: "Actions" },
+                    { title: "Action" },
                   ]}
                   selectable={false}
                 >
@@ -877,7 +879,7 @@ export function CampaignSection2() {
             content: "Save",
             onAction: () => {
               if (campaignTitle && campaignInfo) {
-                console.log("Passss");
+                // console.log("Passss");
                 setIsLoading(true);
                 isLoading
                   ? null

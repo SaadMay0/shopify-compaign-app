@@ -160,7 +160,7 @@ export default function HomePage() {
   return (
     <>
       {/* <TitleBar
-        title="Campaignes"
+        title="Campaigns"
         primaryAction={{
           content: "New Campaign",
           onAction: () => {
