@@ -357,21 +357,21 @@ export const newCampaigns = async (req, res) => {
           if (ProductExistes.length >= 1) {
             Data = campaignInfo;
             redirect = false;
-            Status = 200;
+            Status = 405;
             Message = "Some products are exist in Active Campaign";
             Err = " Looking Good";
           } else {
             if (ProductExistes2.length >= 1) {
               Data = campaignInfo;
               redirect = false;
-              Status = 200;
+              Status = 405;
               Message = "Already have a campaign with same Products or Time";
               Err = " Looking Good";
             } else {
               if (uniqueArr.size < allProductsOfThisCampaignInfo.length) {
                 Data = campaignInfo;
                 redirect = false;
-                Status = 200;
+                Status = 405;
                 Message = "some products are repeated in this campaign";
                 Err = " Looking Good";
               } else {
@@ -408,7 +408,7 @@ export const newCampaigns = async (req, res) => {
           }
         } else {
           Data = null;
-          Status = 401;
+          Status = 405;
           redirect = false;
           Message =
             "The Started  Date or Time must be greater than today's date or  time";
@@ -416,7 +416,7 @@ export const newCampaigns = async (req, res) => {
         }
       } else {
         Data = null;
-        Status = 401;
+        Status = 405;
         redirect = false;
         Message =
           "The end Date or Time must be greater than the start Date or Time";
@@ -424,7 +424,7 @@ export const newCampaigns = async (req, res) => {
       }
     } else {
       Data = campaignInfo;
-      Status = 200;
+      Status = 405;
       redirect = false;
       Message = "The number of products in the Campaign exceeded the limit.";
       Err = "Products exceeded the limit";
@@ -581,7 +581,7 @@ export const startCampaign = async (req, res) => {
       console.log(allCampaign.length, "<===Active Campaign Length");
       res.status(200).send({
         Response: {
-          Status : 200,
+          Status : 405,
           Message : "Already have a campaign active",
           Err : " Looking Good",
 
@@ -608,21 +608,22 @@ export const startCampaign = async (req, res) => {
            },
          });
         await updateProductPricesInShoify(session, id);
+        res.redirect("/campaign/cheackStatus");
       } else {
         findCampaign.isCampaignStart = true;
         await findCampaign.save();
 
-         res.status(200).send({
-           Response: {
-             
-             Status : 200,
-             // Message : "Starting the campaign is under process",
-             Message : " Campaign start successfully",
-             Err : " Looking Good",
-           },
-         });
+        res.status(200).send({
+          Response: {
+            Status: 200,
+            // Message : "Starting the campaign is under process",
+            Message: " Campaign start successfully",
+            Err: " Looking Good",
+          },
+        });
 
         await start(session, id);
+        // res.redirect("/api/campaign/cheackStatus");
         console.log(
           "its startCampaign data",
           findCampaign.campaignStatus == "Active"
@@ -721,24 +722,31 @@ export const stopAllCampaignAndSetDefaultValues = async (req, res) => {
       where: {
         storeId: session.id,
         campaignStatus: "Active",
-        campaignMessage: "gracefully updated the price in Shopify",
+        // campaignMessage: "gracefully updated the price in Shopify",
       },
     });
 
     
     if (campaign.length> 0 ) {
       console.log("stopAllCampaignAndSetDefaultValues data");
-      await db.Campaign.update(
-        { isCampaignStart: true },
+      let result = await db.Campaign.findOne(
+       
         {
           where: {
             storeId: session.id,
             campaignStatus: "Active",
-            campaignMessage: "gracefully updated the price in Shopify",
+            // campaignMessage: "gracefully updated the price in Shopify",
           },
         }
       );
+
+      result.isCampaignStart = true
+      await result.save();
+
+
+      console.log(result.id,"<======={{{{{{{}}}}}}}}}}}}");
       res.status(200).send({
+        Data: result.id,
         Status : 200,
         Message : "Your Request is under process it Takes a couple of minutes",
         Err : " Looking Good",
@@ -1094,7 +1102,7 @@ export const updateCampaigns = async (req, res) => {
           if (ProductExistes.length >= 1) {
             Data = campaignInfo;
             redirect = false;
-            Status = 200;
+            Status = 405;
             Message = "Some products are exist in Active campaign";
             Err = " Looking Good";
           } else {
@@ -1107,14 +1115,14 @@ export const updateCampaigns = async (req, res) => {
             if (ProductExistes2.length >= 1) {
               Data = campaignInfo;
               redirect = false;
-              Status = 200;
+              Status = 405;
               Message = "Already have a campaign with some Products and time";
               Err = " Looking Good";
             } else {
               if (uniqueArr.size < allProductsOfThisCampaignInfo.length) {
                 Data = campaignInfo;
                 redirect = false;
-                Status = 200;
+                Status = 405;
                 Message = "some products are repeated in this campaign";
                 Err = " Looking Good";
               } else {
@@ -1147,7 +1155,7 @@ export const updateCampaigns = async (req, res) => {
         } else {
           Data = null;
           redirect = false;
-          Status = 401;
+          Status = 405;
           Message =
             "The Started  Date or Time must be greater than today's date or  time";
           Err = "Invalid Date or Time";
@@ -1155,14 +1163,14 @@ export const updateCampaigns = async (req, res) => {
       } else {
         Data = null;
         redirect = false;
-        Status = 401;
+        Status = 405;
         Message =
           "The end Date or Time must be greater than the start Date or Time";
         Err = "Invalid Date or Time";
       }
     } else {
       Data = campaignInfo;
-      Status = 200;
+      Status = 405;
       redirect = false;
       Message =
         "The number of products in the Campaign is exceeded the limit  ";
@@ -1298,4 +1306,103 @@ export const reSchedulAllJobs = async (req, res) => {
     Message = "Serer Error";
     Err = err;
   }
+};
+
+export const cheackStatus = async (req, res) => {
+  console.log("===> cheackStatus its work******************&&&&&&&&&&&&&&&&&&&&");
+  // let Data = [];
+  // let Status;
+  // let Message;
+  // let Err;
+  try {
+    const { id } = req.query;
+    const session = await Shopify.Utils.loadCurrentSession(req, res, false);
+
+
+    async function cheackStatus(session, id) {
+
+      let result = false
+      
+        const findCampaign = await db.Campaign.findOne({
+          where: { storeId: session.id, id: id },
+        });
+        if (findCampaign.isCampaignStart) {
+          // Do something with the result
+          console.log(findCampaign.isCampaignStart, "*******Result ********");
+        } else {
+          console.log(
+            findCampaign.isCampaignStart,
+            "*******Result == False ********"
+          );
+          result = true
+        }
+      
+      return result;
+    }
+
+
+    const intervalId = setInterval(async() => {
+      // Check the condition here
+      
+      let condition = await cheackStatus(session, id); 
+      if (condition) {
+        // Clear the interval if the condition is met
+        clearInterval(intervalId);
+
+          res.status(200).send({
+            Response: {
+              // Data,
+              Status:200,
+              Message:"Update Campaign Status successfully ",
+              Err:"Loocking Good",
+            },
+          });
+        // Perform any additional actions if the condition is met
+        return;
+      }
+      // Do something else if the condition is not met
+      console.log("&&&&&&&&&&&&Interval not cleared&&&&&&&&&&&");
+    }, 5000); // Check every 1 second
+
+    // This line will not be executed until the interval is cleared
+    console.log(
+      "********************Interval cleared****************",
+      // intervalId
+    ); 
+
+
+
+
+
+    // console.log("##########################################");
+
+    // console.log("its Destroy data");
+    // Data = "findCampaign";
+    // Status = 200;
+    // Message = "Update Campaign Sta Successfully";
+    // Err = " Looking Good";
+  }
+   catch (err) {
+    console.log("cheackStatus", err);
+      res.status(200).send({
+        Response: {
+          // Data,
+          Status:404,
+          Message:"Server Error",
+          Err:err,
+        },
+      });
+    // Status = 404;
+    // Message = "Serer Error";
+    // Err = err;
+  }
+
+  // res.status(200).send({
+  //   Response: {
+  //     Data,
+  //     Status,
+  //     Message,
+  //     Err,
+  //   },
+  // });
 };

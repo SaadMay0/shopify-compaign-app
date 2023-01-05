@@ -10,7 +10,7 @@ import {
   Frame,
   Card,
 } from "@shopify/polaris";
-
+import { TitleBar } from "@shopify/app-bridge-react";
 import { ToastComponent } from "./Tost";
 // import {PropCampaign} from "./PropCampaign"
 import { useAuthenticatedFetch } from "../hooks";
@@ -28,7 +28,7 @@ export function CampaignTable({
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const [defaultBu, setdefaultBu] = useState(true)
+  const [defaultBu, setdefaultBu] = useState(true);
   const [campaigns, setCampaigns] = useState([]);
   // const [preferences, setpreferences] = useState();
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
@@ -64,7 +64,7 @@ export function CampaignTable({
     { key: "campaignStatus", title: "Status" },
     { key: "campaignStart", title: "Start" },
     { key: "campaignEnd", title: "End" },
-    { key: "Actiones", title: "Actiones" },
+    { key: "Action", title: "Action" },
   ]);
 
   const resourceName = {
@@ -196,6 +196,7 @@ export function CampaignTable({
                     e.stopPropagation(e);
                     setIsLoading(true);
                     deleteCampaign(`${ele.id}`);
+                    // cheackStatus();
                   }}
                 >
                   Delete
@@ -225,6 +226,39 @@ export function CampaignTable({
   useEffect(() => {
     searchCampainByStatus();
   }, [isLoading]);
+
+  async function cheackStatus(id) {
+    try {
+      await fetch(`api/campaign/cheackStatus?id=${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data, "=====cheackStatus>>>");
+          if (data.Response.Status == 200) {
+            // setCampaigns(data.Response.Data);
+            searchCampainByStatus();
+            setToastContent(data.Response.Message);
+            setToastIsError(false);
+            setToastActive(true);
+            setIsLoading(true);
+          } else {
+            searchCampainByStatus();
+            console.log("else part run");
+            setToastContent(data.Response.Message);
+            setToastIsError(true);
+            setToastActive(true);
+            setIsLoading(true);
+          }
+          // setIsLoading(false);
+        });
+    } catch (error) {
+      console.log(`${error}`);
+    }
+  }
 
   async function searchCampainByStatus() {
     try {
@@ -261,13 +295,14 @@ export function CampaignTable({
           console.log(data, "all search");
           if (data.Response.Status == 200) {
             //  setCampaigns(data.Response.Data);
+            // searchCampainByStatus();
             setToastContent(data.Response.Message);
-            setToastIsError(true);
+            setToastIsError(false);
             setToastActive(true);
             setIsLoading(true);
-            searchCampainByStatus();
           } else {
             console.log("else part run");
+            // searchCampainByStatus();
             setToastContent(data.Response.Message);
             setToastIsError(true);
             setToastActive(true);
@@ -293,18 +328,20 @@ export function CampaignTable({
           console.log(data, "startCampaign ==>");
           if (data.Response.Status == 200) {
             //  setCampaigns(data.Response.Data);
+            searchCampainByStatus();
             setToastContent(data.Response.Message);
-            setToastIsError(true);
+            setToastIsError(false);
             setToastActive(true);
             setIsLoading(true);
-            searchCampainByStatus();
+            cheackStatus(id);
           } else {
             console.log("else part run");
+            searchCampainByStatus();
             setToastContent(data.Response.Message);
             setToastIsError(true);
             setToastActive(true);
             setIsLoading(true);
-            searchCampainByStatus();
+            cheackStatus(id);
           }
           setIsLoading(false);
         });
@@ -326,18 +363,20 @@ export function CampaignTable({
           console.log(data, "stopCampaign ==>");
           if (data.Response.Status == 200) {
             //  setCampaigns(data.Response.Data);
+            searchCampainByStatus();
             setToastContent(data.Response.Message);
-            setToastIsError(true);
+            setToastIsError(false);
             setToastActive(true);
             setIsLoading(true);
-            searchCampainByStatus();
+            cheackStatus(id);
           } else {
             console.log("else part run");
+            searchCampainByStatus();
             setToastContent(data.Response.Message);
             setToastIsError(true);
             setToastActive(true);
             setIsLoading(true);
-            searchCampainByStatus();
+            cheackStatus(id);
           }
           setIsLoading(false);
         });
@@ -346,8 +385,73 @@ export function CampaignTable({
     }
   }
 
+
+
+  async function setDefaultPrices() {
+    try {
+      await fetch(`api/campaign/setAllDefaultPrices`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data, "setDefaultPrices ==>");
+          if (data.Status == 200) {
+            //  setCampaigns(data.Response.Data);
+            searchCampainByStatus();
+            setToastContent(data.Message);
+            setToastIsError(false);
+            setToastActive(true);
+            setIsLoading(true);
+            cheackStatus(data.Data);
+            // setDefaultButton(true);
+            // searchCampainByStatus(tabs[selected]);
+          } else {
+            console.log("else part run");
+            searchCampainByStatus();
+            setToastContent(data.Message);
+            setToastIsError(true);
+            setToastActive(true);
+            setIsLoading(true);
+            cheackStatus(id);
+            // setDefaultButton(true);
+          }
+          setIsLoading(false);
+          // navigate("/");
+          // setSelected(0);
+        });
+    } catch (error) {
+      console.log(`${error}`);
+    }
+    setIsLoading(false);
+  }
+
   return (
     <>
+      <TitleBar
+        title="Campaignes"
+        primaryAction={{
+          content: "New Campaign",
+          onAction: () => {
+            navigate("/campaign");
+            console.log("Campaign Button Click");
+          },
+        }}
+        secondaryActions={[
+          {
+            content: "Set Default Prices",
+
+            onAction: () => {
+              setIsLoading(true);
+
+              setDefaultPrices();
+              console.log("setDefaultPrices Button Click");
+            },
+          },
+        ]}
+      />
       {isLoading ? (
         <div style={{ height: "1px" }}>
           <Frame>

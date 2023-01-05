@@ -1,6 +1,7 @@
 import { ResourcePicker } from "@shopify/app-bridge-react";
 
 import { useState, useCallback, useEffect } from "react";
+// import WebSocket from "ws";
 
 import {
   Page,
@@ -457,6 +458,9 @@ export function CampaignSection2() {
               startyy
             );
 
+            startmm = startmm < 10 ? `0${startmm}` : startmm;
+            endmm = endmm < 10 ? `0${endmm}` : endmm;
+
             let startHour = startDate.getHours();
             let startMinute = startDate.getMinutes();
             let startTime = Number(startHour) < 12 ? "AM" : "PM";
@@ -472,10 +476,12 @@ export function CampaignSection2() {
             let start = `${startyy}-${startmm}-${startdd}`;
             let end = `${endyy}-${endmm}-${enddd}`;
             console.log(
-              typeof startHour,
+              // typeof startHour,
+              `${startyy}-${startmm}-${startdd}`,
               // startHour == 0 ? "1" : startHour,
               "************StartDate And EndDate***********",
-              typeof endHour
+              // typeof endHour
+              `${endyy}-${endmm}-${enddd}`,
             );
             // setIsLoading(true);
             // *****************************************************
@@ -571,7 +577,7 @@ export function CampaignSection2() {
             setCampaignInfo(data.Response.Data);
             setCampaignInfo(data.Response.Data);
             setToastContent(data.Response.Message);
-            setToastIsError(true);
+            setToastIsError(false);
             setToastActive(true);
 
             setTimeout(() => {
@@ -634,7 +640,7 @@ export function CampaignSection2() {
             // setRedirect(data.Response.redirect);
             setCampaignInfo(data.Response.Data);
             setToastContent(data.Response.Message);
-            setToastIsError(true);
+            setToastIsError(false);
             setToastActive(true);
             setIsLoading(true);
 

@@ -8,7 +8,7 @@ import {
   Frame,
   Loading,
 } from "@shopify/polaris";
-import { TitleBar } from "@shopify/app-bridge-react";
+// import { TitleBar } from "@shopify/app-bridge-react";
 import {ToastComponent, BannerComponent, CampaignTable } from "../components";
 
 import { useAuthenticatedFetch } from "../hooks";
@@ -120,46 +120,46 @@ export default function HomePage() {
   //    }
   //  }
 
-  async function setDefaultPrices() {
-    try {
-      await fetch(`api/campaign/setAllDefaultPrices`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json;charset=UTF-8",
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data, "stopCampaign ==>");
-          if (data.Status == 200) {
-            //  setCampaigns(data.Response.Data);
-            setToastContent(data.Message);
-            setToastIsError(false);
-            setToastActive(true);
-            setIsLoading(true);
-            setDefaultButton(true);
-            // searchCampainByStatus(tabs[selected]);
-          } else {
-            console.log("else part run");
-            setToastContent(data.Message);
-            setToastIsError(false);
-            setToastActive(true);
-            setIsLoading(true);
-            setDefaultButton(true);
-          }
-          setIsLoading(false);
-          // navigate("/");
-          // setSelected(0);
-        });
-    } catch (error) {
-      console.log(`${error}`);
-    }
-    setIsLoading(false);
-  }
+  // async function setDefaultPrices() {
+  //   try {
+  //     await fetch(`api/campaign/setAllDefaultPrices`, {
+  //       method: "GET",
+  //       headers: {
+  //         "Content-Type": "application/json;charset=UTF-8",
+  //       },
+  //     })
+  //       .then((response) => response.json())
+  //       .then((data) => {
+  //         console.log(data, "stopCampaign ==>");
+  //         if (data.Status == 200) {
+  //           //  setCampaigns(data.Response.Data);
+  //           setToastContent(data.Message);
+  //           setToastIsError(false);
+  //           setToastActive(true);
+  //           setIsLoading(true);
+  //           setDefaultButton(true);
+  //           // searchCampainByStatus(tabs[selected]);
+  //         } else {
+  //           console.log("else part run");
+  //           setToastContent(data.Message);
+  //           setToastIsError(false);
+  //           setToastActive(true);
+  //           setIsLoading(true);
+  //           setDefaultButton(true);
+  //         }
+  //         setIsLoading(false);
+  //         // navigate("/");
+  //         // setSelected(0);
+  //       });
+  //   } catch (error) {
+  //     console.log(`${error}`);
+  //   }
+  //   setIsLoading(false);
+  // }
 
   return (
     <>
-      <TitleBar
+      {/* <TitleBar
         title="Campaignes"
         primaryAction={{
           content: "New Campaign",
@@ -180,7 +180,7 @@ export default function HomePage() {
             },
           },
         ]}
-      />
+      /> */}
 
       <Page>
         {isLoading ? (

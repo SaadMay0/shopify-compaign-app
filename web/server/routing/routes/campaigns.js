@@ -11,6 +11,7 @@ import {
   startCampaign,
   stopCampaign,
   stopAllCampaignAndSetDefaultValues,
+  cheackStatus,
 } from "../services/shopify/campaigns.js";
 import "colors";
 const router = express.Router();
@@ -22,6 +23,7 @@ router.get("/reSchedulAllJobs", reSchedulAllJobs);
 router.get("/startCampaign", startCampaign);
 router.get("/stopCampaign", stopCampaign);
 router.get("/setAllDefaultPrices", stopAllCampaignAndSetDefaultValues);
+router.get("/cheackStatus", cheackStatus);
 // POST
 
 router.post("/CampaignInfo", getCampaignInfo);

@@ -2,6 +2,8 @@ import { getCollectionProducts } from "../../../../shopify/rest_api/collection.j
 import { getProductVariantByGraphql } from "../../../../shopify/graphql_api/queryies/products.js";
 import { variantsUpdate } from "../../../../shopify/graphql_api/mutations/products.js";
 import db from "../../../../db/models/postgres/index.js";
+ 
+
 
 export const getCollectionProductsArr = async (session, id) => {
   try {
@@ -48,7 +50,7 @@ export const getCollectionProductsArr = async (session, id) => {
   } catch (err) {
     console.log("getCollectionProductsArr Error ", err);
   }
-};
+}; 
 
 export const updateCampaignInfoArr = async (session, id) => {
   try {
@@ -198,7 +200,7 @@ export const setDefaultProductPricesInShoify = async (session, id) => {
       where: {
         storeId: session.id,
         id,
-        campaignMessage: "gracefully updated the price in Shopify",
+        // campaignMessage: "gracefully updated the price in Shopify",
         campaignStatus: "Active",
       },
       defaults: {},
@@ -282,17 +284,17 @@ export const setDefaultProductPricesOfAllCampaign = async (session, campaign) =>
 
     for (let items of campaign) {
       console.log("********** Get Next Campaign *********");
-      await db.Campaign.update(
-        {
-          isCampaignStart: true,
-        },
-        {
-          where: {
-            storeId: items.storeId,
-            id: items.id,
-          },
-        }
-      );
+      // await db.Campaign.update(
+      //   {
+      //     isCampaignStart: true,
+      //   },
+      //   {
+      //     where: {
+      //       storeId: items.storeId,
+      //       id: items.id,
+      //     },
+      //   }
+      // );
       // return true;
       for (let ele of items.campaignInfo) {
         console.log(
@@ -321,15 +323,15 @@ export const setDefaultProductPricesOfAllCampaign = async (session, campaign) =>
           console.log(
             "Result of setDefaultProductPricesOfAllCampaign is ======>>>>",
             result,
-            ele,
+            // ele,
             ele.id,
             ele.storeId
           );
 
-          console.log("Updated campaign status");
         }
       }
-
+      
+      console.log("******#######Updated campaign status******#######");
       await db.Campaign.update(
         {
           campaignStatus: "Expired",
@@ -340,7 +342,7 @@ export const setDefaultProductPricesOfAllCampaign = async (session, campaign) =>
           where: {
             storeId: items.storeId,
             id: items.id,
-            campaignMessage: "gracefully updated the price in Shopify",
+            // campaignMessage: "gracefully updated the price in Shopify",
             campaignStatus: "Active",
           },
         }
